@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SilentTalk.Domain.Common;
 using SilentTalk.Domain.Entities;
@@ -5,9 +6,9 @@ using SilentTalk.Domain.Entities;
 namespace SilentTalk.Infrastructure.Data;
 
 /// <summary>
-/// Main database context for SilentTalk application
+/// Main database context for SilentTalk application with ASP.NET Identity support
 /// </summary>
-public class ApplicationDbContext : DbContext
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
