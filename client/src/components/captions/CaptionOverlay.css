@@ -1,0 +1,149 @@
+/**
+ * Caption Overlay Styles
+ * FR-004: Caption positioning and styling
+ */
+
+.caption-overlay {
+  position: absolute;
+  z-index: 1000;
+  pointer-events: none;
+  padding: 16px;
+  max-width: 80%;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Position classes */
+.caption-overlay--top-left {
+  top: 0;
+  left: 0;
+}
+
+.caption-overlay--top-center {
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.caption-overlay--top-right {
+  top: 0;
+  right: 0;
+}
+
+.caption-overlay--bottom-left {
+  bottom: 0;
+  left: 0;
+}
+
+.caption-overlay--bottom-center {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.caption-overlay--bottom-right {
+  bottom: 0;
+  right: 0;
+}
+
+/* Caption content */
+.caption-overlay__content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+}
+
+.caption-overlay__text {
+  font-weight: 600;
+  line-height: 1.4;
+  flex: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.caption-overlay__confidence {
+  font-size: 0.85em;
+  opacity: 0.8;
+  font-weight: 500;
+  white-space: nowrap;
+  padding: 2px 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+/* Font size classes */
+.caption-overlay--font-small .caption-overlay__text {
+  font-size: 16px;
+}
+
+.caption-overlay--font-medium .caption-overlay__text {
+  font-size: 20px;
+}
+
+.caption-overlay--font-large .caption-overlay__text {
+  font-size: 28px;
+}
+
+.caption-overlay--font-extra-large .caption-overlay__text {
+  font-size: 36px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .caption-overlay {
+    max-width: 90%;
+    padding: 12px;
+  }
+
+  .caption-overlay__content {
+    padding: 10px 16px;
+  }
+
+  .caption-overlay--font-small .caption-overlay__text {
+    font-size: 14px;
+  }
+
+  .caption-overlay--font-medium .caption-overlay__text {
+    font-size: 18px;
+  }
+
+  .caption-overlay--font-large .caption-overlay__text {
+    font-size: 24px;
+  }
+
+  .caption-overlay--font-extra-large .caption-overlay__text {
+    font-size: 30px;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .caption-overlay__content {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .caption-overlay {
+    animation: none;
+  }
+
+  .caption-overlay__content {
+    transition: none;
+  }
+}
