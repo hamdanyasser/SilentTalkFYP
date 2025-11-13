@@ -1,0 +1,158 @@
+version: '3.8'
+
+services:
+  # SQL Server Database
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: silenttalk-sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=YourStrong@Passw0rd
+      - MSSQL_PID=Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    networks:
+      - silenttalk-network
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P 'YourStrong@Passw0rd' -Q 'SELECT 1'
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL Database (alternative to SQL Server)
+  postgres:
+    image: postgres:16-alpine
+    container_name: silenttalk-postgres
+    environment:
+      - POSTGRES_USER=silenttalk
+      - POSTGRES_PASSWORD=silenttalk_password
+      - POSTGRES_DB=silenttalk_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - silenttalk-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U silenttalk"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    profiles:
+      - postgres  # Only run if explicitly specified
+
+  # MongoDB for messages and logs
+  mongodb:
+    image: mongo:7.0
+    container_name: silenttalk-mongodb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin_password
+      - MONGO_INITDB_DATABASE=silenttalk
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - silenttalk-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/silenttalk --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for caching
+  redis:
+    image: redis:7.2-alpine
+    container_name: silenttalk-redis
+    command: redis-server --requirepass redis_password
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - silenttalk-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: silenttalk-backend
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=SilentTalkDb;User Id=SA;Password=YourStrong@Passw0rd;TrustServerCertificate=True;
+      - ConnectionStrings__Redis=redis:6379,password=redis_password
+      - ConnectionStrings__MongoDB=mongodb://admin:admin_password@mongodb:27017/silenttalk?authSource=admin
+      - JwtSettings__SecretKey=YourSuperSecretKeyThatIsAtLeast32CharactersLong!2024
+    ports:
+      - "5001:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - silenttalk-network
+    volumes:
+      - ./backend:/app
+      - /app/bin
+      - /app/obj
+    profiles:
+      - backend
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: silenttalk-frontend
+    environment:
+      - VITE_API_URL=http://localhost:5001/api
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - silenttalk-network
+    profiles:
+      - frontend
+
+  # ML Service
+  ml-service:
+    build:
+      context: ./ml-service
+      dockerfile: Dockerfile
+    container_name: silenttalk-ml
+    environment:
+      - ALLOWED_ORIGINS=http://localhost:5173,https://localhost:5001
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./ml-service:/app
+      - ml_models:/app/models
+    networks:
+      - silenttalk-network
+    profiles:
+      - ml
+
+networks:
+  silenttalk-network:
+    driver: bridge
+
+volumes:
+  sqlserver_data:
+  postgres_data:
+  mongodb_data:
+  redis_data:
+  ml_models:

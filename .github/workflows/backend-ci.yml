@@ -1,0 +1,74 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-ci.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'backend/**'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore dependencies
+      working-directory: ./backend
+      run: dotnet restore
+
+    - name: Build
+      working-directory: ./backend
+      run: dotnet build --no-restore --configuration Release
+
+    - name: Run unit tests
+      working-directory: ./backend
+      run: dotnet test tests/SilentTalk.UnitTests --no-build --configuration Release --verbosity normal --collect:"XPlat Code Coverage"
+
+    - name: Run integration tests
+      working-directory: ./backend
+      run: dotnet test tests/SilentTalk.IntegrationTests --no-build --configuration Release --verbosity normal
+
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        directory: ./backend
+        flags: backend
+        name: backend-coverage
+
+    - name: Publish
+      working-directory: ./backend
+      run: dotnet publish src/SilentTalk.Api/SilentTalk.Api.csproj --configuration Release --output ./publish
+
+    - name: Build Docker image
+      working-directory: ./backend
+      run: docker build -t silenttalk/backend:latest .
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Install dotnet format
+      run: dotnet tool install -g dotnet-format
+
+    - name: Run linter
+      working-directory: ./backend
+      run: dotnet format --verify-no-changes --verbosity diagnostic
