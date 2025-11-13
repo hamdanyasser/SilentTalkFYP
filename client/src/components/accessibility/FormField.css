@@ -1,0 +1,184 @@
+/**
+ * Accessible Form Field Styles
+ * WCAG 2.1 AA Form Guidelines
+ */
+
+.form-field {
+  margin-bottom: 20px;
+}
+
+.form-field__label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.form-field__label.required::after {
+  content: " *";
+  color: #d32f2f;
+}
+
+.form-field__required {
+  color: #d32f2f;
+  margin-left: 4px;
+}
+
+.form-field__helper {
+  margin: 4px 0 6px 0;
+  font-size: 13px;
+  color: #666;
+  line-height: 1.4;
+}
+
+.form-field__input,
+.form-field__textarea,
+.form-field__select {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #1a1a1a;
+  background: #fff;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-field__input:hover,
+.form-field__textarea:hover,
+.form-field__select:hover {
+  border-color: #999;
+}
+
+.form-field__input:focus,
+.form-field__textarea:focus,
+.form-field__select:focus {
+  outline: none;
+  border-color: #0066cc;
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}
+
+.form-field__textarea {
+  min-height: 100px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.form-field__select {
+  cursor: pointer;
+  padding-right: 36px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  appearance: none;
+}
+
+/* Error state */
+.form-field--error .form-field__label {
+  color: #d32f2f;
+}
+
+.form-field__input--error,
+.form-field__textarea--error,
+.form-field__select--error {
+  border-color: #d32f2f;
+}
+
+.form-field__input--error:focus,
+.form-field__textarea--error:focus,
+.form-field__select--error:focus {
+  border-color: #d32f2f;
+  box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1);
+}
+
+.form-field__error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 8px 12px;
+  background: #ffebee;
+  border-left: 4px solid #d32f2f;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #b71c1c;
+  font-weight: 500;
+}
+
+.form-field__error-icon {
+  flex-shrink: 0;
+  font-size: 16px;
+}
+
+/* Disabled state */
+.form-field__input:disabled,
+.form-field__textarea:disabled,
+.form-field__select:disabled {
+  background: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* High contrast mode */
+:root.high-contrast .form-field__label {
+  color: var(--color-text);
+}
+
+:root.high-contrast .form-field__helper {
+  color: var(--color-text-secondary);
+}
+
+:root.high-contrast .form-field__input,
+:root.high-contrast .form-field__textarea,
+:root.high-contrast .form-field__select {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+:root.high-contrast .form-field__input:focus,
+:root.high-contrast .form-field__textarea:focus,
+:root.high-contrast .form-field__select:focus {
+  border-color: var(--color-focus);
+  box-shadow: 0 0 0 3px rgba(77, 158, 255, 0.3);
+}
+
+:root.high-contrast .form-field__error {
+  background: var(--color-surface);
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+/* Reduced motion */
+:root.reduce-motion .form-field__input,
+:root.reduce-motion .form-field__textarea,
+:root.reduce-motion .form-field__select,
+@media (prefers-reduced-motion: reduce) {
+  .form-field__input,
+  .form-field__textarea,
+  .form-field__select {
+    transition: none;
+  }
+}
+
+/* Focus visible enhancement */
+:root.enhanced-focus .form-field__input:focus-visible,
+:root.enhanced-focus .form-field__textarea:focus-visible,
+:root.enhanced-focus .form-field__select:focus-visible {
+  outline: 3px solid #0066cc;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px rgba(0, 102, 204, 0.2);
+}
+
+/* Mobile responsive */
+@media screen and (max-width: 768px) {
+  .form-field__input,
+  .form-field__textarea,
+  .form-field__select {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+}

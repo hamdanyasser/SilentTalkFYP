@@ -1,0 +1,476 @@
+/**
+ * Global Accessibility Styles
+ * WCAG 2.1 AA Implementation (NFR-006)
+ */
+
+/* ================================
+   Screen Reader Only
+   ================================ */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.sr-only-focusable:focus,
+.sr-only-focusable:active {
+  position: static;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* ================================
+   Focus Indicators (WCAG 2.4.7)
+   ================================ */
+
+/* Default focus style for all interactive elements */
+:root.show-focus *:focus {
+  outline: 2px solid #0066cc;
+  outline-offset: 2px;
+}
+
+:root.show-focus *:focus:not(:focus-visible) {
+  outline: none;
+}
+
+:root.show-focus *:focus-visible {
+  outline: 2px solid #0066cc;
+  outline-offset: 2px;
+}
+
+/* Enhanced focus indicators */
+:root.enhanced-focus *:focus-visible {
+  outline: 3px solid #0066cc;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px rgba(0, 102, 204, 0.2);
+}
+
+/* Skip link focus */
+.skip-link:focus {
+  outline: 3px solid #0066cc;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px rgba(0, 102, 204, 0.3);
+}
+
+/* ================================
+   High Contrast Mode (WCAG 1.4.3, 1.4.6)
+   ================================ */
+
+:root.high-contrast {
+  /* High contrast color palette */
+  --color-background: #000000;
+  --color-surface: #1a1a1a;
+  --color-text: #ffffff;
+  --color-text-secondary: #e0e0e0;
+  --color-primary: #4d9eff;
+  --color-primary-hover: #80b3ff;
+  --color-secondary: #ff9d4d;
+  --color-success: #4dff9d;
+  --color-error: #ff4d4d;
+  --color-warning: #ffd24d;
+  --color-border: #4d4d4d;
+  --color-focus: #4d9eff;
+}
+
+:root.high-contrast body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+
+:root.high-contrast button,
+:root.high-contrast .video-call-page__button,
+:root.high-contrast .caption-settings__button {
+  border: 2px solid var(--color-border);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
+
+:root.high-contrast button:hover,
+:root.high-contrast .video-call-page__button:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary);
+  color: var(--color-background);
+}
+
+:root.high-contrast input,
+:root.high-contrast select,
+:root.high-contrast textarea {
+  border: 2px solid var(--color-border);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
+
+:root.high-contrast a {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+:root.high-contrast a:hover {
+  color: var(--color-primary-hover);
+}
+
+/* High contrast focus */
+:root.high-contrast *:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+/* ================================
+   Reduced Motion (WCAG 2.3.3)
+   ================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+:root.reduce-motion *,
+:root.reduce-motion *::before,
+:root.reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* ================================
+   Touch Targets (WCAG 2.5.5)
+   Minimum 44x44px
+   ================================ */
+
+button,
+a,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+[role="button"],
+[role="link"] {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ensure padding for text */
+button,
+a,
+[role="button"] {
+  padding: 8px 16px;
+}
+
+/* Icon-only buttons */
+button[aria-label]:empty,
+[role="button"][aria-label]:empty {
+  width: 44px;
+  height: 44px;
+  padding: 8px;
+}
+
+/* ================================
+   Font Sizing (WCAG 1.4.4)
+   Support up to 200% zoom
+   ================================ */
+
+:root {
+  font-size: 16px;
+}
+
+:root[data-font-size="large"] {
+  font-size: 18px;
+}
+
+:root[data-font-size="extra-large"] {
+  font-size: 20px;
+}
+
+/* Use relative units */
+body {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+h1 {
+  font-size: 2rem;
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: 1.5rem;
+  line-height: 1.3;
+}
+
+h3 {
+  font-size: 1.25rem;
+  line-height: 1.4;
+}
+
+/* Ensure content reflows at 200% zoom */
+@media screen and (min-width: 1280px) {
+  .container {
+    max-width: 90%;
+  }
+}
+
+/* ================================
+   Skip Links (WCAG 2.4.1)
+   ================================ */
+
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #000;
+  color: #fff;
+  padding: 8px 16px;
+  text-decoration: none;
+  z-index: 10000;
+  font-weight: bold;
+  border-radius: 0 0 4px 0;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+.skip-links {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10000;
+}
+
+/* ================================
+   Form Accessibility
+   ================================ */
+
+/* Required field indicator */
+.required::after {
+  content: " *";
+  color: #d32f2f;
+  font-weight: bold;
+}
+
+/* Error messages */
+.error-message {
+  color: #d32f2f;
+  font-size: 0.875rem;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.error-message::before {
+  content: "⚠️";
+}
+
+/* Invalid fields */
+input:invalid,
+select:invalid,
+textarea:invalid {
+  border-color: #d32f2f;
+}
+
+input:invalid:focus,
+select:invalid:focus,
+textarea:invalid:focus {
+  outline-color: #d32f2f;
+  box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.2);
+}
+
+/* Valid fields (when explicitly marked) */
+input.valid,
+select.valid,
+textarea.valid {
+  border-color: #4caf50;
+}
+
+/* Form labels */
+label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+/* Helper text */
+.helper-text {
+  font-size: 0.875rem;
+  color: #666;
+  margin-top: 4px;
+}
+
+:root.high-contrast .helper-text {
+  color: var(--color-text-secondary);
+}
+
+/* ================================
+   Color Contrast (WCAG 1.4.3)
+   Minimum 4.5:1 for normal text
+   Minimum 3:1 for large text
+   ================================ */
+
+/* Ensure sufficient contrast for all text */
+body {
+  color: #1a1a1a;
+  background: #ffffff;
+}
+
+/* Links */
+a {
+  color: #0066cc;
+}
+
+a:hover {
+  color: #0052a3;
+}
+
+/* Buttons */
+button,
+.button {
+  background: #0066cc;
+  color: #ffffff;
+  border: none;
+}
+
+button:hover,
+.button:hover {
+  background: #0052a3;
+}
+
+/* Secondary buttons */
+button.secondary,
+.button.secondary {
+  background: #6c757d;
+  color: #ffffff;
+}
+
+/* Disabled state */
+button:disabled,
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ================================
+   Keyboard Navigation Indicators
+   ================================ */
+
+/* Current/selected item */
+[aria-current="page"],
+[aria-current="step"],
+[aria-current="location"] {
+  font-weight: bold;
+  border-left: 4px solid #0066cc;
+  padding-left: 12px;
+}
+
+/* Pressed state */
+[aria-pressed="true"] {
+  background: #0066cc;
+  color: #fff;
+}
+
+/* Expanded state */
+[aria-expanded="true"]::after {
+  content: " ▼";
+}
+
+[aria-expanded="false"]::after {
+  content: " ▶";
+}
+
+/* ================================
+   Loading States (Accessibility)
+   ================================ */
+
+.loading-spinner {
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-top-color: #0066cc;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Loading state for buttons */
+button.loading {
+  position: relative;
+  color: transparent;
+}
+
+button.loading::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  top: 50%;
+  left: 50%;
+  margin-left: -8px;
+  margin-top: -8px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+/* ================================
+   Responsive Text Sizing
+   ================================ */
+
+@media screen and (max-width: 768px) {
+  :root {
+    font-size: 14px;
+  }
+
+  :root[data-font-size="large"] {
+    font-size: 16px;
+  }
+
+  :root[data-font-size="extra-large"] {
+    font-size: 18px;
+  }
+}
+
+/* ================================
+   Print Accessibility
+   ================================ */
+
+@media print {
+  .skip-link,
+  .skip-links,
+  nav,
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    color: #000;
+    background: #fff;
+  }
+
+  a::after {
+    content: " (" attr(href) ")";
+  }
+}

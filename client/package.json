@@ -13,7 +13,10 @@
     "type-check": "tsc --noEmit",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "a11y:test": "node scripts/a11y-test.mjs",
+    "a11y:audit": "node scripts/a11y-audit.mjs",
+    "lighthouse": "node scripts/lighthouse-ci.mjs"
   },
   "dependencies": {
     "@radix-ui/react-alert-dialog": "^1.0.5",
@@ -33,6 +36,7 @@
     "simple-peer": "^9.11.1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.8.3",
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",
     "@types/simple-peer": "^9.11.8",
@@ -40,11 +44,15 @@
     "@typescript-eslint/parser": "^6.18.1",
     "@vitejs/plugin-react": "^4.2.1",
     "@vitest/ui": "^1.1.3",
+    "axe-core": "^4.8.3",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
+    "lighthouse": "^11.4.0",
+    "playwright": "^1.40.1",
     "prettier": "^3.1.1",
     "sass": "^1.69.7",
     "typescript": "^5.3.3",
