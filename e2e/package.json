@@ -1,0 +1,49 @@
+{
+  "name": "silenttalk-e2e-tests",
+  "version": "1.0.0",
+  "description": "End-to-end tests for SilentTalk FYP using Playwright",
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:report": "playwright show-report",
+    "test:e2e:trace": "playwright show-trace",
+    "test:auth": "playwright test 01-auth-flow",
+    "test:video": "playwright test 02-video-call-flow",
+    "test:recognition": "playwright test 03-sign-recognition",
+    "test:forum": "playwright test 04-forum-flow",
+    "test:library": "playwright test 05-library-flow",
+    "test:acceptance": "playwright test 06-acceptance-criteria",
+    "test:chromium": "playwright test --project=chromium",
+    "test:firefox": "playwright test --project=firefox",
+    "test:webkit": "playwright test --project=webkit",
+    "test:mobile": "playwright test --project='Mobile Chrome' --project='Mobile Safari'",
+    "codegen": "playwright codegen http://localhost:3000",
+    "install:browsers": "playwright install --with-deps",
+    "clean": "rm -rf test-results playwright-report"
+  },
+  "keywords": [
+    "e2e",
+    "playwright",
+    "testing",
+    "silenttalk",
+    "accessibility",
+    "wcag"
+  ],
+  "author": "SilentTalk Team",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.10.0",
+    "dotenv": "^16.3.1",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "axe-core": "^4.8.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
