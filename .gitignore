@@ -1,17 +1,56 @@
-# .NET / ASP.NET Core
-*.suo
+# ============================================
+# MONOREPO ROOT .gitignore
+# SilentsTalk - Sign Language Platform
+# ============================================
+
+# ============================================
+# Operating System Files
+# ============================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ============================================
+# IDE / Editor Files
+# ============================================
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-workspace
+*.sublime-project
+.vs/
+.history/
+
+# ============================================
+# .NET / C# / ASP.NET Core (server/)
+# ============================================
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
 *.user
 *.userosscache
-*.sln.docstates
+*.suo
 *.userprefs
-bin/
-obj/
-.vs/
 *.cache
 *.dll
 *.exe
 *.pdb
-*.log
 *.vspscc
 *.vssscc
 .builds
@@ -21,37 +60,54 @@ obj/
 _ReSharper*/
 *.[Rr]e[Ss]harper
 *.DotSettings.user
-.idea/
-*.sln.iml
-
-# .NET Core
 project.lock.json
 project.fragment.lock.json
 artifacts/
 **/Properties/launchSettings.json
+*.dbmdl
+*.jfm
+*.pfx
+*.publishsettings
 
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt
 
-# Node / React / Frontend
+# StyleCop
+StyleCopReport.xml
+
+# ============================================
+# Node.js / React / Frontend (client/)
+# ============================================
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.pnp
-.pnp.js
-coverage/
-build/
-dist/
-.DS_Store
+lerna-debug.log*
+.pnpm-debug.log*
+.npm
+.eslintcache
+.node_repl_history
+*.tgz
+.yarn-integrity
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+.cache
+.parcel-cache
+.next
+out
+build
+dist
 *.tsbuildinfo
+.turbo
+coverage/
+.nyc_output
 
-# Python / Machine Learning
+# ============================================
+# Python / ML Service (ml-service/)
+# ============================================
 __pycache__/
 *.py[cod]
 *$py.class
@@ -60,77 +116,81 @@ __pycache__/
 env/
 venv/
 ENV/
+env.bak/
+venv.bak/
 .venv
 pip-log.txt
 pip-delete-this-directory.txt
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+*.cover
+*.log
 .pytest_cache/
+.hypothesis/
+.pytype/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+*.egg
 *.egg-info/
+dist/
+build/
+*.manifest
+*.spec
+*.mo
+*.pot
+instance/
+.webassets-cache
+.scrapy
+celerybeat-schedule
+celerybeat.pid
+*.sage.py
 .ipynb_checkpoints
+profile_default/
+ipython_config.py
+
+# ML Models & Data
 *.h5
 *.pb
 *.ckpt
 *.pkl
 *.joblib
-models/checkpoints/
-datasets/raw/
-datasets/processed/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# Machine Learning specific
 *.weights
 *.model
 *.caffemodel
 *.onnx
+*.pt
+*.pth
+models/checkpoints/
+datasets/raw/
+datasets/processed/
 wandb/
 mlruns/
 *.tfrecord
 
-# Database
+# ============================================
+# Database Files
+# ============================================
 *.db
 *.sqlite
 *.sqlite3
 *.mdf
 *.ldf
+*.bak
 
-# IDEs
-.vscode/
-.vs/
-*.swp
-*.swo
-*~
-.project
-.classpath
-.settings/
-*.sublime-workspace
-*.sublime-project
+# ============================================
+# Docker & Infrastructure
+# ============================================
+.dockerignore
+docker-compose.override.yml
+.docker/
 
-# OS
-Thumbs.db
-.DS_Store
-Desktop.ini
-$RECYCLE.BIN/
-
-# Azure
-*.pubxml
-*.PublishSettings
-local.settings.json
-__blobstorage__
-__queuestorage__
-__azurite_db*__
-
-# Secrets and credentials
-appsettings.Development.json
-secrets.json
-*.pfx
-*.p12
-*.key
-*.pem
-credentials.json
-.env.secret
-
+# ============================================
 # Logs
+# ============================================
 logs/
 *.log
 npm-debug.log*
@@ -138,26 +198,72 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
-# Testing
+# ============================================
+# Test Coverage & Reports
+# ============================================
 coverage/
 *.coverage
-.nyc_output/
 test-results/
 TestResults/
+BenchmarkDotNet.Artifacts/
 
-# Documentation build
-docs/_build/
-site/
+# ============================================
+# Secrets & Credentials
+# ============================================
+secrets/
+*.secret
+*.pem
+*.key
+credentials.json
+.env.secret
+appsettings.Development.json
+local.settings.json
+__blobstorage__/
+__queuestorage__/
+__azurite_db*__/
 
-# Temporary files
+# ============================================
+# Temporary Files
+# ============================================
 tmp/
 temp/
 *.tmp
 *.bak
 *.swp
+.~lock.*
 
-# Package files
+# ============================================
+# Package Files
+# ============================================
 *.nupkg
 *.snupkg
 packages/
 paket-files/
+
+# ============================================
+# ELK Stack Data
+# ============================================
+elasticsearch-data/
+logstash-data/
+kibana-data/
+
+# ============================================
+# MinIO Data
+# ============================================
+minio-data/
+
+# ============================================
+# Redis Data
+# ============================================
+redis-data/
+
+# ============================================
+# MongoDB Data
+# ============================================
+mongodb-data/
+
+# ============================================
+# SQL Data
+# ============================================
+sqlserver-data/
+postgres-data/

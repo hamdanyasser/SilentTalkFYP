@@ -1,0 +1,105 @@
+# ============================================
+# EditorConfig - Consistent coding styles
+# https://editorconfig.org
+# ============================================
+root = true
+
+# ============================================
+# All Files
+# ============================================
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+# ============================================
+# Markdown
+# ============================================
+[*.md]
+trim_trailing_whitespace = false
+max_line_length = 100
+
+# ============================================
+# C# Files (server/)
+# ============================================
+[*.cs]
+indent_size = 4
+max_line_length = 120
+
+# C# Coding Conventions
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+csharp_indent_case_contents = true
+csharp_indent_switch_labels = true
+csharp_space_after_cast = false
+csharp_space_after_keywords_in_control_flow_statements = true
+csharp_prefer_braces = true:warning
+csharp_prefer_simple_using_statement = true:suggestion
+
+# Naming conventions
+dotnet_naming_rule.interfaces_should_be_prefixed_with_i.severity = warning
+dotnet_naming_rule.interfaces_should_be_prefixed_with_i.symbols = interface
+dotnet_naming_rule.interfaces_should_be_prefixed_with_i.style = begins_with_i
+
+dotnet_naming_symbols.interface.applicable_kinds = interface
+dotnet_naming_symbols.interface.applicable_accessibilities = public, internal, private, protected, protected_internal
+
+dotnet_naming_style.begins_with_i.required_prefix = I
+dotnet_naming_style.begins_with_i.capitalization = pascal_case
+
+# ============================================
+# JavaScript/TypeScript Files (client/)
+# ============================================
+[*.{js,jsx,ts,tsx}]
+indent_size = 2
+max_line_length = 100
+quote_type = single
+
+# ============================================
+# Python Files (ml-service/)
+# ============================================
+[*.py]
+indent_size = 4
+max_line_length = 120
+
+# ============================================
+# JSON Files
+# ============================================
+[*.json]
+indent_size = 2
+
+# ============================================
+# YAML Files
+# ============================================
+[*.{yml,yaml}]
+indent_size = 2
+
+# ============================================
+# XML/Config Files
+# ============================================
+[*.{csproj,props,targets,xml,config}]
+indent_size = 2
+
+# ============================================
+# Shell Scripts
+# ============================================
+[*.sh]
+indent_size = 2
+end_of_line = lf
+
+# ============================================
+# Docker Files
+# ============================================
+[Dockerfile*]
+indent_size = 2
+
+# ============================================
+# Makefile
+# ============================================
+[Makefile]
+indent_style = tab

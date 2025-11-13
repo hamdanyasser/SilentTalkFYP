@@ -1,0 +1,377 @@
+version: '3.8'
+
+# ============================================
+# SilentsTalk Platform - Development Stack
+# ============================================
+# Services: PostgreSQL, MongoDB, Redis, Elasticsearch, Logstash, Kibana, MinIO, Coturn
+# Application: Server (ASP.NET Core), Client (React), ML Service (FastAPI)
+# ============================================
+
+networks:
+  silents-talk-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+
+volumes:
+  postgres-data:
+  mongodb-data:
+  redis-data:
+  elasticsearch-data:
+  minio-data:
+  coturn-data:
+
+services:
+  # ============================================
+  # DATABASE: PostgreSQL 16
+  # ============================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: silents-talk-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: silentstalk
+      POSTGRES_PASSWORD: silentstalk_dev_password
+      POSTGRES_DB: silentstalk_db
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ../../server/config/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    networks:
+      - silents-talk-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U silentstalk -d silentstalk_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    labels:
+      com.silentstalk.service: "database"
+      com.silentstalk.description: "PostgreSQL database for structured data"
+
+  # ============================================
+  # DATABASE: MongoDB 7.0
+  # ============================================
+  mongodb:
+    image: mongo:7.0
+    container_name: silents-talk-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin_dev_password
+      MONGO_INITDB_DATABASE: silentstalk
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+      - ../../server/config/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - silents-talk-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/silentstalk --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    labels:
+      com.silentstalk.service: "nosql-database"
+      com.silentstalk.description: "MongoDB for messages and flexible data"
+
+  # ============================================
+  # CACHE: Redis 7.2
+  # ============================================
+  redis:
+    image: redis:7.2-alpine
+    container_name: silents-talk-redis
+    restart: unless-stopped
+    command: redis-server --requirepass redis_dev_password --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - silents-talk-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    labels:
+      com.silentstalk.service: "cache"
+      com.silentstalk.description: "Redis for caching and session management"
+
+  # ============================================
+  # LOGGING: Elasticsearch
+  # ============================================
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: silents-talk-elasticsearch
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - xpack.security.enabled=false
+      - xpack.security.enrollment.enabled=false
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    networks:
+      - silents-talk-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    labels:
+      com.silentstalk.service: "logging"
+      com.silentstalk.description: "Elasticsearch for log storage"
+
+  # ============================================
+  # LOGGING: Logstash
+  # ============================================
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.11.0
+    container_name: silents-talk-logstash
+    restart: unless-stopped
+    environment:
+      - LS_JAVA_OPTS=-Xmx256m -Xms256m
+    ports:
+      - "5000:5000/tcp"
+      - "5000:5000/udp"
+      - "9600:9600"
+    volumes:
+      - ./config/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+    networks:
+      - silents-talk-network
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    labels:
+      com.silentstalk.service: "logging"
+      com.silentstalk.description: "Logstash for log processing"
+
+  # ============================================
+  # LOGGING: Kibana
+  # ============================================
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    container_name: silents-talk-kibana
+    restart: unless-stopped
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    networks:
+      - silents-talk-network
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5601/api/status || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    labels:
+      com.silentstalk.service: "logging"
+      com.silentstalk.description: "Kibana for log visualization"
+
+  # ============================================
+  # STORAGE: MinIO (S3-compatible)
+  # ============================================
+  minio:
+    image: minio/minio:latest
+    container_name: silents-talk-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+    networks:
+      - silents-talk-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+      start_period: 30s
+    labels:
+      com.silentstalk.service: "storage"
+      com.silentstalk.description: "MinIO S3-compatible object storage"
+
+  # MinIO Client - Create initial buckets
+  minio-init:
+    image: minio/mc:latest
+    container_name: silents-talk-minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    networks:
+      - silents-talk-network
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set myminio http://minio:9000 minioadmin minioadmin123;
+      mc mb myminio/videos --ignore-existing;
+      mc mb myminio/profiles --ignore-existing;
+      mc mb myminio/resources --ignore-existing;
+      mc mb myminio/recordings --ignore-existing;
+      mc anonymous set download myminio/resources;
+      echo 'MinIO buckets created successfully';
+      "
+    labels:
+      com.silentstalk.service: "storage-init"
+      com.silentstalk.description: "Initialize MinIO buckets"
+
+  # ============================================
+  # WEBRTC: Coturn (TURN/STUN Server)
+  # ============================================
+  coturn:
+    image: coturn/coturn:latest
+    container_name: silents-talk-coturn
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - coturn-data:/var/lib/coturn
+      - ./config/coturn/turnserver.conf:/etc/coturn/turnserver.conf:ro
+    labels:
+      com.silentstalk.service: "webrtc"
+      com.silentstalk.description: "Coturn TURN/STUN server for WebRTC"
+    # Note: Uses host network for proper NAT traversal
+
+  # ============================================
+  # APPLICATION: Backend Server (ASP.NET Core 8)
+  # ============================================
+  server:
+    build:
+      context: ../../server
+      dockerfile: Dockerfile
+      target: development
+    container_name: silents-talk-server
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=silentstalk_db;Username=silentstalk;Password=silentstalk_dev_password
+      - ConnectionStrings__MongoDB=mongodb://admin:admin_dev_password@mongodb:27017/silentstalk?authSource=admin
+      - ConnectionStrings__Redis=redis:6379,password=redis_dev_password
+      - JwtSettings__SecretKey=SuperSecretKeyForDevelopmentOnly_ChangeInProduction_32CharactersMinimum
+      - JwtSettings__Issuer=SilentsTalkAPI
+      - JwtSettings__Audience=SilentsTalkClient
+      - JwtSettings__ExpirationMinutes=60
+      - Storage__Provider=MinIO
+      - Storage__MinIO__Endpoint=minio:9000
+      - Storage__MinIO__AccessKey=minioadmin
+      - Storage__MinIO__SecretKey=minioadmin123
+      - Storage__MinIO__UseSSL=false
+      - Logging__LogLevel__Default=Information
+      - Logging__LogLevel__Microsoft=Warning
+      - Logging__Elasticsearch__Enabled=true
+      - Logging__Elasticsearch__Url=http://elasticsearch:9200
+    ports:
+      - "5000:5000"
+    volumes:
+      - ../../server:/app
+      - /app/bin
+      - /app/obj
+    networks:
+      - silents-talk-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      com.silentstalk.service: "backend"
+      com.silentstalk.description: "ASP.NET Core 8 API Server"
+
+  # ============================================
+  # APPLICATION: Frontend Client (React 18)
+  # ============================================
+  client:
+    build:
+      context: ../../client
+      dockerfile: Dockerfile
+      target: development
+    container_name: silents-talk-client
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://localhost:5000
+      - VITE_WS_URL=ws://localhost:5000
+      - VITE_ML_SERVICE_URL=http://localhost:8000
+      - VITE_TURN_SERVER=turn:localhost:3478
+      - VITE_STUN_SERVER=stun:localhost:3478
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../../client:/app
+      - /app/node_modules
+    networks:
+      - silents-talk-network
+    depends_on:
+      - server
+    stdin_open: true
+    tty: true
+    labels:
+      com.silentstalk.service: "frontend"
+      com.silentstalk.description: "React 18 Frontend Application"
+
+  # ============================================
+  # APPLICATION: ML Service (FastAPI)
+  # ============================================
+  ml-service:
+    build:
+      context: ../../ml-service
+      dockerfile: Dockerfile
+      target: development
+    container_name: silents-talk-ml
+    restart: unless-stopped
+    environment:
+      - PYTHONUNBUFFERED=1
+      - ENVIRONMENT=development
+      - LOG_LEVEL=INFO
+      - REDIS_URL=redis://:redis_dev_password@redis:6379/0
+      - MODEL_PATH=/app/models
+      - ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5000
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../../ml-service:/app
+      - ../../ml-service/models:/app/models
+    networks:
+      - silents-talk-network
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    labels:
+      com.silentstalk.service: "ml"
+      com.silentstalk.description: "FastAPI ML Service with MediaPipe"
