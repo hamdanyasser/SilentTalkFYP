@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import HomePage from './pages/HomePage'
 import VideoCallPage from './pages/VideoCallPage'
+import DesignSystem from './pages/DesignSystem'
 import { SkipLinks, AccessibilityPanel } from './components/accessibility'
 import { SkipLink } from './types/accessibility'
 
@@ -19,6 +20,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/call" element={<VideoCallPage />} />
+        <Route path="/design-system" element={<DesignSystem />} />
         <Route path="/health" element={<HealthPage />} />
       </Routes>
       <AccessibilityPanel

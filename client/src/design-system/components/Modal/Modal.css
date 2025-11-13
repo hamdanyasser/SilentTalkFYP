@@ -1,0 +1,263 @@
+@import '../../tokens.css';
+
+/* ============================================================================ */
+/* BACKDROP */
+/* ============================================================================ */
+.ds-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--z-modal);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-4);
+
+  background-color: var(--color-bg-overlay);
+  backdrop-filter: blur(4px);
+
+  animation: ds-modal-backdrop-fade-in var(--transition-base) var(--easing-out);
+}
+
+@keyframes ds-modal-backdrop-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ============================================================================ */
+/* MODAL CONTAINER */
+/* ============================================================================ */
+.ds-modal {
+  position: relative;
+  width: 100%;
+  max-height: calc(100vh - var(--spacing-8));
+
+  display: flex;
+  flex-direction: column;
+
+  background-color: var(--color-bg-primary);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-2xl);
+
+  animation: ds-modal-scale-in var(--transition-slow) var(--easing-out);
+  overflow: hidden;
+}
+
+@keyframes ds-modal-scale-in {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Focus on modal */
+.ds-modal:focus {
+  outline: none;
+}
+
+/* ============================================================================ */
+/* MODAL SIZES */
+/* ============================================================================ */
+.ds-modal--sm {
+  max-width: 400px;
+}
+
+.ds-modal--md {
+  max-width: 600px;
+}
+
+.ds-modal--lg {
+  max-width: 800px;
+}
+
+.ds-modal--xl {
+  max-width: 1000px;
+}
+
+.ds-modal--full {
+  max-width: calc(100vw - var(--spacing-8));
+  max-height: calc(100vh - var(--spacing-8));
+}
+
+/* ============================================================================ */
+/* CLOSE BUTTON */
+/* ============================================================================ */
+.ds-modal__close {
+  position: absolute;
+  top: var(--spacing-4);
+  right: var(--spacing-4);
+  z-index: 1;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: var(--size-touch-target);
+  height: var(--size-touch-target);
+
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  border-radius: var(--radius-md);
+
+  transition: all var(--transition-base) var(--easing-in-out);
+}
+
+.ds-modal__close:hover {
+  background-color: var(--color-interactive-hover);
+  color: var(--color-text-primary);
+}
+
+.ds-modal__close:active {
+  background-color: var(--color-interactive-active);
+}
+
+.ds-modal__close:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+:root.enhanced-focus .ds-modal__close:focus-visible {
+  outline-width: 3px;
+  box-shadow: var(--shadow-focus);
+}
+
+/* ============================================================================ */
+/* MODAL CONTENT */
+/* ============================================================================ */
+.ds-modal__content {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  max-height: 100%;
+}
+
+/* ============================================================================ */
+/* MODAL HEADER */
+/* ============================================================================ */
+.ds-modal__header {
+  padding: var(--spacing-6);
+  padding-right: calc(var(--size-touch-target) + var(--spacing-6));
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.ds-modal__header h1,
+.ds-modal__header h2,
+.ds-modal__header h3,
+.ds-modal__header h4,
+.ds-modal__header h5,
+.ds-modal__header h6 {
+  margin: 0;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.ds-modal__header h2 {
+  font-size: var(--font-size-2xl);
+  line-height: var(--line-height-tight);
+}
+
+/* ============================================================================ */
+/* MODAL BODY */
+/* ============================================================================ */
+.ds-modal__body {
+  padding: var(--spacing-6);
+  flex: 1;
+  overflow-y: auto;
+}
+
+.ds-modal__body p {
+  margin: 0 0 var(--spacing-4) 0;
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+}
+
+.ds-modal__body p:last-child {
+  margin-bottom: 0;
+}
+
+/* ============================================================================ */
+/* MODAL FOOTER */
+/* ============================================================================ */
+.ds-modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-3);
+  padding: var(--spacing-6);
+  border-top: 1px solid var(--color-border-light);
+}
+
+/* ============================================================================ */
+/* RESPONSIVE */
+/* ============================================================================ */
+@media (max-width: 640px) {
+  .ds-modal-backdrop {
+    padding: 0;
+  }
+
+  .ds-modal {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 0;
+    min-height: 100vh;
+  }
+
+  .ds-modal__header,
+  .ds-modal__body,
+  .ds-modal__footer {
+    padding: var(--spacing-4);
+  }
+
+  .ds-modal__footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ds-modal__footer > * {
+    width: 100%;
+  }
+}
+
+/* ============================================================================ */
+/* REDUCE MOTION */
+/* ============================================================================ */
+:root.reduce-motion .ds-modal-backdrop,
+:root.reduce-motion .ds-modal,
+@media (prefers-reduced-motion: reduce) {
+  .ds-modal-backdrop,
+  .ds-modal {
+    animation-duration: 0.01ms;
+  }
+}
+
+/* ============================================================================ */
+/* HIGH CONTRAST */
+/* ============================================================================ */
+:root.high-contrast .ds-modal {
+  border: 2px solid var(--color-border-default);
+}
+
+:root.high-contrast .ds-modal__header,
+:root.high-contrast .ds-modal__footer {
+  border-color: var(--color-border-default);
+}
+
+:root.high-contrast .ds-modal__close {
+  border: 1px solid var(--color-border-default);
+}

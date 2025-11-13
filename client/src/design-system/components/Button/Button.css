@@ -1,0 +1,333 @@
+@import '../../tokens.css';
+
+/* ============================================================================ */
+/* BASE BUTTON */
+/* ============================================================================ */
+.ds-button {
+  /* Reset */
+  margin: 0;
+  border: none;
+  background: none;
+  font-family: inherit;
+  cursor: pointer;
+  user-select: none;
+
+  /* Layout */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  position: relative;
+
+  /* Typography */
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+  text-decoration: none;
+  white-space: nowrap;
+
+  /* Visual */
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base) var(--easing-in-out);
+
+  /* Accessibility - Touch target minimum */
+  min-height: var(--size-touch-target);
+  min-width: var(--size-touch-target);
+}
+
+.ds-button:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+  box-shadow: var(--shadow-focus);
+}
+
+:root.enhanced-focus .ds-button:focus-visible {
+  outline-width: 3px;
+  outline-offset: 3px;
+}
+
+.ds-button:disabled,
+.ds-button[aria-disabled='true'] {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ============================================================================ */
+/* SIZES */
+/* ============================================================================ */
+.ds-button--sm {
+  padding: var(--spacing-2) var(--spacing-3);
+  font-size: var(--font-size-sm);
+  min-height: var(--size-touch-target);
+}
+
+.ds-button--md {
+  padding: var(--spacing-3) var(--spacing-4);
+  font-size: var(--font-size-base);
+  min-height: var(--size-touch-target);
+}
+
+.ds-button--lg {
+  padding: var(--spacing-4) var(--spacing-6);
+  font-size: var(--font-size-lg);
+  min-height: calc(var(--size-touch-target) + var(--spacing-2));
+}
+
+/* ============================================================================ */
+/* FULL WIDTH */
+/* ============================================================================ */
+.ds-button--full-width {
+  width: 100%;
+}
+
+/* ============================================================================ */
+/* VARIANTS */
+/* ============================================================================ */
+
+/* Primary */
+.ds-button--primary {
+  background-color: var(--color-blue-600);
+  color: var(--color-white);
+  border: 2px solid transparent;
+}
+
+.ds-button--primary:hover:not(:disabled):not([aria-disabled='true']) {
+  background-color: var(--color-blue-700);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.ds-button--primary:active:not(:disabled):not([aria-disabled='true']) {
+  background-color: var(--color-blue-800);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(0);
+}
+
+/* Secondary */
+.ds-button--secondary {
+  background-color: var(--color-gray-600);
+  color: var(--color-white);
+  border: 2px solid transparent;
+}
+
+.ds-button--secondary:hover:not(:disabled):not([aria-disabled='true']) {
+  background-color: var(--color-gray-700);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.ds-button--secondary:active:not(:disabled):not([aria-disabled='true']) {
+  background-color: var(--color-gray-800);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(0);
+}
+
+/* Outline */
+.ds-button--outline {
+  background-color: transparent;
+  color: var(--color-text-primary);
+  border: 2px solid var(--color-border-default);
+}
+
+.ds-button--outline:hover:not(:disabled):not([aria-disabled='true']) {
+  background-color: var(--color-interactive-hover);
+  border-color: var(--color-border-dark);
+  box-shadow: var(--shadow-sm);
+}
+
+.ds-button--outline:active:not(:disabled):not([aria-disabled='true']) {
+  background-color: var(--color-interactive-active);
+}
+
+/* High contrast - ensure outline is visible */
+:root.high-contrast .ds-button--outline {
+  border-color: var(--color-border-default);
+  border-width: 2px;
+}
+
+/* Ghost */
+.ds-button--ghost {
+  background-color: transparent;
+  color: var(--color-text-primary);
+  border: 2px solid transparent;
+}
+
+.ds-button--ghost:hover:not(:disabled):not([aria-disabled='true']) {
+  background-color: var(--color-interactive-hover);
+}
+
+.ds-button--ghost:active:not(:disabled):not([aria-disabled='true']) {
+  background-color: var(--color-interactive-active);
+}
+
+/* Danger */
+.ds-button--danger {
+  background-color: var(--color-red-600);
+  color: var(--color-white);
+  border: 2px solid transparent;
+}
+
+.ds-button--danger:hover:not(:disabled):not([aria-disabled='true']) {
+  background-color: var(--color-red-700);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.ds-button--danger:active:not(:disabled):not([aria-disabled='true']) {
+  background-color: var(--color-red-800);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(0);
+}
+
+/* Success */
+.ds-button--success {
+  background-color: var(--color-green-600);
+  color: var(--color-white);
+  border: 2px solid transparent;
+}
+
+.ds-button--success:hover:not(:disabled):not([aria-disabled='true']) {
+  background-color: var(--color-green-700);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.ds-button--success:active:not(:disabled):not([aria-disabled='true']) {
+  background-color: var(--color-green-800);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(0);
+}
+
+/* ============================================================================ */
+/* ICONS */
+/* ============================================================================ */
+.ds-button__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--size-icon-base);
+  height: var(--size-icon-base);
+}
+
+.ds-button--sm .ds-button__icon {
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+}
+
+.ds-button--lg .ds-button__icon {
+  width: var(--size-icon-lg);
+  height: var(--size-icon-lg);
+}
+
+/* ============================================================================ */
+/* LOADING STATE */
+/* ============================================================================ */
+.ds-button--loading {
+  position: relative;
+  pointer-events: none;
+}
+
+.ds-button__spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-icon-base);
+  height: var(--size-icon-base);
+}
+
+.ds-button--sm .ds-button__spinner {
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+}
+
+.ds-button--lg .ds-button__spinner {
+  width: var(--size-icon-lg);
+  height: var(--size-icon-lg);
+}
+
+.ds-button__spinner-icon {
+  width: 100%;
+  height: 100%;
+  animation: ds-button-spin 1s linear infinite;
+}
+
+.ds-button__spinner-track {
+  stroke: currentColor;
+  opacity: 0.2;
+}
+
+.ds-button__spinner-path {
+  stroke: currentColor;
+  animation: ds-button-dash 1.5s ease-in-out infinite;
+}
+
+@keyframes ds-button-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ds-button-dash {
+  0% {
+    stroke-dashoffset: 60;
+  }
+  50% {
+    stroke-dashoffset: 15;
+  }
+  100% {
+    stroke-dashoffset: 60;
+  }
+}
+
+/* Disable animations in reduce motion */
+:root.reduce-motion .ds-button__spinner-icon,
+@media (prefers-reduced-motion: reduce) {
+  .ds-button__spinner-icon {
+    animation: none;
+  }
+}
+
+:root.reduce-motion .ds-button__spinner-path,
+@media (prefers-reduced-motion: reduce) {
+  .ds-button__spinner-path {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ============================================================================ */
+/* CONTENT */
+/* ============================================================================ */
+.ds-button__content {
+  display: inline-block;
+}
+
+/* ============================================================================ */
+/* HIGH CONTRAST ADJUSTMENTS */
+/* ============================================================================ */
+:root.high-contrast .ds-button {
+  border-width: 2px;
+}
+
+:root.high-contrast .ds-button--primary {
+  background-color: var(--color-blue-500);
+  border-color: var(--color-blue-400);
+}
+
+:root.high-contrast .ds-button--secondary {
+  background-color: var(--color-gray-700);
+  border-color: var(--color-gray-500);
+}
+
+:root.high-contrast .ds-button--danger {
+  background-color: var(--color-red-700);
+  border-color: var(--color-red-500);
+}
+
+:root.high-contrast .ds-button--success {
+  background-color: var(--color-green-700);
+  border-color: var(--color-green-500);
+}

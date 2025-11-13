@@ -1,0 +1,60 @@
+@import '../../tokens.css';
+
+.ds-stack {
+  display: flex;
+  gap: var(--stack-gap, var(--spacing-4));
+}
+
+.ds-stack--row {
+  flex-direction: row;
+}
+
+.ds-stack--column {
+  flex-direction: column;
+}
+
+.ds-stack--wrap {
+  flex-wrap: wrap;
+}
+
+/* Alignment */
+.ds-stack--align-start {
+  align-items: flex-start;
+}
+
+.ds-stack--align-center {
+  align-items: center;
+}
+
+.ds-stack--align-end {
+  align-items: flex-end;
+}
+
+.ds-stack--align-stretch {
+  align-items: stretch;
+}
+
+/* Justification */
+.ds-stack--justify-start {
+  justify-content: flex-start;
+}
+
+.ds-stack--justify-center {
+  justify-content: center;
+}
+
+.ds-stack--justify-end {
+  justify-content: flex-end;
+}
+
+.ds-stack--justify-between {
+  justify-content: space-between;
+}
+
+.ds-stack--justify-around {
+  justify-content: space-around;
+}
+
+.ds-stack--justify-evenly {
+  justify-content: space-evenly;
+}

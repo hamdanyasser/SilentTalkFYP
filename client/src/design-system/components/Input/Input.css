@@ -1,0 +1,414 @@
+@import '../../tokens.css';
+
+/* ============================================================================ */
+/* INPUT WRAPPER */
+/* ============================================================================ */
+.ds-input-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: auto;
+}
+
+.ds-input-wrapper--full-width {
+  width: 100%;
+}
+
+/* ============================================================================ */
+/* BASE INPUT */
+/* ============================================================================ */
+.ds-input {
+  /* Reset */
+  margin: 0;
+  font-family: inherit;
+  outline: none;
+
+  /* Layout */
+  display: block;
+  width: 100%;
+
+  /* Typography */
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+
+  /* Visual */
+  background-color: var(--color-bg-primary);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base) var(--easing-in-out);
+
+  /* Accessibility - Touch target minimum */
+  min-height: var(--size-touch-target);
+}
+
+.ds-input::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.ds-input:focus {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: -2px;
+}
+
+:root.enhanced-focus .ds-input:focus {
+  outline-width: 3px;
+  box-shadow: var(--shadow-focus);
+}
+
+.ds-input:disabled,
+.ds-input[aria-disabled='true'] {
+  cursor: not-allowed;
+  opacity: 0.6;
+  background-color: var(--color-interactive-disabled);
+}
+
+/* ============================================================================ */
+/* SIZES */
+/* ============================================================================ */
+.ds-input-wrapper--sm .ds-input {
+  padding: var(--spacing-2) var(--spacing-3);
+  font-size: var(--font-size-sm);
+  min-height: var(--size-touch-target);
+}
+
+.ds-input-wrapper--md .ds-input {
+  padding: var(--spacing-3) var(--spacing-4);
+  font-size: var(--font-size-base);
+  min-height: var(--size-touch-target);
+}
+
+.ds-input-wrapper--lg .ds-input {
+  padding: var(--spacing-4) var(--spacing-5);
+  font-size: var(--font-size-lg);
+  min-height: calc(var(--size-touch-target) + var(--spacing-2));
+}
+
+/* Adjust padding when icons are present */
+.ds-input-wrapper--has-left-icon.ds-input-wrapper--sm .ds-input {
+  padding-left: calc(var(--size-icon-sm) + var(--spacing-4));
+}
+
+.ds-input-wrapper--has-left-icon.ds-input-wrapper--md .ds-input {
+  padding-left: calc(var(--size-icon-base) + var(--spacing-6));
+}
+
+.ds-input-wrapper--has-left-icon.ds-input-wrapper--lg .ds-input {
+  padding-left: calc(var(--size-icon-lg) + var(--spacing-8));
+}
+
+.ds-input-wrapper--has-right-icon.ds-input-wrapper--sm .ds-input {
+  padding-right: calc(var(--size-icon-sm) + var(--spacing-4));
+}
+
+.ds-input-wrapper--has-right-icon.ds-input-wrapper--md .ds-input {
+  padding-right: calc(var(--size-icon-base) + var(--spacing-6));
+}
+
+.ds-input-wrapper--has-right-icon.ds-input-wrapper--lg .ds-input {
+  padding-right: calc(var(--size-icon-lg) + var(--spacing-8));
+}
+
+/* ============================================================================ */
+/* VARIANTS */
+/* ============================================================================ */
+
+/* Default */
+.ds-input-wrapper--default .ds-input {
+  border: 2px solid var(--color-border-default);
+}
+
+.ds-input-wrapper--default .ds-input:hover:not(:disabled):not([aria-disabled='true']) {
+  border-color: var(--color-border-dark);
+}
+
+.ds-input-wrapper--default .ds-input:focus {
+  border-color: var(--color-border-focus);
+}
+
+/* Filled */
+.ds-input-wrapper--filled .ds-input {
+  border: 2px solid transparent;
+  background-color: var(--color-bg-secondary);
+}
+
+.ds-input-wrapper--filled .ds-input:hover:not(:disabled):not([aria-disabled='true']) {
+  background-color: var(--color-bg-tertiary);
+}
+
+.ds-input-wrapper--filled .ds-input:focus {
+  background-color: var(--color-bg-primary);
+  border-color: var(--color-border-focus);
+}
+
+/* Flushed */
+.ds-input-wrapper--flushed .ds-input {
+  border: none;
+  border-bottom: 2px solid var(--color-border-default);
+  border-radius: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.ds-input-wrapper--flushed .ds-input:hover:not(:disabled):not([aria-disabled='true']) {
+  border-bottom-color: var(--color-border-dark);
+}
+
+.ds-input-wrapper--flushed .ds-input:focus {
+  border-bottom-color: var(--color-border-focus);
+  outline: none;
+  box-shadow: 0 1px 0 0 var(--color-border-focus);
+}
+
+/* ============================================================================ */
+/* STATES */
+/* ============================================================================ */
+
+/* Error */
+.ds-input-wrapper--error .ds-input {
+  border-color: var(--color-error);
+}
+
+.ds-input-wrapper--error .ds-input:focus {
+  border-color: var(--color-error);
+  outline-color: var(--color-error);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+}
+
+/* Success */
+.ds-input-wrapper--success .ds-input {
+  border-color: var(--color-success);
+}
+
+.ds-input-wrapper--success .ds-input:focus {
+  border-color: var(--color-success);
+  outline-color: var(--color-success);
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2);
+}
+
+/* ============================================================================ */
+/* ICONS */
+/* ============================================================================ */
+.ds-input__icon {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-tertiary);
+  pointer-events: none;
+}
+
+.ds-input-wrapper--sm .ds-input__icon {
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+}
+
+.ds-input-wrapper--md .ds-input__icon {
+  width: var(--size-icon-base);
+  height: var(--size-icon-base);
+}
+
+.ds-input-wrapper--lg .ds-input__icon {
+  width: var(--size-icon-lg);
+  height: var(--size-icon-lg);
+}
+
+.ds-input__icon--left {
+  left: var(--spacing-3);
+}
+
+.ds-input__icon--right {
+  right: var(--spacing-3);
+}
+
+.ds-input-wrapper--lg .ds-input__icon--left {
+  left: var(--spacing-4);
+}
+
+.ds-input-wrapper--lg .ds-input__icon--right {
+  right: var(--spacing-4);
+}
+
+/* ============================================================================ */
+/* TEXTAREA */
+/* ============================================================================ */
+.ds-textarea-wrapper {
+  position: relative;
+  display: inline-flex;
+  width: auto;
+}
+
+.ds-textarea-wrapper--full-width {
+  width: 100%;
+}
+
+.ds-textarea {
+  /* Reset */
+  margin: 0;
+  font-family: inherit;
+  outline: none;
+
+  /* Layout */
+  display: block;
+  width: 100%;
+
+  /* Typography */
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-relaxed);
+  color: var(--color-text-primary);
+
+  /* Visual */
+  background-color: var(--color-bg-primary);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base) var(--easing-in-out);
+
+  /* Minimum height */
+  min-height: calc(var(--size-touch-target) * 1.5);
+}
+
+.ds-textarea::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.ds-textarea:focus {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: -2px;
+}
+
+:root.enhanced-focus .ds-textarea:focus {
+  outline-width: 3px;
+  box-shadow: var(--shadow-focus);
+}
+
+.ds-textarea:disabled,
+.ds-textarea[aria-disabled='true'] {
+  cursor: not-allowed;
+  opacity: 0.6;
+  background-color: var(--color-interactive-disabled);
+}
+
+/* ============================================================================ */
+/* TEXTAREA SIZES */
+/* ============================================================================ */
+.ds-textarea-wrapper--sm .ds-textarea {
+  padding: var(--spacing-2) var(--spacing-3);
+  font-size: var(--font-size-sm);
+}
+
+.ds-textarea-wrapper--md .ds-textarea {
+  padding: var(--spacing-3) var(--spacing-4);
+  font-size: var(--font-size-base);
+}
+
+.ds-textarea-wrapper--lg .ds-textarea {
+  padding: var(--spacing-4) var(--spacing-5);
+  font-size: var(--font-size-lg);
+}
+
+/* ============================================================================ */
+/* TEXTAREA VARIANTS */
+/* ============================================================================ */
+
+/* Default */
+.ds-textarea-wrapper--default .ds-textarea {
+  border: 2px solid var(--color-border-default);
+}
+
+.ds-textarea-wrapper--default .ds-textarea:hover:not(:disabled):not([aria-disabled='true']) {
+  border-color: var(--color-border-dark);
+}
+
+.ds-textarea-wrapper--default .ds-textarea:focus {
+  border-color: var(--color-border-focus);
+}
+
+/* Filled */
+.ds-textarea-wrapper--filled .ds-textarea {
+  border: 2px solid transparent;
+  background-color: var(--color-bg-secondary);
+}
+
+.ds-textarea-wrapper--filled .ds-textarea:hover:not(:disabled):not([aria-disabled='true']) {
+  background-color: var(--color-bg-tertiary);
+}
+
+.ds-textarea-wrapper--filled .ds-textarea:focus {
+  background-color: var(--color-bg-primary);
+  border-color: var(--color-border-focus);
+}
+
+/* Flushed */
+.ds-textarea-wrapper--flushed .ds-textarea {
+  border: none;
+  border-bottom: 2px solid var(--color-border-default);
+  border-radius: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.ds-textarea-wrapper--flushed .ds-textarea:hover:not(:disabled):not([aria-disabled='true']) {
+  border-bottom-color: var(--color-border-dark);
+}
+
+.ds-textarea-wrapper--flushed .ds-textarea:focus {
+  border-bottom-color: var(--color-border-focus);
+  outline: none;
+  box-shadow: 0 1px 0 0 var(--color-border-focus);
+}
+
+/* ============================================================================ */
+/* TEXTAREA STATES */
+/* ============================================================================ */
+
+/* Error */
+.ds-textarea-wrapper--error .ds-textarea {
+  border-color: var(--color-error);
+}
+
+.ds-textarea-wrapper--error .ds-textarea:focus {
+  border-color: var(--color-error);
+  outline-color: var(--color-error);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+}
+
+/* Success */
+.ds-textarea-wrapper--success .ds-textarea {
+  border-color: var(--color-success);
+}
+
+.ds-textarea-wrapper--success .ds-textarea:focus {
+  border-color: var(--color-success);
+  outline-color: var(--color-success);
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2);
+}
+
+/* ============================================================================ */
+/* TEXTAREA RESIZE */
+/* ============================================================================ */
+.ds-textarea--resize-none .ds-textarea {
+  resize: none;
+}
+
+.ds-textarea--resize-both .ds-textarea {
+  resize: both;
+}
+
+.ds-textarea--resize-horizontal .ds-textarea {
+  resize: horizontal;
+}
+
+.ds-textarea--resize-vertical .ds-textarea {
+  resize: vertical;
+}
+
+/* ============================================================================ */
+/* HIGH CONTRAST ADJUSTMENTS */
+/* ============================================================================ */
+:root.high-contrast .ds-input,
+:root.high-contrast .ds-textarea {
+  border-width: 2px;
+}
+
+:root.high-contrast .ds-input-wrapper--filled .ds-input,
+:root.high-contrast .ds-textarea-wrapper--filled .ds-textarea {
+  border: 2px solid var(--color-border-default);
+}

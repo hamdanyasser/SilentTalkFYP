@@ -1,0 +1,266 @@
+@import '../../tokens.css';
+
+/* ============================================================================ */
+/* SELECT WRAPPER */
+/* ============================================================================ */
+.ds-select-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: auto;
+}
+
+.ds-select-wrapper--full-width {
+  width: 100%;
+}
+
+/* ============================================================================ */
+/* BASE SELECT */
+/* ============================================================================ */
+.ds-select {
+  /* Reset */
+  margin: 0;
+  font-family: inherit;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  /* Layout */
+  display: block;
+  width: 100%;
+  cursor: pointer;
+
+  /* Typography */
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+
+  /* Visual */
+  background-color: var(--color-bg-primary);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base) var(--easing-in-out);
+
+  /* Accessibility - Touch target minimum */
+  min-height: var(--size-touch-target);
+
+  /* Reserve space for chevron icon */
+  padding-right: calc(var(--size-icon-base) + var(--spacing-6));
+}
+
+.ds-select:focus {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: -2px;
+}
+
+:root.enhanced-focus .ds-select:focus {
+  outline-width: 3px;
+  box-shadow: var(--shadow-focus);
+}
+
+.ds-select:disabled,
+.ds-select[aria-disabled='true'] {
+  cursor: not-allowed;
+  opacity: 0.6;
+  background-color: var(--color-interactive-disabled);
+}
+
+/* ============================================================================ */
+/* SIZES */
+/* ============================================================================ */
+.ds-select-wrapper--sm .ds-select {
+  padding: var(--spacing-2) calc(var(--size-icon-sm) + var(--spacing-5)) var(--spacing-2)
+    var(--spacing-3);
+  font-size: var(--font-size-sm);
+  min-height: var(--size-touch-target);
+}
+
+.ds-select-wrapper--md .ds-select {
+  padding: var(--spacing-3) calc(var(--size-icon-base) + var(--spacing-6)) var(--spacing-3)
+    var(--spacing-4);
+  font-size: var(--font-size-base);
+  min-height: var(--size-touch-target);
+}
+
+.ds-select-wrapper--lg .ds-select {
+  padding: var(--spacing-4) calc(var(--size-icon-lg) + var(--spacing-8)) var(--spacing-4)
+    var(--spacing-5);
+  font-size: var(--font-size-lg);
+  min-height: calc(var(--size-touch-target) + var(--spacing-2));
+}
+
+/* Adjust padding when left icon is present */
+.ds-select-wrapper--has-left-icon.ds-select-wrapper--sm .ds-select {
+  padding-left: calc(var(--size-icon-sm) + var(--spacing-4));
+}
+
+.ds-select-wrapper--has-left-icon.ds-select-wrapper--md .ds-select {
+  padding-left: calc(var(--size-icon-base) + var(--spacing-6));
+}
+
+.ds-select-wrapper--has-left-icon.ds-select-wrapper--lg .ds-select {
+  padding-left: calc(var(--size-icon-lg) + var(--spacing-8));
+}
+
+/* ============================================================================ */
+/* VARIANTS */
+/* ============================================================================ */
+
+/* Default */
+.ds-select-wrapper--default .ds-select {
+  border: 2px solid var(--color-border-default);
+}
+
+.ds-select-wrapper--default .ds-select:hover:not(:disabled):not([aria-disabled='true']) {
+  border-color: var(--color-border-dark);
+}
+
+.ds-select-wrapper--default .ds-select:focus {
+  border-color: var(--color-border-focus);
+}
+
+/* Filled */
+.ds-select-wrapper--filled .ds-select {
+  border: 2px solid transparent;
+  background-color: var(--color-bg-secondary);
+}
+
+.ds-select-wrapper--filled .ds-select:hover:not(:disabled):not([aria-disabled='true']) {
+  background-color: var(--color-bg-tertiary);
+}
+
+.ds-select-wrapper--filled .ds-select:focus {
+  background-color: var(--color-bg-primary);
+  border-color: var(--color-border-focus);
+}
+
+/* Flushed */
+.ds-select-wrapper--flushed .ds-select {
+  border: none;
+  border-bottom: 2px solid var(--color-border-default);
+  border-radius: 0;
+  padding-left: 0;
+}
+
+.ds-select-wrapper--flushed .ds-select:hover:not(:disabled):not([aria-disabled='true']) {
+  border-bottom-color: var(--color-border-dark);
+}
+
+.ds-select-wrapper--flushed .ds-select:focus {
+  border-bottom-color: var(--color-border-focus);
+  outline: none;
+  box-shadow: 0 1px 0 0 var(--color-border-focus);
+}
+
+/* ============================================================================ */
+/* STATES */
+/* ============================================================================ */
+
+/* Error */
+.ds-select-wrapper--error .ds-select {
+  border-color: var(--color-error);
+}
+
+.ds-select-wrapper--error .ds-select:focus {
+  border-color: var(--color-error);
+  outline-color: var(--color-error);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+}
+
+/* Success */
+.ds-select-wrapper--success .ds-select {
+  border-color: var(--color-success);
+}
+
+.ds-select-wrapper--success .ds-select:focus {
+  border-color: var(--color-success);
+  outline-color: var(--color-success);
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2);
+}
+
+/* ============================================================================ */
+/* ICONS */
+/* ============================================================================ */
+.ds-select__icon {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-tertiary);
+  pointer-events: none;
+}
+
+.ds-select-wrapper--sm .ds-select__icon {
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+}
+
+.ds-select-wrapper--md .ds-select__icon {
+  width: var(--size-icon-base);
+  height: var(--size-icon-base);
+}
+
+.ds-select-wrapper--lg .ds-select__icon {
+  width: var(--size-icon-lg);
+  height: var(--size-icon-lg);
+}
+
+.ds-select__icon--left {
+  left: var(--spacing-3);
+}
+
+.ds-select-wrapper--lg .ds-select__icon--left {
+  left: var(--spacing-4);
+}
+
+/* Chevron icon */
+.ds-select__chevron {
+  position: absolute;
+  right: var(--spacing-3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-tertiary);
+  pointer-events: none;
+  transition: transform var(--transition-base) var(--easing-in-out);
+}
+
+.ds-select-wrapper--sm .ds-select__chevron {
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+}
+
+.ds-select-wrapper--md .ds-select__chevron {
+  width: var(--size-icon-base);
+  height: var(--size-icon-base);
+}
+
+.ds-select-wrapper--lg .ds-select__chevron {
+  width: var(--size-icon-lg);
+  height: var(--size-icon-lg);
+  right: var(--spacing-4);
+}
+
+/* Chevron animation on focus */
+.ds-select:focus ~ .ds-select__chevron {
+  color: var(--color-border-focus);
+}
+
+/* Disable animation in reduce motion */
+:root.reduce-motion .ds-select__chevron,
+@media (prefers-reduced-motion: reduce) {
+  .ds-select__chevron {
+    transition: none;
+  }
+}
+
+/* ============================================================================ */
+/* HIGH CONTRAST ADJUSTMENTS */
+/* ============================================================================ */
+:root.high-contrast .ds-select {
+  border-width: 2px;
+}
+
+:root.high-contrast .ds-select-wrapper--filled .ds-select {
+  border: 2px solid var(--color-border-default);
+}
