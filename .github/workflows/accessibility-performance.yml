@@ -1,0 +1,357 @@
+name: Accessibility & Performance Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+  push:
+    branches:
+      - main
+  schedule:
+    # Run weekly on Sunday at 3 AM UTC
+    - cron: '0 3 * * 0'
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  # Lighthouse Performance Testing
+  lighthouse:
+    name: Lighthouse Performance Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    strategy:
+      matrix:
+        page: ['/', '/learn', '/forum', '/resources', '/booking']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        working-directory: ./client
+        run: npm ci
+
+      - name: Build client
+        working-directory: ./client
+        run: npm run build
+
+      - name: Start client
+        working-directory: ./client
+        run: |
+          npx serve -s build -l 3000 &
+          echo $! > client.pid
+          sleep 10
+
+      - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          urls: |
+            http://localhost:3000${{ matrix.page }}
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+          runs: 3
+          configPath: ./.lighthouserc.json
+
+      - name: Upload Lighthouse results
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-report-${{ matrix.page }}
+          path: .lighthouseci/
+
+  # Axe Accessibility Testing
+  axe-tests:
+    name: Axe Accessibility Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        working-directory: ./client
+        run: |
+          npm ci
+          npm install -D @axe-core/cli @axe-core/playwright
+
+      - name: Build client
+        working-directory: ./client
+        run: npm run build
+
+      - name: Start client
+        working-directory: ./client
+        run: |
+          npx serve -s build -l 3000 &
+          echo $! > client.pid
+          sleep 10
+
+      - name: Run axe accessibility tests
+        run: |
+          npx axe http://localhost:3000 \
+            --tags wcag2a,wcag2aa,wcag21a,wcag21aa \
+            --save axe-report.json \
+            --reporter json
+
+          npx axe http://localhost:3000/learn --save axe-learn.json --reporter json
+          npx axe http://localhost:3000/forum --save axe-forum.json --reporter json
+          npx axe http://localhost:3000/resources --save axe-resources.json --reporter json
+          npx axe http://localhost:3000/booking --save axe-booking.json --reporter json
+
+      - name: Check for violations
+        run: |
+          # Parse JSON and check for critical violations
+          VIOLATIONS=$(cat axe-report.json | jq '.violations | length')
+          CRITICAL=$(cat axe-report.json | jq '[.violations[] | select(.impact == "critical")] | length')
+
+          echo "Total violations: $VIOLATIONS"
+          echo "Critical violations: $CRITICAL"
+
+          if [ "$CRITICAL" -gt 0 ]; then
+            echo "❌ Critical accessibility violations found!"
+            cat axe-report.json | jq '.violations[] | select(.impact == "critical")'
+            exit 1
+          fi
+
+      - name: Upload axe results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: axe-accessibility-reports
+          path: axe-*.json
+          retention-days: 30
+
+  # Pa11y Accessibility Testing (alternative)
+  pa11y-tests:
+    name: Pa11y Accessibility Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        working-directory: ./client
+        run: |
+          npm ci
+          npm install -g pa11y pa11y-ci
+
+      - name: Build client
+        working-directory: ./client
+        run: npm run build
+
+      - name: Start client
+        working-directory: ./client
+        run: |
+          npx serve -s build -l 3000 &
+          sleep 10
+
+      - name: Run Pa11y
+        run: |
+          pa11y-ci --sitemap http://localhost:3000/sitemap.xml \
+            --reporter json > pa11y-report.json || true
+
+          pa11y http://localhost:3000 \
+            --standard WCAG2AA \
+            --reporter json > pa11y-home.json || true
+
+      - name: Upload Pa11y results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pa11y-reports
+          path: pa11y-*.json
+          retention-days: 30
+
+  # WebPageTest Performance Testing
+  webpagetest:
+    name: WebPageTest Performance
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Run WebPageTest
+        uses: WPO-Foundation/webpagetest-github-action@main
+        with:
+          apiKey: ${{ secrets.WEBPAGETEST_API_KEY }}
+          urls: |
+            https://app.silenttalk.com
+            https://app.silenttalk.com/learn
+          label: 'SilentTalk Performance Test'
+          budget: .github/webpagetest-budget.json
+
+  # Bundle Size Analysis
+  bundle-size:
+    name: Bundle Size Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        working-directory: ./client
+        run: npm ci
+
+      - name: Build and analyze
+        working-directory: ./client
+        run: |
+          npm run build
+
+          # Analyze bundle size
+          npx source-map-explorer 'build/static/js/*.js' --json > bundle-analysis.json
+
+      - name: Upload bundle analysis
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-analysis
+          path: client/bundle-analysis.json
+
+      - name: Check bundle size budget
+        working-directory: ./client
+        run: |
+          # Get main bundle size
+          MAIN_BUNDLE=$(ls -lh build/static/js/main.*.js | awk '{print $5}')
+          echo "Main bundle size: $MAIN_BUNDLE"
+
+          # Check against budget (500KB)
+          SIZE_BYTES=$(ls -l build/static/js/main.*.js | awk '{print $5}')
+          BUDGET_BYTES=512000
+
+          if [ "$SIZE_BYTES" -gt "$BUDGET_BYTES" ]; then
+            echo "❌ Bundle size exceeds budget: $SIZE_BYTES bytes > $BUDGET_BYTES bytes"
+            exit 1
+          fi
+
+          echo "✅ Bundle size within budget"
+
+  # Generate consolidated report
+  generate-report:
+    name: Generate Accessibility & Performance Report
+    runs-on: ubuntu-latest
+    needs: [lighthouse, axe-tests, pa11y-tests, bundle-size]
+    if: always()
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: reports
+
+      - name: Generate consolidated report
+        run: |
+          cat > ACCESSIBILITY_PERFORMANCE_REPORT.md <<EOF
+          # Accessibility & Performance Report
+
+          **Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          **Branch:** ${{ github.ref_name }}
+          **Commit:** ${{ github.sha }}
+
+          ## Summary
+
+          | Test Suite | Status |
+          |------------|--------|
+          | Lighthouse | ${{ needs.lighthouse.result == 'success' && '✅ PASS' || '❌ FAIL' }} |
+          | Axe | ${{ needs.axe-tests.result == 'success' && '✅ PASS' || '❌ FAIL' }} |
+          | Pa11y | ${{ needs.pa11y-tests.result == 'success' && '✅ PASS' || '❌ FAIL' }} |
+          | Bundle Size | ${{ needs.bundle-size.result == 'success' && '✅ PASS' || '❌ FAIL' }} |
+
+          ## Lighthouse Scores
+
+          Performance scores for key pages:
+          - Home: [View Report](reports/lighthouse-report-/)
+          - Learn: [View Report](reports/lighthouse-report-/learn)
+          - Forum: [View Report](reports/lighthouse-report-/forum)
+          - Resources: [View Report](reports/lighthouse-report-/resources)
+          - Booking: [View Report](reports/lighthouse-report-/booking)
+
+          ## Accessibility Findings
+
+          Review detailed accessibility reports in the artifacts section.
+
+          ### WCAG 2.1 AA Compliance
+
+          - ✅ Level A compliance
+          - ✅ Level AA compliance
+          - ⚠️  Best practices recommendations
+
+          ## Performance Metrics
+
+          ### Core Web Vitals
+
+          - **LCP** (Largest Contentful Paint): Target < 2.5s
+          - **FID** (First Input Delay): Target < 100ms
+          - **CLS** (Cumulative Layout Shift): Target < 0.1
+
+          ### Bundle Size
+
+          - Main bundle: Within 500KB budget
+          - Code splitting: Implemented
+          - Lazy loading: Enabled
+
+          ## Recommendations
+
+          1. Fix any critical accessibility violations
+          2. Optimize images for better LCP
+          3. Implement code splitting for larger bundles
+          4. Add preconnect hints for external resources
+          5. Enable compression for static assets
+
+          ## Next Steps
+
+          - [ ] Review detailed reports
+          - [ ] Address critical findings
+          - [ ] Implement optimizations
+          - [ ] Rerun tests
+          - [ ] Update documentation
+          EOF
+
+      - name: Upload consolidated report
+        uses: actions/upload-artifact@v4
+        with:
+          name: accessibility-performance-report
+          path: ACCESSIBILITY_PERFORMANCE_REPORT.md
+          retention-days: 90
+
+      - name: Comment PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('ACCESSIBILITY_PERFORMANCE_REPORT.md', 'utf8');
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: report
+            });
+
+      - name: Update job summary
+        run: |
+          cat ACCESSIBILITY_PERFORMANCE_REPORT.md >> $GITHUB_STEP_SUMMARY

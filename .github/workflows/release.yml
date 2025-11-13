@@ -1,0 +1,331 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Release type'
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: write
+  packages: write
+  issues: write
+  pull-requests: write
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  # Semantic Release
+  semantic-release:
+    name: Semantic Release
+    runs-on: ubuntu-latest
+
+    outputs:
+      new_release_published: ${{ steps.semantic.outputs.new_release_published }}
+      new_release_version: ${{ steps.semantic.outputs.new_release_version }}
+      new_release_git_tag: ${{ steps.semantic.outputs.new_release_git_tag }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install semantic-release
+        run: |
+          npm install -g semantic-release \
+            @semantic-release/changelog \
+            @semantic-release/git \
+            @semantic-release/github \
+            @semantic-release/npm \
+            @semantic-release/exec \
+            conventional-changelog-conventionalcommits
+
+      - name: Create release configuration
+        run: |
+          cat > .releaserc.json <<EOF
+          {
+            "branches": ["main"],
+            "plugins": [
+              [
+                "@semantic-release/commit-analyzer",
+                {
+                  "preset": "conventionalcommits",
+                  "releaseRules": [
+                    {"type": "feat", "release": "minor"},
+                    {"type": "fix", "release": "patch"},
+                    {"type": "perf", "release": "patch"},
+                    {"type": "revert", "release": "patch"},
+                    {"type": "docs", "release": "patch"},
+                    {"type": "style", "release": "patch"},
+                    {"type": "refactor", "release": "patch"},
+                    {"type": "test", "release": "patch"},
+                    {"type": "build", "release": "patch"},
+                    {"type": "ci", "release": "patch"},
+                    {"type": "chore", "release": "patch"},
+                    {"breaking": true, "release": "major"}
+                  ]
+                }
+              ],
+              [
+                "@semantic-release/release-notes-generator",
+                {
+                  "preset": "conventionalcommits",
+                  "presetConfig": {
+                    "types": [
+                      {"type": "feat", "section": "✨ Features"},
+                      {"type": "fix", "section": "🐛 Bug Fixes"},
+                      {"type": "perf", "section": "⚡ Performance"},
+                      {"type": "revert", "section": "⏪ Reverts"},
+                      {"type": "docs", "section": "📝 Documentation"},
+                      {"type": "style", "section": "💄 Styles"},
+                      {"type": "refactor", "section": "♻️ Refactoring"},
+                      {"type": "test", "section": "✅ Tests"},
+                      {"type": "build", "section": "📦 Build"},
+                      {"type": "ci", "section": "👷 CI/CD"},
+                      {"type": "chore", "section": "🔧 Chores"}
+                    ]
+                  }
+                }
+              ],
+              [
+                "@semantic-release/changelog",
+                {
+                  "changelogFile": "CHANGELOG.md"
+                }
+              ],
+              [
+                "@semantic-release/npm",
+                {
+                  "npmPublish": false
+                }
+              ],
+              [
+                "@semantic-release/git",
+                {
+                  "assets": ["CHANGELOG.md", "package.json", "package-lock.json"],
+                  "message": "chore(release): \${nextRelease.version} [skip ci]\n\n\${nextRelease.notes}"
+                }
+              ],
+              [
+                "@semantic-release/github",
+                {
+                  "assets": [
+                    {"path": "client/build/**", "label": "Client Build"},
+                    {"path": "server/dist/**", "label": "Server Build"}
+                  ]
+                }
+              ]
+            ]
+          }
+          EOF
+
+      - name: Run semantic-release
+        id: semantic
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GIT_AUTHOR_NAME: github-actions[bot]
+          GIT_AUTHOR_EMAIL: github-actions[bot]@users.noreply.github.com
+          GIT_COMMITTER_NAME: github-actions[bot]
+          GIT_COMMITTER_EMAIL: github-actions[bot]@users.noreply.github.com
+        run: |
+          npx semantic-release
+
+  # Build release artifacts
+  build-release:
+    name: Build Release Artifacts
+    runs-on: ubuntu-latest
+    needs: semantic-release
+    if: needs.semantic-release.outputs.new_release_published == 'true'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.semantic-release.outputs.new_release_git_tag }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Build client
+        working-directory: ./client
+        run: |
+          npm ci
+          npm run build
+
+          # Create tarball
+          cd build
+          tar -czf ../../client-${{ needs.semantic-release.outputs.new_release_version }}.tar.gz *
+
+      - name: Build server
+        working-directory: ./server
+        run: |
+          npm ci
+          npm run build
+
+          # Create tarball
+          cd dist
+          tar -czf ../../server-${{ needs.semantic-release.outputs.new_release_version }}.tar.gz *
+
+      - name: Generate checksums
+        run: |
+          sha256sum client-${{ needs.semantic-release.outputs.new_release_version }}.tar.gz > checksums.txt
+          sha256sum server-${{ needs.semantic-release.outputs.new_release_version }}.tar.gz >> checksums.txt
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-artifacts
+          path: |
+            client-${{ needs.semantic-release.outputs.new_release_version }}.tar.gz
+            server-${{ needs.semantic-release.outputs.new_release_version }}.tar.gz
+            checksums.txt
+
+  # Tag container images
+  tag-containers:
+    name: Tag Container Images
+    runs-on: ubuntu-latest
+    needs: [semantic-release, build-release]
+    if: needs.semantic-release.outputs.new_release_published == 'true'
+
+    strategy:
+      matrix:
+        component: [client, server]
+
+    steps:
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Tag and push versioned image
+        run: |
+          VERSION=${{ needs.semantic-release.outputs.new_release_version }}
+          IMAGE=ghcr.io/${{ github.repository }}/${{ matrix.component }}
+
+          # Pull latest
+          docker pull $IMAGE:main
+
+          # Tag with semantic version
+          docker tag $IMAGE:main $IMAGE:$VERSION
+          docker tag $IMAGE:main $IMAGE:v$VERSION
+
+          # Tag with major.minor
+          MAJOR_MINOR=$(echo $VERSION | cut -d. -f1,2)
+          docker tag $IMAGE:main $IMAGE:$MAJOR_MINOR
+
+          # Push all tags
+          docker push $IMAGE:$VERSION
+          docker push $IMAGE:v$VERSION
+          docker push $IMAGE:$MAJOR_MINOR
+
+  # Create GitHub Release
+  create-github-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [semantic-release, build-release, tag-containers]
+    if: needs.semantic-release.outputs.new_release_published == 'true'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.semantic-release.outputs.new_release_git_tag }}
+
+      - name: Download release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ needs.semantic-release.outputs.new_release_git_tag }}
+          name: Release ${{ needs.semantic-release.outputs.new_release_version }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          files: |
+            client-${{ needs.semantic-release.outputs.new_release_version }}.tar.gz
+            server-${{ needs.semantic-release.outputs.new_release_version }}.tar.gz
+            checksums.txt
+
+  # Notify Slack (if configured)
+  notify:
+    name: Notify Release
+    runs-on: ubuntu-latest
+    needs: [semantic-release, create-github-release]
+    if: needs.semantic-release.outputs.new_release_published == 'true'
+
+    steps:
+      - name: Send Slack notification
+        if: env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST $SLACK_WEBHOOK_URL \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "text": "🚀 New Release: v${{ needs.semantic-release.outputs.new_release_version }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*SilentTalk FYP Release* 🎉\n\nVersion: `${{ needs.semantic-release.outputs.new_release_version }}`\n\n<https://github.com/${{ github.repository }}/releases/tag/${{ needs.semantic-release.outputs.new_release_git_tag }}|View Release Notes>"
+                  }
+                }
+              ]
+            }'
+
+  # Release Summary
+  release-summary:
+    name: Release Summary
+    runs-on: ubuntu-latest
+    needs: [semantic-release, build-release, tag-containers, create-github-release]
+    if: always()
+
+    steps:
+      - name: Generate summary
+        run: |
+          echo "## 🚀 Release Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ needs.semantic-release.outputs.new_release_published }}" == "true" ]; then
+            echo "### ✅ New Release Published" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Version:** ${{ needs.semantic-release.outputs.new_release_version }}" >> $GITHUB_STEP_SUMMARY
+            echo "**Tag:** ${{ needs.semantic-release.outputs.new_release_git_tag }}" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### 📦 Artifacts" >> $GITHUB_STEP_SUMMARY
+            echo "- Client: \`client-${{ needs.semantic-release.outputs.new_release_version }}.tar.gz\`" >> $GITHUB_STEP_SUMMARY
+            echo "- Server: \`server-${{ needs.semantic-release.outputs.new_release_version }}.tar.gz\`" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### 🐳 Container Images" >> $GITHUB_STEP_SUMMARY
+            echo "- \`ghcr.io/${{ github.repository }}/client:${{ needs.semantic-release.outputs.new_release_version }}\`" >> $GITHUB_STEP_SUMMARY
+            echo "- \`ghcr.io/${{ github.repository }}/server:${{ needs.semantic-release.outputs.new_release_version }}\`" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ℹ️ No New Release" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "No commits found that trigger a release." >> $GITHUB_STEP_SUMMARY
+          fi

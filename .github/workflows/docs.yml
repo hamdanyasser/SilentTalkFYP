@@ -1,0 +1,401 @@
+name: Documentation
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'server/**'
+      - 'docs/**'
+      - '.github/workflows/docs.yml'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  # Generate OpenAPI documentation
+  openapi-docs:
+    name: Generate OpenAPI Documentation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        working-directory: ./server
+        run: |
+          npm ci
+          npm install -D swagger-jsdoc swagger-ui-express openapi-typescript
+
+      - name: Generate OpenAPI spec
+        working-directory: ./server
+        run: |
+          # Create OpenAPI generator script
+          cat > generate-openapi.js <<EOF
+          const swaggerJsdoc = require('swagger-jsdoc');
+          const fs = require('fs');
+
+          const options = {
+            definition: {
+              openapi: '3.0.0',
+              info: {
+                title: 'SilentTalk API',
+                version: '1.0.0',
+                description: 'API documentation for SilentTalk FYP application',
+                contact: {
+                  name: 'SilentTalk Team',
+                  email: 'support@silenttalk.com'
+                },
+                license: {
+                  name: 'MIT',
+                  url: 'https://opensource.org/licenses/MIT'
+                }
+              },
+              servers: [
+                {
+                  url: 'http://localhost:5000',
+                  description: 'Development server'
+                },
+                {
+                  url: 'https://api.silenttalk.com',
+                  description: 'Production server'
+                }
+              ],
+              components: {
+                securitySchemes: {
+                  bearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT'
+                  }
+                }
+              },
+              security: [{
+                bearerAuth: []
+              }]
+            },
+            apis: ['./src/routes/**/*.ts', './src/controllers/**/*.ts'],
+          };
+
+          const spec = swaggerJsdoc(options);
+          fs.writeFileSync('../docs/openapi.json', JSON.stringify(spec, null, 2));
+          fs.writeFileSync('../docs/openapi.yaml', require('js-yaml').dump(spec));
+
+          console.log('OpenAPI spec generated successfully!');
+          EOF
+
+          # Run generator
+          node generate-openapi.js || echo "OpenAPI generation skipped - no routes annotated yet"
+
+      - name: Generate TypeScript types from OpenAPI
+        working-directory: ./server
+        run: |
+          if [ -f ../docs/openapi.json ]; then
+            npx openapi-typescript ../docs/openapi.json --output ../docs/api-types.ts
+          fi
+
+      - name: Upload OpenAPI spec
+        uses: actions/upload-artifact@v4
+        with:
+          name: openapi-spec
+          path: |
+            docs/openapi.json
+            docs/openapi.yaml
+            docs/api-types.ts
+
+  # Generate API documentation with Redoc
+  redoc-docs:
+    name: Generate Redoc Documentation
+    runs-on: ubuntu-latest
+    needs: openapi-docs
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download OpenAPI spec
+        uses: actions/download-artifact@v4
+        with:
+          name: openapi-spec
+          path: docs/
+
+      - name: Install Redoc CLI
+        run: npm install -g redoc-cli
+
+      - name: Generate Redoc HTML
+        run: |
+          if [ -f docs/openapi.json ]; then
+            redoc-cli bundle docs/openapi.json \
+              -o docs/api-documentation.html \
+              --title "SilentTalk API Documentation"
+          fi
+
+      - name: Upload Redoc documentation
+        uses: actions/upload-artifact@v4
+        with:
+          name: redoc-docs
+          path: docs/api-documentation.html
+
+  # Generate TypeDoc documentation
+  typedoc:
+    name: Generate TypeDoc Documentation
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        component: [client, server]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        working-directory: ./${{ matrix.component }}
+        run: |
+          npm ci
+          npm install -D typedoc typedoc-plugin-markdown
+
+      - name: Generate TypeDoc
+        working-directory: ./${{ matrix.component }}
+        run: |
+          npx typedoc \
+            --out ../docs/typedoc/${{ matrix.component }} \
+            --entryPointStrategy expand \
+            --exclude "**/*.test.ts" \
+            --exclude "**/*.spec.ts" \
+            src/
+
+      - name: Upload TypeDoc
+        uses: actions/upload-artifact@v4
+        with:
+          name: typedoc-${{ matrix.component }}
+          path: docs/typedoc/${{ matrix.component }}/
+
+  # Build documentation site
+  build-docs-site:
+    name: Build Documentation Site
+    runs-on: ubuntu-latest
+    needs: [redoc-docs, typedoc]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all documentation artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: docs-artifacts/
+
+      - name: Setup documentation structure
+        run: |
+          mkdir -p docs-site
+          mkdir -p docs-site/api
+          mkdir -p docs-site/typedoc
+
+          # Copy OpenAPI docs
+          if [ -f docs-artifacts/redoc-docs/api-documentation.html ]; then
+            cp docs-artifacts/redoc-docs/api-documentation.html docs-site/api/index.html
+          fi
+
+          # Copy TypeDoc
+          if [ -d docs-artifacts/typedoc-client ]; then
+            cp -r docs-artifacts/typedoc-client docs-site/typedoc/client
+          fi
+
+          if [ -d docs-artifacts/typedoc-server ]; then
+            cp -r docs-artifacts/typedoc-server docs-site/typedoc/server
+          fi
+
+          # Create index.html
+          cat > docs-site/index.html <<EOF
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>SilentTalk Documentation</title>
+            <style>
+              body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 2rem;
+                line-height: 1.6;
+              }
+              h1 { color: #2c3e50; }
+              .docs-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 2rem;
+                margin-top: 2rem;
+              }
+              .doc-card {
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                padding: 1.5rem;
+                text-decoration: none;
+                color: inherit;
+                transition: all 0.3s;
+              }
+              .doc-card:hover {
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                transform: translateY(-2px);
+              }
+              .doc-card h2 {
+                margin-top: 0;
+                color: #3498db;
+              }
+            </style>
+          </head>
+          <body>
+            <h1>📚 SilentTalk Documentation</h1>
+            <p>Welcome to the SilentTalk FYP documentation portal.</p>
+
+            <div class="docs-grid">
+              <a href="./api/" class="doc-card">
+                <h2>🔌 API Documentation</h2>
+                <p>Interactive API documentation with request/response examples.</p>
+              </a>
+
+              <a href="./typedoc/client/" class="doc-card">
+                <h2>⚛️ Client TypeDoc</h2>
+                <p>Frontend code documentation and type definitions.</p>
+              </a>
+
+              <a href="./typedoc/server/" class="doc-card">
+                <h2>🖥️ Server TypeDoc</h2>
+                <p>Backend code documentation and API implementation.</p>
+              </a>
+
+              <a href="https://github.com/${{ github.repository }}" class="doc-card">
+                <h2>📖 GitHub Repository</h2>
+                <p>Source code, issues, and contribution guidelines.</p>
+              </a>
+            </div>
+
+            <footer style="margin-top: 4rem; text-align: center; color: #7f8c8d;">
+              <p>Generated on $(date -u +"%Y-%m-%d %H:%M:%S UTC") | Commit: ${GITHUB_SHA:0:7}</p>
+            </footer>
+          </body>
+          </html>
+          EOF
+
+      - name: Upload documentation site
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-site
+          path: docs-site/
+
+  # Deploy to GitHub Pages
+  deploy-pages:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: build-docs-site
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Download documentation site
+        uses: actions/download-artifact@v4
+        with:
+          name: docs-site
+          path: docs-site/
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload to Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs-site/
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  # Generate README badges
+  generate-badges:
+    name: Generate README Badges
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Generate shields.io badges
+        run: |
+          cat > BADGES.md <<EOF
+          # SilentTalk FYP - Badges
+
+          ## Build Status
+          ![CI](https://github.com/${{ github.repository }}/workflows/CI%20Pipeline/badge.svg)
+          ![Container Build](https://github.com/${{ github.repository }}/workflows/Container%20Build%20&%20Push/badge.svg)
+          ![E2E Tests](https://github.com/${{ github.repository }}/workflows/E2E%20Tests/badge.svg)
+
+          ## Code Quality
+          ![CodeQL](https://github.com/${{ github.repository }}/workflows/CodeQL/badge.svg)
+          ![Security](https://github.com/${{ github.repository }}/workflows/Security%20Scanning/badge.svg)
+
+          ## Documentation
+          ![Docs](https://github.com/${{ github.repository }}/workflows/Documentation/badge.svg)
+          ![License](https://img.shields.io/github/license/${{ github.repository }})
+
+          ## Statistics
+          ![Last Commit](https://img.shields.io/github/last-commit/${{ github.repository }})
+          ![Contributors](https://img.shields.io/github/contributors/${{ github.repository }})
+          ![Stars](https://img.shields.io/github/stars/${{ github.repository }})
+          EOF
+
+      - name: Commit badges
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add BADGES.md
+          git commit -m "docs: update badges [skip ci]" || echo "No changes"
+          git push || echo "No changes to push"
+
+  # Documentation summary
+  docs-summary:
+    name: Documentation Summary
+    runs-on: ubuntu-latest
+    needs: [openapi-docs, redoc-docs, typedoc, build-docs-site]
+    if: always()
+
+    steps:
+      - name: Generate summary
+        run: |
+          echo "## 📚 Documentation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Documentation Type | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------------------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| OpenAPI Spec | ${{ needs.openapi-docs.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Redoc API Docs | ${{ needs.redoc-docs.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| TypeDoc | ${{ needs.typedoc.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Documentation Site | ${{ needs.build-docs-site.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
