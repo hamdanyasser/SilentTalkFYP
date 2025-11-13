@@ -1,0 +1,44 @@
+# AWS Infrastructure Configuration
+# Copy this file to terraform.tfvars and fill in your values
+
+# AWS Configuration
+aws_region  = "us-east-1"
+environment = "production"
+
+# Network Configuration
+vpc_cidr = "10.0.0.0/16"
+
+# RDS Configuration
+rds_instance_class        = "db.t3.medium"    # Production: db.r6g.large or higher
+rds_allocated_storage     = 100
+rds_max_allocated_storage = 500
+db_name                   = "silenttalk_prod"
+db_username               = "silenttalk_admin"
+
+# Redis Configuration
+redis_node_type = "cache.t3.medium" # Production: cache.r6g.large or higher
+
+# Container Images
+server_container_image = "ghcr.io/your-org/silenttalk-fyp/server:1.0.0"
+client_container_image = "ghcr.io/your-org/silenttalk-fyp/client:1.0.0"
+
+# TURN Server Configuration
+turn_instance_type = "t3.medium" # Production: c6g.large or higher
+ec2_key_name       = "your-ec2-key-pair"
+
+# Domain Configuration
+api_domain          = "api.silenttalk.com"
+cdn_domain          = "cdn.silenttalk.com"
+acm_certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/your-cert-id"
+cors_origin         = "https://silenttalk.com"
+
+# Monitoring Configuration
+alert_emails = [
+  "devops@silenttalk.com",
+  "oncall@silenttalk.com"
+]
+slack_webhook_url = "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+
+# WAF Configuration
+geo_blocking_enabled = false
+blocked_countries    = []
