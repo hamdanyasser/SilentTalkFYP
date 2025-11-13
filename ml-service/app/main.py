@@ -7,6 +7,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 import logging
+import os
+from pathlib import Path
+
+# Import API routers
+from api.recognition import router as recognition_router
+from services.onnx_inference import get_inference_engine
 
 # Configure logging
 logging.basicConfig(
@@ -19,7 +25,7 @@ logger = logging.getLogger(__name__)
 # Create FastAPI app
 app = FastAPI(
     title="SilentTalk ML Service",
-    description="Sign Language Recognition API using MediaPipe",
+    description="Sign Language Recognition API using MediaPipe and CNN-LSTM",
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc"
@@ -33,6 +39,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include routers
+app.include_router(recognition_router)
 
 
 @app.get("/")
@@ -80,8 +89,41 @@ async def liveness_check():
 @app.on_event("startup")
 async def startup_event():
     """Startup event handler"""
+    logger.info("=" * 80)
     logger.info("Starting SilentTalk ML Service")
-    # Initialize MediaPipe, load models, connect to Redis, etc.
+    logger.info("=" * 80)
+
+    # Load ONNX model if available
+    model_path = os.getenv("MODEL_PATH", "checkpoints/model.onnx")
+
+    if os.path.exists(model_path):
+        try:
+            logger.info(f"Loading ONNX model from {model_path}")
+
+            # ASL alphabet classes (A-Z)
+            class_names = [chr(i) for i in range(ord('A'), ord('Z') + 1)]
+
+            # Initialize inference engine
+            engine = get_inference_engine(
+                model_path=model_path,
+                class_names=class_names
+            )
+
+            # Run benchmark
+            logger.info("Running inference benchmark...")
+            stats = engine.benchmark(num_iterations=100, sequence_length=30)
+
+            logger.info("Model loaded successfully")
+        except Exception as e:
+            logger.warning(f"Failed to load ONNX model: {e}")
+            logger.warning("Service will start without pre-loaded model")
+    else:
+        logger.warning(f"ONNX model not found at {model_path}")
+        logger.warning("Service will start without pre-loaded model")
+        logger.info("Train a model using: python app/train.py --export-onnx")
+
+    logger.info("SilentTalk ML Service started successfully")
+    logger.info("=" * 80)
 
 
 @app.on_event("shutdown")
