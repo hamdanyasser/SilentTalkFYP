@@ -35,6 +35,15 @@ FastAPI-based machine learning service for real-time sign language recognition u
 - `GET /recognition/sessions` - List active sessions
 - Health check endpoints
 
+✅ **Real-Time Streaming Recognition** 🔥 NEW
+- WebSocket endpoint for live video streaming
+- Sliding window buffer (window=30, stride=10)
+- Continuous recognition at 15-30 FPS
+- Lighting normalization (CLAHE + adaptive brightness)
+- Emits (sign, confidence, timestamp) in real-time
+- User feedback capture and dataset append
+- Works under varied lighting conditions
+
 ## Installation
 
 ```bash
@@ -122,6 +131,87 @@ feedback = {
 }
 
 response = requests.post('http://localhost:8000/recognition/feedback', json=feedback)
+```
+
+### Live Streaming Recognition
+
+Run the demo client to stream from your webcam:
+
+```bash
+# Start the ML service first
+uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+# In another terminal, run the demo client
+python demo_streaming_client.py --camera 0 --fps 30
+```
+
+The demo client will:
+- Capture webcam video at 30 FPS
+- Send frames to ML service via WebSocket
+- Display real-time recognition results
+- Show (sign, confidence, timestamp) on screen
+- Handle varied lighting conditions automatically
+
+**Controls:**
+- `q` - Quit
+- `r` - Reset session
+
+**Example output:**
+```
+[2025-01-13T14:23:45.123Z]
+  Sign: A
+  Confidence: 87.5%
+  Handedness: Right
+  Inference: 42.3ms
+  Top predictions:
+    1. A: 87.5%
+    2. S: 8.2%
+    3. E: 2.1%
+```
+
+### Submit Streaming Feedback
+
+```python
+import requests
+
+feedback = {
+    "session_id": "your-session-id",
+    "timestamp": "2025-01-13T14:23:45.123Z",
+    "predicted_sign": "A",
+    "correct_sign": "B",
+    "confidence": 0.875,
+    "was_correct": False,
+    "user_comment": "Lighting was dim"
+}
+
+response = requests.post('http://localhost:8000/streaming/feedback', json=feedback)
+```
+
+### Append to Dataset for Retraining
+
+```python
+# Collect landmarks during incorrect predictions
+dataset_entry = {
+    "session_id": "your-session-id",
+    "correct_sign": "B",
+    "landmarks_sequence": landmarks_array.tolist(),  # Shape: (30, 21, 3)
+    "timestamp": "2025-01-13T14:23:45.123Z",
+    "metadata": {"lighting": "dim", "handedness": "Right"}
+}
+
+response = requests.post('http://localhost:8000/streaming/dataset/append', json=dataset_entry)
+```
+
+### Export Dataset for Retraining
+
+```python
+# Get collected dataset
+response = requests.get('http://localhost:8000/streaming/dataset/export')
+dataset = response.json()
+
+print(f"Total entries: {dataset['total_entries']}")
+print(f"Unique signs: {dataset['unique_signs']}")
+print(f"Distribution: {dataset['signs_distribution']}")
 ```
 
 ## Testing
