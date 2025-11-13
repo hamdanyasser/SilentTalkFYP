@@ -1,0 +1,235 @@
+/**
+ * Metrics Dashboard Styles
+ */
+
+.metrics-dashboard {
+  padding: var(--spacing-6);
+  background: var(--color-background-secondary);
+  border-radius: var(--radius-lg);
+}
+
+.metrics-dashboard__loading {
+  padding: var(--spacing-6);
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.metrics-dashboard__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-6);
+  padding-bottom: var(--spacing-4);
+  border-bottom: 2px solid var(--color-border-default);
+}
+
+.metrics-dashboard__title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.metrics-dashboard__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+.metrics-dashboard__timestamp {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+}
+
+.metrics-dashboard__health-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-3);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-transform: capitalize;
+}
+
+.metrics-dashboard__health-indicator.healthy {
+  background: var(--color-success-background);
+  color: var(--color-success);
+}
+
+.metrics-dashboard__health-indicator.degraded {
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+}
+
+.metrics-dashboard__health-indicator.unhealthy {
+  background: var(--color-error-background);
+  color: var(--color-error);
+}
+
+.metrics-dashboard__section {
+  margin-bottom: var(--spacing-6);
+}
+
+.metrics-dashboard__section-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-4);
+}
+
+.metrics-dashboard__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-4);
+}
+
+.metrics-dashboard__metric {
+  padding: var(--spacing-4);
+  background: var(--color-background-primary);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.metrics-dashboard__metric:hover {
+  border-color: var(--color-border-hover);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.metrics-dashboard__metric--highlight {
+  border-color: var(--color-primary);
+  border-width: 2px;
+}
+
+.metrics-dashboard__metric--warning {
+  border-color: var(--color-warning);
+  background: var(--color-warning-light);
+}
+
+.metrics-dashboard__metric--error {
+  border-color: var(--color-error);
+  background: var(--color-error-background);
+}
+
+.metrics-dashboard__metric-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-2);
+  font-weight: var(--font-weight-medium);
+}
+
+.metrics-dashboard__metric-value {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-mono);
+}
+
+.metrics-dashboard__metric--error .metrics-dashboard__metric-value {
+  color: var(--color-error);
+}
+
+.metrics-dashboard__metric--warning .metrics-dashboard__metric-value {
+  color: var(--color-warning-dark);
+}
+
+.metrics-dashboard__metric-description {
+  margin-top: var(--spacing-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+.metrics-dashboard__health-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.metrics-dashboard__health-item {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: var(--spacing-3);
+  align-items: center;
+  padding: var(--spacing-3);
+  background: var(--color-background-primary);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+}
+
+.metrics-dashboard__health-service {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  text-transform: capitalize;
+}
+
+.metrics-dashboard__health-status {
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-transform: capitalize;
+}
+
+.metrics-dashboard__health-status.healthy {
+  background: var(--color-success-background);
+  color: var(--color-success);
+}
+
+.metrics-dashboard__health-status.degraded {
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+}
+
+.metrics-dashboard__health-status.unhealthy {
+  background: var(--color-error-background);
+  color: var(--color-error);
+}
+
+.metrics-dashboard__health-response {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  font-family: var(--font-family-mono);
+}
+
+.metrics-dashboard__health-uptime {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.metrics-dashboard__health-message {
+  grid-column: 1 / -1;
+  margin-top: var(--spacing-2);
+  padding-top: var(--spacing-2);
+  border-top: 1px solid var(--color-border-default);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .metrics-dashboard {
+    padding: var(--spacing-4);
+  }
+
+  .metrics-dashboard__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-3);
+  }
+
+  .metrics-dashboard__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .metrics-dashboard__health-item {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-2);
+  }
+
+  .metrics-dashboard__health-status,
+  .metrics-dashboard__health-response,
+  .metrics-dashboard__health-uptime {
+    justify-self: start;
+  }
+}
