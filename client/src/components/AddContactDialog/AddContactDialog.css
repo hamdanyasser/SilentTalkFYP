@@ -1,0 +1,218 @@
+/**
+ * Add Contact Dialog Styles
+ */
+
+.add-contact-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.add-contact-dialog {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: dialog-enter 0.2s ease-out;
+}
+
+@keyframes dialog-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.add-contact-dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-6);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.add-contact-dialog__title {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.add-contact-dialog__close {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: var(--font-size-xl);
+  color: var(--color-text-secondary);
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-contact-dialog__close:hover:not(:disabled) {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.add-contact-dialog__close:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.add-contact-dialog__close:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.add-contact-dialog__form {
+  padding: var(--spacing-6);
+}
+
+.add-contact-dialog__textarea {
+  width: 100%;
+  padding: var(--spacing-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: var(--font-size-base);
+  resize: vertical;
+  transition: border-color var(--transition-fast);
+}
+
+.add-contact-dialog__textarea:hover {
+  border-color: var(--color-primary);
+}
+
+.add-contact-dialog__textarea:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-color: transparent;
+}
+
+.add-contact-dialog__textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.add-contact-dialog__alert {
+  padding: var(--spacing-3) var(--spacing-4);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-4);
+}
+
+.add-contact-dialog__alert--error {
+  background: var(--color-red-100);
+  color: var(--color-red-800);
+  border: 1px solid var(--color-red-300);
+}
+
+.add-contact-dialog__alert--success {
+  background: var(--color-green-100);
+  color: var(--color-green-800);
+  border: 1px solid var(--color-green-300);
+}
+
+.add-contact-dialog__actions {
+  display: flex;
+  gap: var(--spacing-3);
+  justify-content: flex-end;
+  margin-top: var(--spacing-6);
+}
+
+/* Form styles */
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.form-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+}
+
+.form-hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.text-error {
+  color: var(--color-red-600);
+}
+
+/* Scrollbar */
+.add-contact-dialog::-webkit-scrollbar {
+  width: 8px;
+}
+
+.add-contact-dialog::-webkit-scrollbar-track {
+  background: var(--color-surface-subtle);
+}
+
+.add-contact-dialog::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+}
+
+.add-contact-dialog::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-tertiary);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .add-contact-dialog {
+    animation: none;
+  }
+
+  .add-contact-dialog__close {
+    transition: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .add-contact-dialog {
+    border: 2px solid var(--color-border);
+  }
+
+  .add-contact-dialog__close:focus {
+    outline-width: 3px;
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+  .add-contact-dialog {
+    width: 95%;
+    max-height: 95vh;
+  }
+
+  .add-contact-dialog__header,
+  .add-contact-dialog__form {
+    padding: var(--spacing-4);
+  }
+}

@@ -1,0 +1,67 @@
+/**
+ * Presence Badge Styles
+ */
+
+.presence-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.presence-badge__indicator {
+  display: block;
+  border-radius: 50%;
+  border: 2px solid var(--color-surface);
+  flex-shrink: 0;
+}
+
+/* Size variants */
+.presence-badge--sm .presence-badge__indicator {
+  width: 8px;
+  height: 8px;
+}
+
+.presence-badge--md .presence-badge__indicator {
+  width: 12px;
+  height: 12px;
+}
+
+.presence-badge--lg .presence-badge__indicator {
+  width: 16px;
+  height: 16px;
+}
+
+.presence-badge__label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Pulsing animation for online status */
+.presence-badge--online .presence-badge__indicator {
+  animation: presence-pulse 2s ease-in-out infinite;
+}
+
+@keyframes presence-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .presence-badge__indicator {
+    border-width: 3px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .presence-badge--online .presence-badge__indicator {
+    animation: none;
+  }
+}
