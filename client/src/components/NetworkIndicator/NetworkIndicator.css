@@ -1,0 +1,112 @@
+/**
+ * Network Indicator Styles
+ */
+
+.network-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.network-indicator__bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.network-indicator__bar {
+  background: var(--color-gray-300);
+  border-radius: 2px;
+  transition: background-color var(--transition-fast);
+}
+
+/* Size variants */
+.network-indicator--sm .network-indicator__bar {
+  width: 3px;
+}
+
+.network-indicator--sm .network-indicator__bar:nth-child(1) {
+  height: 4px;
+}
+
+.network-indicator--sm .network-indicator__bar:nth-child(2) {
+  height: 6px;
+}
+
+.network-indicator--sm .network-indicator__bar:nth-child(3) {
+  height: 8px;
+}
+
+.network-indicator--sm .network-indicator__bar:nth-child(4) {
+  height: 10px;
+}
+
+.network-indicator--md .network-indicator__bar {
+  width: 4px;
+}
+
+.network-indicator--md .network-indicator__bar:nth-child(1) {
+  height: 6px;
+}
+
+.network-indicator--md .network-indicator__bar:nth-child(2) {
+  height: 9px;
+}
+
+.network-indicator--md .network-indicator__bar:nth-child(3) {
+  height: 12px;
+}
+
+.network-indicator--md .network-indicator__bar:nth-child(4) {
+  height: 15px;
+}
+
+.network-indicator--lg .network-indicator__bar {
+  width: 5px;
+}
+
+.network-indicator--lg .network-indicator__bar:nth-child(1) {
+  height: 8px;
+}
+
+.network-indicator--lg .network-indicator__bar:nth-child(2) {
+  height: 12px;
+}
+
+.network-indicator--lg .network-indicator__bar:nth-child(3) {
+  height: 16px;
+}
+
+.network-indicator--lg .network-indicator__bar:nth-child(4) {
+  height: 20px;
+}
+
+.network-indicator__label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+.network-indicator__latency {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .network-indicator__bar {
+    transition: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .network-indicator__bar {
+    border: 1px solid currentColor;
+  }
+
+  .network-indicator__bar--active {
+    border-width: 2px;
+  }
+}

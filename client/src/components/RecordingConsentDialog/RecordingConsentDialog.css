@@ -1,0 +1,157 @@
+/**
+ * Recording Consent Dialog Styles
+ */
+
+.recording-consent-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(4px);
+}
+
+.recording-consent-dialog {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  width: 90%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: dialog-enter 0.2s ease-out;
+}
+
+@keyframes dialog-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.recording-consent-dialog__header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-6) var(--spacing-6) var(--spacing-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.recording-consent-dialog__icon {
+  font-size: 48px;
+  margin-bottom: var(--spacing-3);
+}
+
+.recording-consent-dialog__title {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  text-align: center;
+}
+
+.recording-consent-dialog__body {
+  padding: var(--spacing-6);
+}
+
+.recording-consent-dialog__body p {
+  margin: 0 0 var(--spacing-4);
+  color: var(--color-text);
+  line-height: 1.6;
+}
+
+.recording-consent-dialog__body p:last-child {
+  margin-bottom: 0;
+}
+
+.recording-consent-dialog__warning {
+  display: flex;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4);
+  background: var(--color-yellow-100);
+  border: 1px solid var(--color-yellow-300);
+  border-radius: var(--radius-md);
+  margin-top: var(--spacing-4);
+}
+
+.recording-consent-dialog__warning-icon {
+  font-size: var(--font-size-xl);
+  flex-shrink: 0;
+}
+
+.recording-consent-dialog__warning p {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-yellow-900);
+}
+
+.recording-consent-dialog__warning strong {
+  color: var(--color-yellow-900);
+}
+
+.recording-consent-dialog__actions {
+  padding: var(--spacing-4) var(--spacing-6) var(--spacing-6);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .recording-consent-dialog__warning {
+    background: rgba(245, 158, 11, 0.2);
+    border-color: rgba(245, 158, 11, 0.4);
+  }
+
+  .recording-consent-dialog__warning p,
+  .recording-consent-dialog__warning strong {
+    color: var(--color-yellow-200);
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .recording-consent-dialog {
+    animation: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .recording-consent-dialog {
+    border: 2px solid var(--color-border);
+  }
+
+  .recording-consent-dialog__warning {
+    border-width: 2px;
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+  .recording-consent-dialog {
+    width: 95%;
+    max-height: 95vh;
+  }
+
+  .recording-consent-dialog__header,
+  .recording-consent-dialog__body,
+  .recording-consent-dialog__actions {
+    padding-left: var(--spacing-4);
+    padding-right: var(--spacing-4);
+  }
+
+  .recording-consent-dialog__icon {
+    font-size: 40px;
+  }
+
+  .recording-consent-dialog__title {
+    font-size: var(--font-size-lg);
+  }
+}

@@ -1,0 +1,219 @@
+/**
+ * Call Controls Styles
+ */
+
+.call-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4);
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(10px);
+}
+
+.call-controls__recording-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-3);
+  background: var(--color-red-600);
+  color: white;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.call-controls__recording-dot {
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+  animation: recording-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes recording-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.call-controls__primary,
+.call-controls__secondary {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+}
+
+/* Call Control Button */
+.call-control {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: var(--font-size-xl);
+  color: white;
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.call-control:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+.call-control:focus {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.call-control:active {
+  transform: scale(0.95);
+}
+
+/* Active state */
+.call-control--active {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Off state (mic/camera muted) */
+.call-control--off {
+  background: var(--color-red-600);
+}
+
+.call-control--off:hover {
+  background: var(--color-red-700);
+}
+
+/* End call button */
+.call-control--end {
+  background: var(--color-red-600);
+  width: 64px;
+  height: 64px;
+  font-size: var(--font-size-2xl);
+}
+
+.call-control--end:hover {
+  background: var(--color-red-700);
+}
+
+/* Secondary controls (smaller) */
+.call-control--secondary {
+  width: 44px;
+  height: 44px;
+  font-size: var(--font-size-base);
+}
+
+/* Icon */
+.call-control__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Badge (for unread count) */
+.call-control__badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 12px;
+  height: 12px;
+  background: var(--color-red-500);
+  border: 2px solid rgba(0, 0, 0, 0.8);
+  border-radius: 50%;
+}
+
+/* Tooltip */
+.call-control__tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: var(--spacing-2) var(--spacing-3);
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+  border-radius: var(--radius-md);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.call-control__tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: rgba(0, 0, 0, 0.9);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .call-control {
+    transition: none;
+  }
+
+  .call-control:hover,
+  .call-control:active {
+    transform: none;
+  }
+
+  .call-controls__recording-dot {
+    animation: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .call-control {
+    border: 2px solid white;
+  }
+
+  .call-control:focus {
+    outline-width: 4px;
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+  .call-controls {
+    padding: var(--spacing-3);
+  }
+
+  .call-control {
+    width: 48px;
+    height: 48px;
+    font-size: var(--font-size-lg);
+  }
+
+  .call-control--end {
+    width: 56px;
+    height: 56px;
+    font-size: var(--font-size-xl);
+  }
+
+  .call-control--secondary {
+    width: 40px;
+    height: 40px;
+    font-size: var(--font-size-sm);
+  }
+
+  .call-controls__primary,
+  .call-controls__secondary {
+    gap: var(--spacing-2);
+  }
+}

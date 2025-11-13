@@ -4,6 +4,7 @@ import HomePage from './pages/HomePage'
 import VideoCallPage from './pages/VideoCallPage'
 import DesignSystem from './pages/DesignSystem'
 import { ContactsPage } from './pages/contacts/ContactsPage'
+import { CallHistoryPage } from './pages/callHistory/CallHistoryPage'
 import { SkipLinks, AccessibilityPanel } from './components/accessibility'
 import { SkipLink } from './types/accessibility'
 import { ContactsProvider } from './contexts/ContactsContext'
@@ -24,6 +25,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/call" element={<VideoCallPage />} />
           <Route path="/contacts" element={<ContactsPage />} />
+          <Route path="/call-history" element={<CallHistoryPage />} />
           <Route path="/design-system" element={<DesignSystem />} />
           <Route path="/health" element={<HealthPage />} />
         </Routes>
