@@ -153,6 +153,10 @@ builder.Services.AddRateLimiter(options =>
 // JWT Token Service
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
+// SignalR Services
+builder.Services.AddSingleton<ICallRoomService, CallRoomService>();
+builder.Services.AddScoped<IIceServerConfigService, IceServerConfigService>();
+
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICallRepository, CallRepository>();
@@ -170,15 +174,28 @@ builder.Services.AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssemblyContaining<SilentTalk.Application.Validators.RegisterRequestValidator>();
 
 // ============================================
+// SignalR Configuration
+// ============================================
+builder.Services.AddSignalR(options =>
+{
+    options.EnableDetailedErrors = builder.Environment.IsDevelopment();
+    options.KeepAliveInterval = TimeSpan.FromSeconds(15);
+    options.ClientTimeoutInterval = TimeSpan.FromSeconds(30);
+    options.HandshakeTimeout = TimeSpan.FromSeconds(15);
+    options.MaximumReceiveMessageSize = 102400; // 100 KB
+});
+
+// ============================================
 // CORS
 // ============================================
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.WithOrigins("http://localhost:3000", "http://localhost:5173") // React dev servers
               .AllowAnyMethod()
-              .AllowAnyHeader();
+              .AllowAnyHeader()
+              .AllowCredentials(); // Required for SignalR
     });
 });
 
@@ -285,6 +302,9 @@ app.UseActivityTracking();
 
 // Map controllers
 app.MapControllers();
+
+// Map SignalR hubs
+app.MapHub<SilentTalk.Api.Hubs.CallHub>("/hubs/call");
 
 // Health check endpoints
 app.MapHealthChecks("/health");
