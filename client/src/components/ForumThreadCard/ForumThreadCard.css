@@ -1,0 +1,136 @@
+/**
+ * Forum Thread Card Styles
+ */
+
+.forum-thread-card {
+  padding: var(--spacing-4);
+  background: var(--color-background-primary);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.forum-thread-card:hover {
+  border-color: var(--color-border-hover);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.forum-thread-card:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.forum-thread-card.pinned {
+  border-left: 4px solid var(--color-primary);
+  background: var(--color-background-secondary);
+}
+
+.forum-thread-card.locked {
+  opacity: 0.8;
+}
+
+.forum-thread-card.flagged {
+  border-color: var(--color-warning);
+}
+
+.forum-thread-card__header {
+  margin-bottom: var(--spacing-2);
+}
+
+.forum-thread-card__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-sm);
+}
+
+.forum-thread-card__author {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  flex: 1;
+}
+
+.forum-thread-card__avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-round);
+  object-fit: cover;
+}
+
+.forum-thread-card__username {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.forum-thread-card__reputation {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  background: var(--color-background-secondary);
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-sm);
+}
+
+.forum-thread-card__time {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  margin-left: auto;
+}
+
+.forum-thread-card__title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: var(--spacing-2) 0;
+  line-height: var(--line-height-tight);
+}
+
+.forum-thread-card__tags {
+  margin: var(--spacing-2) 0;
+}
+
+.forum-thread-card__tag {
+  display: inline-block;
+  padding: var(--spacing-1) var(--spacing-2);
+  background: var(--color-background-secondary);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-fast);
+}
+
+.forum-thread-card__tag:hover {
+  background: var(--color-background-hover);
+}
+
+.forum-thread-card__footer {
+  margin-top: var(--spacing-3);
+  padding-top: var(--spacing-3);
+  border-top: 1px solid var(--color-border-default);
+}
+
+.forum-thread-card__stat {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.forum-thread-card__stat-icon {
+  font-size: var(--font-size-base);
+}
+
+.forum-thread-card__stat-value {
+  font-weight: var(--font-weight-medium);
+}
+
+.forum-thread-card__activity {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  margin-left: auto;
+}

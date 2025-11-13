@@ -1,0 +1,90 @@
+/**
+ * Forum Thread List Styles
+ */
+
+.forum-thread-list {
+  width: 100%;
+}
+
+.forum-thread-list__toolbar {
+  padding: var(--spacing-3);
+  background: var(--color-background-secondary);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-3);
+}
+
+.forum-thread-list__count {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+.forum-thread-list__sort {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.forum-thread-list__sort-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+.forum-thread-list__sort-select {
+  padding: var(--spacing-2) var(--spacing-3);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  background: var(--color-background-primary);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-family: var(--font-family-base);
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+
+.forum-thread-list__sort-select:hover {
+  border-color: var(--color-border-hover);
+}
+
+.forum-thread-list__sort-select:focus {
+  outline: none;
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+.forum-thread-list__loading,
+.forum-thread-list__error,
+.forum-thread-list__empty {
+  padding: var(--spacing-6);
+  text-align: center;
+  color: var(--color-text-secondary);
+  background: var(--color-background-secondary);
+  border-radius: var(--radius-md);
+}
+
+.forum-thread-list__error {
+  color: var(--color-error);
+  background: var(--color-error-background);
+}
+
+.forum-thread-list__empty p {
+  margin: var(--spacing-2) 0;
+}
+
+.forum-thread-list__items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.forum-thread-list__pagination {
+  margin-top: var(--spacing-4);
+  padding: var(--spacing-3);
+}
+
+.forum-thread-list__page-info {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+}
