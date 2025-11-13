@@ -158,6 +158,8 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICallRepository, CallRepository>();
 builder.Services.AddScoped<IParticipantRepository, ParticipantRepository>();
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
+builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+builder.Services.AddScoped<IUserReportRepository, UserReportRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // ============================================
