@@ -191,6 +191,82 @@ export class CallSignalingClient {
   }
 
   // ============================================
+  // Chat Methods
+  // ============================================
+
+  /**
+   * Send chat message
+   */
+  async sendChatMessage(message: SendChatMessageRequest): Promise<void> {
+    if (!this.connection) throw new Error('Not connected');
+    await this.connection.invoke('SendChatMessage', message);
+  }
+
+  /**
+   * Get chat history
+   */
+  async getChatHistory(callId: string, skip: number = 0, limit: number = 100): Promise<ChatMessage[]> {
+    if (!this.connection) throw new Error('Not connected');
+    return await this.connection.invoke('GetChatHistory', callId, skip, limit);
+  }
+
+  // ============================================
+  // Screenshare Methods
+  // ============================================
+
+  /**
+   * Start screenshare
+   */
+  async startScreenshare(callId: string): Promise<void> {
+    if (!this.connection) throw new Error('Not connected');
+    await this.connection.invoke('StartScreenshare', callId);
+  }
+
+  /**
+   * Stop screenshare
+   */
+  async stopScreenshare(callId: string): Promise<void> {
+    if (!this.connection) throw new Error('Not connected');
+    await this.connection.invoke('StopScreenshare', callId);
+  }
+
+  // ============================================
+  // Recording Methods
+  // ============================================
+
+  /**
+   * Start call recording
+   */
+  async startRecording(request: StartRecordingRequest): Promise<string> {
+    if (!this.connection) throw new Error('Not connected');
+    return await this.connection.invoke('StartRecording', request);
+  }
+
+  /**
+   * Stop call recording
+   */
+  async stopRecording(request: StopRecordingRequest): Promise<void> {
+    if (!this.connection) throw new Error('Not connected');
+    await this.connection.invoke('StopRecording', request);
+  }
+
+  /**
+   * Submit recording consent
+   */
+  async submitRecordingConsent(consent: RecordingConsent): Promise<void> {
+    if (!this.connection) throw new Error('Not connected');
+    await this.connection.invoke('SubmitRecordingConsent', consent);
+  }
+
+  /**
+   * Submit call quality report
+   */
+  async submitCallQualityReport(report: CallQualityReport): Promise<void> {
+    if (!this.connection) throw new Error('Not connected');
+    await this.connection.invoke('SubmitCallQualityReport', report);
+  }
+
+  // ============================================
   // Event Handlers Registration
   // ============================================
 
@@ -262,6 +338,48 @@ export class CallSignalingClient {
    */
   onNetworkQualityChanged(handler: (data: { userId: string; quality: NetworkQuality; stats?: NetworkStats }) => void): void {
     this.connection?.on('NetworkQualityChanged', handler);
+  }
+
+  /**
+   * Register handler for receiving chat message
+   */
+  onReceiveChatMessage(handler: (message: ChatMessage) => void): void {
+    this.connection?.on('ReceiveChatMessage', handler);
+  }
+
+  /**
+   * Register handler for screenshare started event
+   */
+  onScreenshareStarted(handler: (data: { callId: string; userId: string; displayName: string }) => void): void {
+    this.connection?.on('ScreenshareStarted', handler);
+  }
+
+  /**
+   * Register handler for screenshare stopped event
+   */
+  onScreenshareStopped(handler: (data: { callId: string; userId: string }) => void): void {
+    this.connection?.on('ScreenshareStopped', handler);
+  }
+
+  /**
+   * Register handler for recording started event
+   */
+  onRecordingStarted(handler: (data: { recordingId: string; callId: string; initiatedBy: string; initiatorName: string; requireConsent: boolean; startedAt: string }) => void): void {
+    this.connection?.on('RecordingStarted', handler);
+  }
+
+  /**
+   * Register handler for recording stopped event
+   */
+  onRecordingStopped(handler: (data: { recordingId: string; callId: string; stoppedBy: string; stoppedAt: string }) => void): void {
+    this.connection?.on('RecordingStopped', handler);
+  }
+
+  /**
+   * Register handler for recording consent received event
+   */
+  onRecordingConsentReceived(handler: (data: { recordingId: string; callId: string; userId: string; displayName: string; consent: boolean }) => void): void {
+    this.connection?.on('RecordingConsentReceived', handler);
   }
 
   // ============================================
@@ -434,4 +552,54 @@ export interface IceServer {
   urls: string[];
   username?: string;
   credential?: string;
+}
+
+// Chat types
+export interface ChatMessage {
+  messageId: string;
+  callId: string;
+  senderId: string;
+  senderName: string;
+  content: string;
+  type: 'text' | 'sign' | 'system';
+  timestamp: string;
+  replyToId?: string;
+}
+
+export interface SendChatMessageRequest {
+  callId: string;
+  content: string;
+  type: 'text' | 'sign' | 'system';
+  replyToId?: string;
+}
+
+// Recording types
+export interface StartRecordingRequest {
+  callId: string;
+  requireConsent: boolean;
+}
+
+export interface StopRecordingRequest {
+  callId: string;
+  recordingId: string;
+}
+
+export interface RecordingConsent {
+  callId: string;
+  recordingId: string;
+  userId: string;
+  consent: boolean;
+}
+
+export interface CallQualityReport {
+  callId: string;
+  userId: string;
+  videoResolutionWidth: number;
+  videoResolutionHeight: number;
+  videoFrameRate: number;
+  videoBitrate: number;
+  audioBitrate: number;
+  packetLossRate: number;
+  jitter: number;
+  roundTripTime: number;
 }
