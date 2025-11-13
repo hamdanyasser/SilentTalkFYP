@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using MongoDB.Driver;
 using Serilog;
 using SilentTalk.Api.Middleware;
 using SilentTalk.Application.Repositories;
@@ -38,6 +39,25 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
         b => b.MigrationsAssembly("SilentTalk.Infrastructure")));
+
+// MongoDB Configuration
+builder.Services.Configure<MongoDbSettings>(options =>
+{
+    options.ConnectionString = builder.Configuration.GetConnectionString("MongoDB")!;
+    options.DatabaseName = "silentstalk";
+});
+
+builder.Services.AddSingleton<IMongoClient>(sp =>
+{
+    var connectionString = builder.Configuration.GetConnectionString("MongoDB");
+    return new MongoClient(connectionString);
+});
+
+builder.Services.AddScoped<IMongoDatabase>(sp =>
+{
+    var client = sp.GetRequiredService<IMongoClient>();
+    return client.GetDatabase("silentstalk");
+});
 
 // ============================================
 // ASP.NET Core Identity Configuration
@@ -157,6 +177,10 @@ builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddSingleton<ICallRoomService, CallRoomService>();
 builder.Services.AddScoped<IIceServerConfigService, IceServerConfigService>();
 
+// Storage Service (MinIO/S3)
+builder.Services.Configure<StorageSettings>(builder.Configuration.GetSection("Storage"));
+builder.Services.AddSingleton<IStorageService, MinIOStorageService>();
+
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICallRepository, CallRepository>();
@@ -164,6 +188,7 @@ builder.Services.AddScoped<IParticipantRepository, ParticipantRepository>();
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
 builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 builder.Services.AddScoped<IUserReportRepository, UserReportRepository>();
+builder.Services.AddScoped<IChatMessageRepository, ChatMessageRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // ============================================
@@ -257,6 +282,10 @@ builder.Services.AddHealthChecks()
         builder.Configuration.GetConnectionString("DefaultConnection")!,
         name: "postgres",
         tags: new[] { "db", "postgres" })
+    .AddMongoDb(
+        builder.Configuration.GetConnectionString("MongoDB")!,
+        name: "mongodb",
+        tags: new[] { "db", "mongodb" })
     .AddRedis(
         builder.Configuration.GetConnectionString("Redis")!,
         name: "redis",

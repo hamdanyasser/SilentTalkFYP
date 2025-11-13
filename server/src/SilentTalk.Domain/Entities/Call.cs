@@ -19,9 +19,9 @@ public class Call : BaseEntity
     public Guid InitiatorId { get; set; }
 
     /// <summary>
-    /// Timestamp when the call started
+    /// Timestamp when the call started (null for scheduled calls that haven't started)
     /// </summary>
-    public DateTime StartTime { get; set; }
+    public DateTime? StartTime { get; set; }
 
     /// <summary>
     /// Timestamp when the call ended (null if still active)
@@ -37,6 +37,38 @@ public class Call : BaseEntity
     /// URL to the call recording (if recorded)
     /// </summary>
     public string? RecordingUrl { get; set; }
+
+    // Scheduling fields
+
+    /// <summary>
+    /// Scheduled start time for the call (null for instant calls)
+    /// </summary>
+    public DateTime? ScheduledStartTime { get; set; }
+
+    /// <summary>
+    /// Expected duration in minutes (null if not specified)
+    /// </summary>
+    public int? DurationMinutes { get; set; }
+
+    /// <summary>
+    /// Title/subject of the call (for scheduled calls)
+    /// </summary>
+    public string? Title { get; set; }
+
+    /// <summary>
+    /// Description or agenda of the call
+    /// </summary>
+    public string? Description { get; set; }
+
+    /// <summary>
+    /// List of invited user IDs (comma-separated for scheduled calls)
+    /// </summary>
+    public string? InvitedUserIds { get; set; }
+
+    /// <summary>
+    /// True if this is a scheduled call, false for instant calls
+    /// </summary>
+    public bool IsScheduled { get; set; }
 
     // Navigation properties
 

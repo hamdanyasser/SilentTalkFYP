@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using SilentTalk.Application.DTOs.SignalR;
+using SilentTalk.Application.Repositories;
 using SilentTalk.Application.Services;
+using SilentTalk.Domain.Entities;
 using System.Security.Claims;
 
 namespace SilentTalk.Api.Hubs;
@@ -15,15 +17,18 @@ public class CallHub : Hub
 {
     private readonly ICallRoomService _roomService;
     private readonly IIceServerConfigService _iceServerConfig;
+    private readonly IChatMessageRepository _chatMessageRepository;
     private readonly ILogger<CallHub> _logger;
 
     public CallHub(
         ICallRoomService roomService,
         IIceServerConfigService iceServerConfig,
+        IChatMessageRepository chatMessageRepository,
         ILogger<CallHub> logger)
     {
         _roomService = roomService;
         _iceServerConfig = iceServerConfig;
+        _chatMessageRepository = chatMessageRepository;
         _logger = logger;
     }
 
@@ -358,6 +363,222 @@ public class CallHub : Hub
             _logger.LogWarning("User {UserId} experiencing poor network quality in call {CallId}: {Quality}",
                 userId, quality.CallId, quality.Quality);
         }
+    }
+
+    #endregion
+
+    #region Chat
+
+    /// <summary>
+    /// Send chat message to all participants
+    /// </summary>
+    [HubMethodName("SendChatMessage")]
+    public async Task SendChatMessage(SendChatMessageRequest request)
+    {
+        var userId = GetUserId();
+        var displayName = GetUserDisplayName();
+        var messageId = Guid.NewGuid().ToString();
+
+        // Persist message to MongoDB
+        var chatMessage = new ChatMessage
+        {
+            MessageId = messageId,
+            CallId = request.CallId,
+            SenderId = userId,
+            SenderName = displayName,
+            Content = request.Content,
+            Type = request.Type,
+            Timestamp = DateTime.UtcNow,
+            ReplyToId = request.ReplyToId
+        };
+
+        await _chatMessageRepository.AddAsync(chatMessage);
+
+        // Broadcast DTO to all participants in the call
+        var messageDto = new ChatMessageDto
+        {
+            MessageId = messageId,
+            CallId = request.CallId,
+            SenderId = userId,
+            SenderName = displayName,
+            Content = request.Content,
+            Type = request.Type,
+            Timestamp = chatMessage.Timestamp,
+            ReplyToId = request.ReplyToId
+        };
+
+        await Clients.Group(request.CallId).SendAsync("ReceiveChatMessage", messageDto);
+
+        _logger.LogDebug("User {UserId} sent chat message to call {CallId}", userId, request.CallId);
+    }
+
+    /// <summary>
+    /// Get chat message history for a call
+    /// </summary>
+    [HubMethodName("GetChatHistory")]
+    public async Task<IEnumerable<ChatMessageDto>> GetChatHistory(string callId, int skip = 0, int limit = 100)
+    {
+        var messages = await _chatMessageRepository.GetByCallIdAsync(callId, skip, limit);
+
+        return messages.Select(m => new ChatMessageDto
+        {
+            MessageId = m.MessageId,
+            CallId = m.CallId,
+            SenderId = m.SenderId,
+            SenderName = m.SenderName,
+            Content = m.Content,
+            Type = m.Type,
+            Timestamp = m.Timestamp,
+            ReplyToId = m.ReplyToId
+        });
+    }
+
+    #endregion
+
+    #region Screenshare
+
+    /// <summary>
+    /// Start screenshare
+    /// </summary>
+    [HubMethodName("StartScreenshare")]
+    public async Task StartScreenshare(string callId)
+    {
+        var userId = GetUserId();
+        var displayName = GetUserDisplayName();
+
+        _logger.LogInformation("User {UserId} started screenshare in call {CallId}", userId, callId);
+
+        // Notify all participants
+        await Clients.Group(callId).SendAsync("ScreenshareStarted", new
+        {
+            CallId = callId,
+            UserId = userId,
+            DisplayName = displayName
+        });
+    }
+
+    /// <summary>
+    /// Stop screenshare
+    /// </summary>
+    [HubMethodName("StopScreenshare")]
+    public async Task StopScreenshare(string callId)
+    {
+        var userId = GetUserId();
+
+        _logger.LogInformation("User {UserId} stopped screenshare in call {CallId}", userId, callId);
+
+        // Notify all participants
+        await Clients.Group(callId).SendAsync("ScreenshareStopped", new
+        {
+            CallId = callId,
+            UserId = userId
+        });
+    }
+
+    #endregion
+
+    #region Recording
+
+    /// <summary>
+    /// Start call recording
+    /// </summary>
+    [HubMethodName("StartRecording")]
+    public async Task<string> StartRecording(StartRecordingRequest request)
+    {
+        var userId = GetUserId();
+        var displayName = GetUserDisplayName();
+        var recordingId = Guid.NewGuid().ToString();
+
+        _logger.LogInformation("User {UserId} started recording for call {CallId}", userId, request.CallId);
+
+        var recording = new RecordingStateDto
+        {
+            CallId = request.CallId,
+            RecordingId = recordingId,
+            IsRecording = true,
+            InitiatedBy = userId,
+            StartedAt = DateTime.UtcNow
+        };
+
+        // Notify all participants about recording
+        await Clients.Group(request.CallId).SendAsync("RecordingStarted", new
+        {
+            RecordingId = recordingId,
+            CallId = request.CallId,
+            InitiatedBy = userId,
+            InitiatorName = displayName,
+            RequireConsent = request.RequireConsent,
+            StartedAt = DateTime.UtcNow
+        });
+
+        return recordingId;
+    }
+
+    /// <summary>
+    /// Stop call recording
+    /// </summary>
+    [HubMethodName("StopRecording")]
+    public async Task StopRecording(StopRecordingRequest request)
+    {
+        var userId = GetUserId();
+
+        _logger.LogInformation("User {UserId} stopped recording {RecordingId} for call {CallId}",
+            userId, request.RecordingId, request.CallId);
+
+        // Notify all participants
+        await Clients.Group(request.CallId).SendAsync("RecordingStopped", new
+        {
+            RecordingId = request.RecordingId,
+            CallId = request.CallId,
+            StoppedBy = userId,
+            StoppedAt = DateTime.UtcNow
+        });
+    }
+
+    /// <summary>
+    /// Submit recording consent
+    /// </summary>
+    [HubMethodName("SubmitRecordingConsent")]
+    public async Task SubmitRecordingConsent(RecordingConsentDto consent)
+    {
+        var userId = GetUserId();
+        var displayName = GetUserDisplayName();
+        consent.UserId = userId;
+
+        _logger.LogInformation("User {UserId} {Consent} to recording {RecordingId}",
+            userId, consent.Consent ? "consented" : "declined", consent.RecordingId);
+
+        // Notify all participants about consent status
+        await Clients.Group(consent.CallId).SendAsync("RecordingConsentReceived", new
+        {
+            RecordingId = consent.RecordingId,
+            CallId = consent.CallId,
+            UserId = userId,
+            DisplayName = displayName,
+            Consent = consent.Consent
+        });
+    }
+
+    #endregion
+
+    #region Call Quality
+
+    /// <summary>
+    /// Submit call quality report
+    /// </summary>
+    [HubMethodName("SubmitCallQualityReport")]
+    public async Task SubmitCallQualityReport(CallQualityReport report)
+    {
+        var userId = GetUserId();
+        report.UserId = userId;
+        report.Timestamp = DateTime.UtcNow;
+
+        _logger.LogDebug("Received quality report from {UserId}: {Width}x{Height} @ {Fps}fps, {VideoBitrate}kbps video, {AudioBitrate}kbps audio, {PacketLoss}% loss, {RTT}ms RTT",
+            userId, report.VideoResolutionWidth, report.VideoResolutionHeight, report.VideoFrameRate,
+            report.VideoBitrate, report.AudioBitrate, report.PacketLossRate * 100, report.RoundTripTime);
+
+        // Store or process quality metrics (could be saved to database/analytics)
+        // For now, just log it
     }
 
     #endregion

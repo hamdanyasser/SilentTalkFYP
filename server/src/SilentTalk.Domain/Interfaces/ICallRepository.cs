@@ -37,4 +37,33 @@ public interface ICallRepository : IRepository<Call>
     /// Get calls in date range
     /// </summary>
     Task<IEnumerable<Call>> GetCallsByDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Get scheduled calls for a user
+    /// </summary>
+    Task<IEnumerable<Call>> GetScheduledCallsAsync(Guid userId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Get upcoming scheduled calls (scheduled for the future)
+    /// </summary>
+    Task<IEnumerable<Call>> GetUpcomingScheduledCallsAsync(Guid userId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Get call history with pagination and filters
+    /// </summary>
+    Task<(IEnumerable<Call> Calls, int TotalCount)> GetCallHistoryAsync(
+        Guid? userId,
+        CallStatus? status,
+        DateTime? startDate,
+        DateTime? endDate,
+        bool scheduledOnly,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Get call statistics for a user
+    /// </summary>
+    Task<(int Total, int Active, int Scheduled, int Completed, int Cancelled, int Missed, int TotalMinutes, double AvgDuration)>
+        GetCallStatisticsAsync(Guid userId, CancellationToken cancellationToken = default);
 }
