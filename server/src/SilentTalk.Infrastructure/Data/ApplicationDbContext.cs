@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SilentTalk.Domain.Common;
+using SilentTalk.Domain.Entities;
 
 namespace SilentTalk.Infrastructure.Data;
 
@@ -12,6 +13,12 @@ public class ApplicationDbContext : DbContext
         : base(options)
     {
     }
+
+    // DbSets for each entity
+    public DbSet<User> Users => Set<User>();
+    public DbSet<Call> Calls => Set<Call>();
+    public DbSet<Participant> Participants => Set<Participant>();
+    public DbSet<Contact> Contacts => Set<Contact>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
