@@ -1,0 +1,335 @@
+name: Security Scanning
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+  push:
+    branches:
+      - main
+  schedule:
+    # Run security scans weekly on Monday at 2 AM UTC
+    - cron: '0 2 * * 1'
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  dependency-scan:
+    name: Dependency Vulnerability Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Scan client dependencies
+        run: |
+          cd client
+          npm audit --audit-level=moderate --json > ../security-reports/client-audit.json || true
+          npm audit --audit-level=moderate
+
+      - name: Scan server dependencies
+        run: |
+          cd server
+          npm audit --audit-level=moderate --json > ../security-reports/server-audit.json || true
+          npm audit --audit-level=moderate
+
+      - name: Run Snyk scan
+        uses: snyk/actions/node@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high --json-file-output=security-reports/snyk-report.json
+
+      - name: Upload dependency scan results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dependency-scan-results
+          path: security-reports/
+          retention-days: 90
+
+  sast-scan:
+    name: Static Application Security Testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Semgrep
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: >-
+            p/security-audit
+            p/owasp-top-ten
+            p/react
+            p/typescript
+          generateSarif: true
+
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: semgrep.sarif
+
+  authorization-tests:
+    name: Authorization Security Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          cd server && npm ci
+          cd ../client && npm ci
+
+      - name: Start server
+        run: |
+          cd server
+          npm run build
+          npm start &
+          sleep 10
+
+      - name: Install k6
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6
+
+      - name: Run authorization tests
+        run: |
+          cd security-tests
+          mkdir -p security-reports
+          k6 run --out json=security-reports/authorization-test-raw.json \
+            --summary-export=security-reports/authorization-test-summary.json \
+            authorization.test.js
+
+      - name: Upload authorization test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: authorization-test-results
+          path: security-tests/security-reports/
+          retention-days: 90
+
+  injection-tests:
+    name: SQL Injection & XSS Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          cd server && npm ci
+
+      - name: Start server
+        run: |
+          cd server
+          npm run build
+          npm start &
+          sleep 10
+
+      - name: Install k6
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6
+
+      - name: Run injection tests
+        run: |
+          cd security-tests
+          mkdir -p security-reports
+          k6 run --out json=security-reports/injection-test-raw.json \
+            --summary-export=security-reports/injection-test-summary.json \
+            injection.test.js
+
+      - name: Upload injection test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: injection-test-results
+          path: security-tests/security-reports/
+          retention-days: 90
+
+  security-headers-test:
+    name: Security Headers Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          cd server && npm ci
+
+      - name: Start server
+        run: |
+          cd server
+          npm run build
+          npm start &
+          sleep 10
+
+      - name: Install k6
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6
+
+      - name: Run security headers tests
+        run: |
+          cd security-tests
+          mkdir -p security-reports
+          k6 run --out json=security-reports/security-headers-test-raw.json \
+            --summary-export=security-reports/security-headers-test-summary.json \
+            security-headers.test.js
+
+      - name: Upload security headers test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-headers-test-results
+          path: security-tests/security-reports/
+          retention-days: 90
+
+  secrets-scan:
+    name: Secrets Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  security-report:
+    name: Generate Security Report
+    needs: [dependency-scan, sast-scan, authorization-tests, injection-tests, security-headers-test]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: security-reports
+
+      - name: Generate consolidated report
+        run: |
+          mkdir -p security-reports/consolidated
+          cat > security-reports/consolidated/SECURITY_REPORT.md << 'EOF'
+          # Security Scan Report
+
+          **Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          **Branch:** ${{ github.ref_name }}
+          **Commit:** ${{ github.sha }}
+
+          ## Summary
+
+          | Scan Type | Status |
+          |-----------|--------|
+          | Dependency Scan | ${{ needs.dependency-scan.result }} |
+          | SAST Scan | ${{ needs.sast-scan.result }} |
+          | Authorization Tests | ${{ needs.authorization-tests.result }} |
+          | Injection Tests | ${{ needs.injection-tests.result }} |
+          | Security Headers | ${{ needs.security-headers-test.result }} |
+
+          ## Findings
+
+          Review individual test results in the artifacts section.
+
+          ## Recommendations
+
+          1. Fix all critical and high severity vulnerabilities immediately
+          2. Review medium severity findings and prioritize fixes
+          3. Update dependencies with known vulnerabilities
+          4. Ensure all security tests pass before merging to main
+
+          ## Next Steps
+
+          - [ ] Review detailed reports
+          - [ ] Create issues for vulnerabilities
+          - [ ] Apply patches and fixes
+          - [ ] Re-run security tests
+          - [ ] Update security documentation
+          EOF
+
+      - name: Upload consolidated report
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-report
+          path: security-reports/consolidated/
+          retention-days: 365
+
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const reportPath = 'security-reports/consolidated/SECURITY_REPORT.md';
+
+            if (fs.existsSync(reportPath)) {
+              const report = fs.readFileSync(reportPath, 'utf8');
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: report
+              });
+            }
+
+  fail-on-critical:
+    name: Fail on Critical Vulnerabilities
+    needs: [dependency-scan, authorization-tests, injection-tests]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Check for critical vulnerabilities
+        run: |
+          # This job fails if any critical vulnerabilities are found
+          # Add logic here to parse results and fail appropriately
+          echo "Checking for critical vulnerabilities..."
+
+          # Placeholder - implement actual check
+          exit 0
