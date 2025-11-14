@@ -16,8 +16,8 @@ RUN apk add --no-cache \
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci
+# Install dependencies (ignore scripts to avoid workspace prepare hook)
+RUN npm ci --ignore-scripts
 
 # Copy application code
 COPY . .
@@ -41,8 +41,8 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install all dependencies
-RUN npm ci
+# Install all dependencies (ignore scripts to avoid workspace prepare hook)
+RUN npm ci --ignore-scripts
 
 # Copy source code
 COPY . .
