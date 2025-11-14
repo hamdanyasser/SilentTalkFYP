@@ -1,0 +1,828 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{tcolorbox}
+\usepackage{listings}
+\usepackage{booktabs}
+
+% Header and Footer
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{SilentTalk FYP - Testing Assignment}
+\rhead{Zainab's Tasks}
+\cfoot{\thepage}
+
+% Colors
+\definecolor{primary}{RGB}{79,70,229}
+\definecolor{success}{RGB}{16,185,129}
+\definecolor{warning}{RGB}{245,158,11}
+
+% Title
+\title{\textbf{SilentTalk FYP\\Testing \& Demonstration Assignment\\Team Member: Zainab}}
+\author{Final Year Project - November 2025}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{fancy}
+
+\begin{tcolorbox}[colback=primary!5,colframe=primary,title=Your Primary Responsibilities]
+\textbf{Focus Areas:}
+\begin{itemize}
+    \item Frontend UI/UX Testing
+    \item End-to-End User Flow Testing (Playwright)
+    \item Accessibility Testing (WCAG 2.1 AA)
+    \item Cross-Browser \& Responsive Testing
+\end{itemize}
+\end{tcolorbox}
+
+\tableofcontents
+\newpage
+
+\section{Testing Responsibilities Overview}
+
+As the frontend and accessibility specialist, you are responsible for testing and demonstrating:
+\begin{itemize}
+    \item User interface functionality and usability
+    \item Complete user journeys (E2E testing)
+    \item Accessibility compliance (WCAG 2.1 AA)
+    \item Cross-browser compatibility
+    \item Responsive design on multiple devices
+    \item Video calling interface
+\end{itemize}
+
+\section{Pre-Testing Setup}
+
+\subsection{Environment Setup Checklist}
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+    \item \textbf{Install Required Software:}
+    \begin{itemize}
+        \item Node.js 18+ and npm
+        \item Google Chrome, Firefox, Safari (for cross-browser testing)
+        \item Screen reader: NVDA (Windows) or VoiceOver (Mac)
+        \item Browser extensions: axe DevTools, WAVE
+    \end{itemize}
+
+    \item \textbf{Clone Repository:}
+    \begin{lstlisting}[language=bash]
+git clone https://github.com/hamdanyasser/SilentTalkFYP.git
+cd SilentTalkFYP
+    \end{lstlisting}
+
+    \item \textbf{Install Frontend Dependencies:}
+    \begin{lstlisting}[language=bash]
+cd client
+npm install
+    \end{lstlisting}
+
+    \item \textbf{Install E2E Test Dependencies:}
+    \begin{lstlisting}[language=bash]
+cd e2e
+npm install
+npx playwright install --with-deps
+    \end{lstlisting}
+\end{enumerate}
+
+\section{Frontend UI Testing Tasks}
+
+\subsection{Task 1: Authentication UI Testing}
+
+\textbf{Objective:} Test all authentication pages and flows (FR-001)
+
+\textbf{Pages to Test:}
+\begin{itemize}
+    \item Login page (\texttt{/login})
+    \item Registration page (\texttt{/register})
+    \item Password reset page (\texttt{/forgot-password})
+\end{itemize}
+
+\textbf{Test Cases:}
+
+\begin{enumerate}
+    \item \textbf{Registration Page}
+    \begin{itemize}
+        \item Navigate to http://localhost:3000/register
+        \item Fill form with valid data
+        \item Submit and verify redirect to dashboard
+        \item Test form validation:
+        \begin{itemize}
+            \item Empty fields show error messages
+            \item Invalid email format shows error
+            \item Weak password shows requirements
+            \item Passwords must match
+        \end{itemize}
+        \item Verify error messages are clear and helpful
+        \item Test "Already have account?" link
+    \end{itemize}
+
+    \textbf{Screenshot Requirements:}
+    \begin{itemize}
+        \item Registration form (empty)
+        \item Form with validation errors
+        \item Successful registration
+    \end{itemize}
+
+    \item \textbf{Login Page}
+    \begin{itemize}
+        \item Test successful login
+        \item Test invalid credentials (should show error)
+        \item Test "Remember me" checkbox
+        \item Test "Forgot password" link
+        \item Verify redirect to dashboard after login
+    \end{itemize}
+
+    \item \textbf{Password Reset}
+    \begin{itemize}
+        \item Navigate to password reset page
+        \item Enter email address
+        \item Verify confirmation message
+    \end{itemize}
+\end{enumerate}
+
+\textbf{Deliverable:} Test report with screenshots for each scenario
+
+\subsection{Task 2: User Profile UI Testing}
+
+\textbf{Objective:} Test profile management interface (FR-005)
+
+\textbf{Page:} \texttt{/profile}
+
+\textbf{Test Cases:}
+
+\begin{enumerate}
+    \item \textbf{View Profile}
+    \begin{itemize}
+        \item Verify profile displays correctly
+        \item Check avatar image loads
+        \item Verify all fields display user data
+    \end{itemize}
+
+    \item \textbf{Edit Profile}
+    \begin{itemize}
+        \item Click "Edit Profile" button
+        \item Modify display name
+        \item Change preferred sign language (ASL/BSL/ISL)
+        \item Update bio
+        \item Update location
+        \item Click "Save Changes"
+        \item Verify changes are saved
+    \end{itemize}
+
+    \item \textbf{Avatar Upload}
+    \begin{itemize}
+        \item Click "Change Avatar" button
+        \item Upload valid image (JPEG/PNG)
+        \item Verify preview shows uploaded image
+        \item Test file size limit (reject > 5MB)
+        \item Test invalid file types (should fail)
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Task 3: Video Call UI Testing}
+
+\textbf{Objective:} Test video conferencing interface (FR-003)
+
+\textbf{Page:} \texttt{/calls/new}
+
+\textbf{Test Cases:}
+
+\begin{enumerate}
+    \item \textbf{Call Initiation}
+    \begin{itemize}
+        \item Click "Start Call" button
+        \item Grant camera/microphone permissions
+        \item Verify local video appears
+        \item Check that call controls are visible:
+        \begin{itemize}
+            \item Mute/Unmute button
+            \item Video on/off button
+            \item End call button
+            \item Screen share button
+            \item Settings button
+        \end{itemize}
+    \end{itemize}
+
+    \item \textbf{Call Controls}
+    \begin{itemize}
+        \item Test mute/unmute functionality
+        \item Test video on/off toggle
+        \item Test screen share (if available)
+        \item Verify call timer is running
+        \item Check participant count display
+    \end{itemize}
+
+    \item \textbf{Captions \& Recognition}
+    \begin{itemize}
+        \item Enable captions toggle
+        \item Verify captions display appears
+        \item Test caption font size adjustment
+        \item Test text-to-speech toggle
+    \end{itemize}
+
+    \item \textbf{End Call}
+    \begin{itemize}
+        \item Click "End Call" button
+        \item Verify redirect to calls list
+        \item Check call appears in history
+    \end{itemize}
+\end{enumerate}
+
+\textbf{Screenshots Required:}
+\begin{itemize}
+    \item Call screen with local video
+    \item Call controls (all buttons visible)
+    \item Captions display
+    \item Settings panel
+\end{itemize}
+
+\subsection{Task 4: Community Forum UI Testing}
+
+\textbf{Objective:} Test forum functionality (FR-007)
+
+\textbf{Page:} \texttt{/forum}
+
+\textbf{Test Cases:}
+
+\begin{enumerate}
+    \item \textbf{Browse Forum}
+    \begin{itemize}
+        \item Verify thread list displays
+        \item Check category filters work
+        \item Test search functionality
+        \item Verify sorting options (recent, popular)
+    \end{itemize}
+
+    \item \textbf{Create Thread}
+    \begin{itemize}
+        \item Click "New Thread" button
+        \item Fill title and content
+        \item Select category
+        \item Submit thread
+        \item Verify thread appears in list
+    \end{itemize}
+
+    \item \textbf{Reply to Thread}
+    \begin{itemize}
+        \item Open a thread
+        \item Write reply in text box
+        \item Submit reply
+        \item Verify reply appears
+    \end{itemize}
+
+    \item \textbf{Moderation}
+    \begin{itemize}
+        \item Test upvote/downvote buttons
+        \item Test report button
+        \item Verify edit/delete (for own posts)
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Task 5: Resource Library UI Testing}
+
+\textbf{Objective:} Test learning resources and glossary (FR-008)
+
+\textbf{Pages:} \texttt{/learn}, \texttt{/glossary}
+
+\textbf{Test Cases:}
+
+\begin{enumerate}
+    \item \textbf{Tutorial Library}
+    \begin{itemize}
+        \item Verify tutorial cards display
+        \item Test search functionality
+        \item Test category filters
+        \item Click on tutorial to view details
+        \item Test video playback
+        \item Test rating system
+    \end{itemize}
+
+    \item \textbf{Glossary}
+    \begin{itemize}
+        \item Navigate to glossary page
+        \item Test search functionality
+        \item Filter by category (basic, intermediate, advanced)
+        \item Filter by sign language (ASL, BSL, ISL)
+        \item Click on term to view details
+        \item Verify definition displays
+        \item Check related terms links work
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Task 6: Booking UI Testing}
+
+\textbf{Objective:} Test interpreter booking interface (FR-009)
+
+\textbf{Page:} \texttt{/booking}
+
+\textbf{Test Cases:}
+
+\begin{enumerate}
+    \item \textbf{Step 1: Select Interpreter}
+    \begin{itemize}
+        \item Verify interpreter cards display
+        \item Check rating, languages, specializations visible
+        \item Click "Select" on an interpreter
+        \item Verify navigation to Step 2
+    \end{itemize}
+
+    \item \textbf{Step 2: Schedule Booking}
+    \begin{itemize}
+        \item Select booking type (video/on-site)
+        \item Choose date and time
+        \item Select duration
+        \item Enter location (if on-site)
+        \item Add notes
+        \item Verify cost calculation updates
+        \item Click "Continue to Confirmation"
+    \end{itemize}
+
+    \item \textbf{Step 3: Confirm Booking}
+    \begin{itemize}
+        \item Verify all booking details display correctly
+        \item Check total cost is accurate
+        \item Click "Confirm Booking"
+        \item Verify success message
+        \item Check booking appears in history
+    \end{itemize}
+\end{enumerate}
+
+\section{End-to-End Testing Tasks}
+
+\subsection{Task 7: Run Playwright E2E Tests}
+
+\textbf{Objective:} Execute comprehensive E2E test suite
+
+\textbf{Prerequisites:}
+\begin{itemize}
+    \item Backend running on port 5000
+    \item ML service running on port 8000
+    \item Frontend running on port 3000
+\end{itemize}
+
+\textbf{Steps:}
+
+\begin{enumerate}
+    \item \textbf{Run All E2E Tests}
+    \begin{lstlisting}[language=bash]
+cd e2e
+npm run test:e2e
+    \end{lstlisting}
+
+    \item \textbf{Run Specific Test Suites}
+    \begin{lstlisting}[language=bash]
+# Authentication tests
+npm run test:auth
+
+# Video call tests
+npm run test:video
+
+# Forum tests
+npm run test:forum
+
+# Library tests
+npm run test:library
+
+# Acceptance criteria tests
+npm run test:acceptance
+    \end{lstlisting}
+
+    \item \textbf{View Test Report}
+    \begin{lstlisting}[language=bash]
+npm run test:e2e:report
+    \end{lstlisting}
+\end{enumerate}
+
+\textbf{Deliverable:}
+\begin{itemize}
+    \item Screenshots of test results (pass/fail)
+    \item HTML test report
+    \item List of any failing tests with error details
+\end{itemize}
+
+\subsection{Task 8: Manual E2E User Journey Testing}
+
+\textbf{Objective:} Manually test complete user flows
+
+\textbf{Journey 1: New User Registration to First Call}
+
+\begin{enumerate}
+    \item Navigate to http://localhost:3000
+    \item Click "Sign Up"
+    \item Complete registration form
+    \item Login with new credentials
+    \item Update profile with photo
+    \item Navigate to "Start Call"
+    \item Grant camera/microphone permissions
+    \item Start video call
+    \item Enable captions
+    \item End call
+    \item Verify call in history
+\end{enumerate}
+
+\textbf{Journey 2: Community Engagement}
+
+\begin{enumerate}
+    \item Login to application
+    \item Navigate to Forum
+    \item Search for a topic
+    \item Create new thread
+    \item Reply to existing thread
+    \item Navigate to Library
+    \item Search for tutorial
+    \item Watch tutorial video
+    \item Rate the tutorial
+\end{enumerate}
+
+\textbf{Document:} Each step with screenshots showing the flow
+
+\section{Accessibility Testing Tasks}
+
+\subsection{Task 9: WCAG 2.1 AA Compliance Testing}
+
+\textbf{Objective:} Ensure application meets accessibility standards (NFR-006)
+
+\textbf{Tools:}
+\begin{itemize}
+    \item axe DevTools (browser extension)
+    \item WAVE (browser extension)
+    \item Lighthouse (Chrome DevTools)
+    \item Screen reader (NVDA or VoiceOver)
+\end{itemize}
+
+\textbf{Test Cases:}
+
+\begin{enumerate}
+    \item \textbf{Automated Accessibility Audit}
+    \begin{itemize}
+        \item Install axe DevTools extension
+        \item Navigate to each page:
+        \begin{itemize}
+            \item Home page
+            \item Login page
+            \item Dashboard
+            \item Profile page
+            \item Video call page
+            \item Forum page
+            \item Glossary page
+        \end{itemize}
+        \item Run axe scan on each page
+        \item Document any violations
+        \item Take screenshots of axe results
+    \end{itemize}
+
+    \textbf{Expected Result:} Zero critical or serious violations
+
+    \item \textbf{Color Contrast Testing}
+    \begin{itemize}
+        \item Use WAVE to check color contrast
+        \item Verify all text meets 4.5:1 ratio (NFR-006)
+        \item Test high contrast mode
+        \item Check buttons and interactive elements (3:1 ratio)
+    \end{itemize}
+
+    \item \textbf{Keyboard Navigation Testing}
+    \begin{itemize}
+        \item Navigate entire site using only keyboard (Tab key)
+        \item Verify all interactive elements are reachable
+        \item Check focus indicators are visible
+        \item Test Shift+Tab (reverse navigation)
+        \item Verify logical tab order
+        \item Test keyboard shortcuts (if any)
+    \end{itemize}
+
+    \textbf{Checklist:}
+    \begin{itemize}
+        \item[$\square$] Can login using keyboard only
+        \item[$\square$] Can navigate menu with Tab
+        \item[$\square$] Can activate buttons with Enter/Space
+        \item[$\square$] Can close modals with Escape
+        \item[$\square$] Focus indicators clearly visible
+    \end{itemize}
+
+    \item \textbf{Screen Reader Testing}
+    \begin{itemize}
+        \item Launch screen reader (NVDA or VoiceOver)
+        \item Navigate through application
+        \item Verify all content is announced
+        \item Check ARIA labels are present
+        \item Test form field labels
+        \item Verify button purposes are clear
+        \item Test skip navigation links
+    \end{itemize}
+
+    \textbf{Document:} Record audio or write notes on screen reader experience
+
+    \item \textbf{Zoom \& Text Scaling}
+    \begin{itemize}
+        \item Test browser zoom at 200\% (NFR-006)
+        \item Verify no content is cut off
+        \item Check horizontal scrolling is minimal
+        \item Test text-only zoom
+    \end{itemize}
+
+    \item \textbf{Captions \& Alternative Text}
+    \begin{itemize}
+        \item Verify all images have alt text
+        \item Check video player has captions
+        \item Test caption customization (font size)
+        \item Verify captions appear within 3 seconds (FR-004.1)
+    \end{itemize}
+\end{enumerate}
+
+\textbf{Deliverable:} Accessibility compliance report with:
+\begin{itemize}
+    \item axe scan results for each page
+    \item Keyboard navigation test log
+    \item Screen reader testing notes
+    \item List of any accessibility issues found
+\end{itemize}
+
+\subsection{Task 10: Focus Management Testing}
+
+\begin{enumerate}
+    \item Open modal dialogs - verify focus moves to modal
+    \item Close modal - verify focus returns to trigger button
+    \item Submit forms - verify focus on error messages
+    \item Navigate pages - verify focus on main heading
+\end{enumerate}
+
+\section{Cross-Browser Testing Tasks}
+
+\subsection{Task 11: Multi-Browser Compatibility}
+
+\textbf{Objective:} Verify app works on all supported browsers (NFR-007)
+
+\textbf{Browsers to Test:}
+\begin{itemize}
+    \item Google Chrome 90+
+    \item Mozilla Firefox 88+
+    \item Safari 14+ (if on Mac)
+    \item Microsoft Edge 90+
+\end{itemize}
+
+\textbf{Test Cases:}
+
+For each browser, test:
+\begin{enumerate}
+    \item Registration and login
+    \item Profile page display
+    \item Video call functionality
+    \item WebRTC camera/microphone access
+    \item Forum posting
+    \item Glossary search
+    \item Responsive design at 1920px, 1366px, 768px
+\end{enumerate}
+
+\textbf{Document:} Create table with browser compatibility results
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\textbf{Feature} & \textbf{Chrome} & \textbf{Firefox} & \textbf{Safari} & \textbf{Edge} \\ \midrule
+Login & \checkmark & \checkmark & \checkmark & \checkmark \\
+Video Call & \checkmark & \checkmark & ? & \checkmark \\
+Forum & \checkmark & \checkmark & \checkmark & \checkmark \\
+... & ... & ... & ... & ... \\ \bottomrule
+\end{tabular}
+\caption{Browser compatibility test results}
+\end{table}
+
+\section{Responsive Design Testing Tasks}
+
+\subsection{Task 12: Mobile Responsiveness Testing}
+
+\textbf{Objective:} Verify responsive design (NFR-007)
+
+\textbf{Screen Sizes to Test:}
+\begin{itemize}
+    \item Mobile: 375px × 667px (iPhone)
+    \item Tablet: 768px × 1024px (iPad)
+    \item Desktop: 1366px × 768px
+    \item Large Desktop: 1920px × 1080px
+\end{itemize}
+
+\textbf{Test Cases:}
+
+\begin{enumerate}
+    \item \textbf{Chrome DevTools Device Emulation}
+    \begin{itemize}
+        \item Open Chrome DevTools (F12)
+        \item Click device toolbar icon (Ctrl+Shift+M)
+        \item Select different device presets
+        \item Verify layout adapts correctly
+    \end{itemize}
+
+    \item \textbf{Elements to Check:}
+    \begin{itemize}
+        \item Navigation menu collapses to hamburger on mobile
+        \item Buttons are touch-friendly (44×44px minimum)
+        \item Text is readable without zooming
+        \item Forms are easy to fill on mobile
+        \item Images scale appropriately
+        \item No horizontal scrolling
+    \end{itemize}
+
+    \item \textbf{Touch Interactions}
+    \begin{itemize}
+        \item Test tap targets are large enough
+        \item Test swipe gestures (if any)
+        \item Verify no hover-only interactions
+    \end{itemize}
+\end{enumerate}
+
+\textbf{Screenshots Required:} Each page at mobile, tablet, desktop sizes
+
+\section{Usability Testing Tasks}
+
+\subsection{Task 13: User Experience Evaluation}
+
+\textbf{Objective:} Assess overall usability (NFR-005)
+
+\textbf{Criteria to Evaluate:}
+
+\begin{enumerate}
+    \item \textbf{Navigation Clarity}
+    \begin{itemize}
+        \item Is it easy to find features?
+        \item Are labels clear and descriptive?
+        \item Is the menu structure logical?
+    \end{itemize}
+
+    \item \textbf{Error Handling}
+    \begin{itemize}
+        \item Are error messages helpful?
+        \item Do errors suggest solutions?
+        \item Are success messages clear?
+    \end{itemize}
+
+    \item \textbf{Performance Perception}
+    \begin{itemize}
+        \item Do pages load quickly?
+        \item Are loading states visible?
+        \item Does app feel responsive?
+    \end{itemize}
+
+    \item \textbf{Visual Design}
+    \begin{itemize}
+        \item Is the design consistent?
+        \item Are colors and fonts appropriate?
+        \item Is content readable?
+    \end{itemize}
+\end{enumerate}
+
+\textbf{Deliverable:} UX evaluation report with recommendations
+
+\section{Deliverables Checklist}
+
+\begin{tcolorbox}[colback=success!5,colframe=success,title=Your Final Deliverables]
+\begin{itemize}
+    \item[$\square$] Authentication UI test report (Task 1)
+    \item[$\square$] Profile UI test results (Task 2)
+    \item[$\square$] Video call UI tests with screenshots (Task 3)
+    \item[$\square$] Forum UI test results (Task 4)
+    \item[$\square$] Library \& Glossary tests (Task 5)
+    \item[$\square$] Booking UI test results (Task 6)
+    \item[$\square$] Playwright E2E test report (Task 7)
+    \item[$\square$] Manual E2E journey documentation (Task 8)
+    \item[$\square$] WCAG accessibility compliance report (Task 9)
+    \item[$\square$] Focus management test results (Task 10)
+    \item[$\square$] Cross-browser compatibility matrix (Task 11)
+    \item[$\square$] Responsive design screenshots (Task 12)
+    \item[$\square$] UX evaluation report (Task 13)
+\end{itemize}
+\end{tcolorbox}
+
+\section{Testing Tools \& Resources}
+
+\subsection{Recommended Browser Extensions}
+
+\begin{itemize}
+    \item \textbf{axe DevTools:} Automated accessibility testing
+    \item \textbf{WAVE:} Visual accessibility checker
+    \item \textbf{Lighthouse:} Performance and accessibility audit
+    \item \textbf{React Developer Tools:} Component inspection
+    \item \textbf{Redux DevTools:} State management debugging
+\end{itemize}
+
+\subsection{Screen Readers}
+
+\begin{itemize}
+    \item \textbf{Windows:} NVDA (free) - https://www.nvaccess.org/
+    \item \textbf{Mac:} VoiceOver (built-in, Cmd+F5)
+    \item \textbf{Chrome:} ChromeVox extension
+\end{itemize}
+
+\subsection{Documentation to Read}
+
+\begin{itemize}
+    \item \texttt{docs/USER\_MANUAL.md} - Complete feature guide
+    \item \texttt{docs/checklists/ACCESSIBILITY\_CHECKLIST.md}
+    \item \texttt{e2e/README.md} - E2E testing guide
+    \item \texttt{client/README.md} - Frontend setup
+\end{itemize}
+
+\section{Demo Preparation}
+
+\subsection{What to Demonstrate}
+
+\begin{enumerate}
+    \item \textbf{User Interface Tour (5 minutes)}
+    \begin{itemize}
+        \item Show landing page
+        \item Demonstrate navigation
+        \item Show all major pages
+        \item Highlight design features
+    \end{itemize}
+
+    \item \textbf{User Journey Demo (10 minutes)}
+    \begin{itemize}
+        \item Live user registration
+        \item Profile setup
+        \item Start video call
+        \item Enable captions
+        \item Post in forum
+        \item Browse glossary
+    \end{itemize}
+
+    \item \textbf{Accessibility Features (5 minutes)}
+    \begin{itemize}
+        \item Demonstrate keyboard navigation
+        \item Show screen reader compatibility
+        \item Display high contrast mode
+        \item Show caption customization
+    \end{itemize}
+
+    \item \textbf{E2E Test Execution (3 minutes)}
+    \begin{itemize}
+        \item Run Playwright tests live
+        \item Show test report
+        \item Display pass/fail statistics
+    \end{itemize}
+
+    \item \textbf{Responsive Design (2 minutes)}
+    \begin{itemize}
+        \item Show mobile view
+        \item Demonstrate tablet layout
+        \item Show desktop version
+    \end{itemize}
+\end{enumerate}
+
+\section{Timeline}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Task} & \textbf{Duration} & \textbf{Priority} \\ \midrule
+Setup \& Environment & 2 hours & High \\
+Authentication UI & 2 hours & High \\
+Profile \& Booking UI & 2 hours & Medium \\
+Video Call UI & 3 hours & Critical \\
+Forum \& Library UI & 2 hours & Medium \\
+E2E Automated Tests & 3 hours & High \\
+E2E Manual Journeys & 2 hours & High \\
+Accessibility Testing & 4 hours & Critical \\
+Cross-Browser Testing & 3 hours & High \\
+Responsive Design & 2 hours & High \\
+Usability Testing & 2 hours & Medium \\
+Documentation & 2 hours & High \\
+Demo Preparation & 2 hours & High \\ \midrule
+\textbf{Total} & \textbf{31 hours} & \\ \bottomrule
+\end{tabular}
+\caption{Estimated time allocation for all tasks}
+\end{table}
+
+\section{Contact \& Support}
+
+\textbf{Team Partner:} Yasser (Backend \& ML Testing)
+
+\textbf{Collaboration Points:}
+\begin{itemize}
+    \item Coordinate on integration testing
+    \item Request test user credentials from Yasser
+    \item Report any API errors to Yasser
+    \item Validate frontend-backend integration together
+\end{itemize}
+
+\vspace{1cm}
+
+\begin{tcolorbox}[colback=warning!5,colframe=warning,title=Important Notes]
+\begin{itemize}
+    \item Test on multiple devices if possible
+    \item Document all bugs with screenshots
+    \item Save test results in organized folders
+    \item Keep Yasser updated on any API issues
+    \item Take clear screenshots for demo
+    \item Practice demo presentation beforehand
+\end{itemize}
+\end{tcolorbox}
+
+\end{document}

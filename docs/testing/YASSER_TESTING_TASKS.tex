@@ -1,0 +1,556 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{tcolorbox}
+\usepackage{listings}
+\usepackage{booktabs}
+
+% Header and Footer
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{SilentTalk FYP - Testing Assignment}
+\rhead{Yasser's Tasks}
+\cfoot{\thepage}
+
+% Colors
+\definecolor{primary}{RGB}{79,70,229}
+\definecolor{success}{RGB}{16,185,129}
+\definecolor{warning}{RGB}{245,158,11}
+
+% Title
+\title{\textbf{SilentTalk FYP\\Testing \& Demonstration Assignment\\Team Member: Yasser}}
+\author{Final Year Project - November 2025}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{fancy}
+
+\begin{tcolorbox}[colback=primary!5,colframe=primary,title=Your Primary Responsibilities]
+\textbf{Focus Areas:}
+\begin{itemize}
+    \item Backend API Testing \& Integration Testing
+    \item ML Service Testing \& Performance Validation
+    \item Security \& Authentication Testing
+    \item Infrastructure \& Deployment Testing
+\end{itemize}
+\end{tcolorbox}
+
+\tableofcontents
+\newpage
+
+\section{Testing Responsibilities Overview}
+
+As the backend and ML specialist, you are responsible for testing and demonstrating:
+\begin{itemize}
+    \item Backend REST API functionality
+    \item Machine Learning sign recognition service
+    \item Database operations and data integrity
+    \item Authentication and authorization systems
+    \item Performance benchmarks and optimization
+    \item Security compliance and vulnerability testing
+\end{itemize}
+
+\section{Pre-Testing Setup}
+
+\subsection{Environment Setup Checklist}
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+    \item \textbf{Install Required Software:}
+    \begin{itemize}
+        \item .NET 8.0 SDK
+        \item PostgreSQL 15+ or SQL Server 2019+
+        \item Python 3.10+
+        \item Redis (for caching)
+        \item Docker Desktop
+    \end{itemize}
+
+    \item \textbf{Clone Repository:}
+    \begin{lstlisting}[language=bash]
+git clone https://github.com/hamdanyasser/SilentTalkFYP.git
+cd SilentTalkFYP
+    \end{lstlisting}
+
+    \item \textbf{Configure Environment Variables:}
+    \begin{itemize}
+        \item Copy \texttt{server/.env.example} to \texttt{server/.env}
+        \item Copy \texttt{ml-service/.env.example} to \texttt{ml-service/.env}
+        \item Update database connection strings
+        \item Set JWT secret keys
+    \end{itemize}
+\end{enumerate}
+
+\section{Backend API Testing Tasks}
+
+\subsection{Task 1: Authentication API Testing}
+
+\textbf{Objective:} Verify all authentication endpoints work correctly
+
+\textbf{Test Cases:}
+
+\begin{enumerate}
+    \item \textbf{User Registration (FR-001.1)}
+    \begin{itemize}
+        \item Test successful registration with valid data
+        \item Test registration with existing email (should fail)
+        \item Test registration with weak password (should fail)
+        \item Test email verification flow
+        \item Verify password is hashed in database
+    \end{itemize}
+
+    \textbf{How to Test:}
+    \begin{lstlisting}[language=bash]
+# Start the backend server
+cd server
+dotnet run
+
+# Use Postman or curl
+curl -X POST http://localhost:5000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "yasser@test.com",
+    "password": "Test123!@#",
+    "displayName": "Yasser Test"
+  }'
+    \end{lstlisting}
+
+    \textbf{Expected Result:}
+    \begin{itemize}
+        \item Status code: 201 Created
+        \item Response contains user ID and JWT token
+        \item User record exists in database
+    \end{itemize}
+
+    \item \textbf{User Login (FR-001.2, FR-001.3)}
+    \begin{itemize}
+        \item Test successful login with valid credentials
+        \item Test login with incorrect password (should fail)
+        \item Test login with non-existent email (should fail)
+        \item Verify JWT token is returned
+        \item Test account lockout after 5 failed attempts (FR-001.9)
+    \end{itemize}
+
+    \item \textbf{JWT Token Validation (FR-001.3)}
+    \begin{itemize}
+        \item Test protected endpoints with valid token
+        \item Test protected endpoints without token (should return 401)
+        \item Test protected endpoints with expired token
+        \item Test token refresh mechanism
+    \end{itemize}
+
+    \item \textbf{Password Reset (FR-001.8)}
+    \begin{itemize}
+        \item Request password reset
+        \item Verify reset token generation
+        \item Test password reset with valid token
+        \item Test password reset with expired token
+    \end{itemize}
+\end{enumerate}
+
+\textbf{Deliverable:} Complete test report with screenshots for each test case
+
+\subsection{Task 2: User Profile API Testing}
+
+\textbf{Objective:} Test user profile CRUD operations (FR-005)
+
+\textbf{Test Cases:}
+
+\begin{enumerate}
+    \item \textbf{Get User Profile}
+    \begin{lstlisting}[language=bash]
+curl -X GET http://localhost:5000/api/user/profile \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+    \end{lstlisting}
+
+    \item \textbf{Update User Profile}
+    \begin{itemize}
+        \item Update display name
+        \item Update preferred sign language (ASL, BSL, ISL)
+        \item Update profile picture
+        \item Verify changes persist in database
+    \end{itemize}
+
+    \item \textbf{Upload Avatar (FR-005.2)}
+    \begin{itemize}
+        \item Test valid image upload (JPEG, PNG)
+        \item Test file size limit (max 5MB)
+        \item Test invalid file types (should fail)
+        \item Verify image is stored correctly
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Task 3: Booking API Testing}
+
+\textbf{Objective:} Test interpreter booking system (FR-009)
+
+\textbf{Test Cases:}
+
+\begin{enumerate}
+    \item \textbf{Get Available Interpreters}
+    \begin{lstlisting}[language=bash]
+curl http://localhost:5000/api/booking/interpreters
+    \end{lstlisting}
+
+    \item \textbf{Create Booking}
+    \begin{itemize}
+        \item Test video call booking
+        \item Test on-site booking with location
+        \item Verify booking stored in database
+        \item Check booking confirmation response
+    \end{itemize}
+
+    \item \textbf{Get User Bookings}
+    \item \textbf{Cancel Booking}
+\end{enumerate}
+
+\section{ML Service Testing Tasks}
+
+\subsection{Task 4: Sign Recognition API Testing}
+
+\textbf{Objective:} Validate ML model accuracy and performance (FR-002)
+
+\textbf{Test Cases:}
+
+\begin{enumerate}
+    \item \textbf{Model Health Check}
+    \begin{lstlisting}[language=bash]
+curl http://localhost:8000/health
+    \end{lstlisting}
+
+    \textbf{Expected:} Model accuracy >= 85\% (NFR-001)
+
+    \item \textbf{Sign Recognition Request (FR-002.1, FR-002.4)}
+    \begin{lstlisting}[language=bash]
+curl -X POST http://localhost:8000/api/ml/recognize \
+  -H "Content-Type: application/json" \
+  -d '{
+    "landmarks": [...],
+    "handedness": "Right"
+  }'
+    \end{lstlisting}
+
+    \textbf{Verify:}
+    \begin{itemize}
+        \item Response time < 100ms (NFR-001)
+        \item Confidence score provided (FR-002.7)
+        \item Correct sign predicted
+    \end{itemize}
+
+    \item \textbf{Performance Testing (FR-002.3, FR-002.4)}
+    \begin{itemize}
+        \item Test with 100 consecutive requests
+        \item Measure average inference time
+        \item Verify all requests complete within 100ms
+        \item Test concurrent requests (simulate 10 users)
+    \end{itemize}
+
+    \item \textbf{Multi-Language Support (FR-002.2)}
+    \begin{itemize}
+        \item Test ASL sign recognition
+        \item Test BSL sign recognition
+        \item Test ISL sign recognition
+        \item Verify language switching
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Task 5: ML Model Accuracy Validation}
+
+\textbf{Objective:} Confirm model meets 85\% accuracy requirement
+
+\textbf{Steps:}
+
+\begin{enumerate}
+    \item Prepare test dataset (at least 100 samples)
+    \item Run predictions on test set
+    \item Calculate accuracy: $\text{Accuracy} = \frac{\text{Correct Predictions}}{\text{Total Predictions}} \times 100$
+    \item Document results in spreadsheet
+    \item Generate confusion matrix
+\end{enumerate}
+
+\textbf{Deliverable:} Excel sheet with test results showing >= 85\% accuracy
+
+\section{Performance Testing Tasks}
+
+\subsection{Task 6: API Performance Benchmarking}
+
+\textbf{Objective:} Validate API response times meet NFR-001 requirements
+
+\textbf{Tools:} Use Postman, JMeter, or k6
+
+\textbf{Test Scenarios:}
+
+\begin{enumerate}
+    \item \textbf{API Response Time (NFR-001)}
+    \begin{itemize}
+        \item Make 100 requests to /api/health
+        \item Measure response times
+        \item Calculate p95 (95th percentile)
+        \item Verify p95 < 200ms
+    \end{itemize}
+
+    \item \textbf{Database Query Performance}
+    \begin{itemize}
+        \item Test user lookup queries
+        \item Test booking queries with filters
+        \item Verify queries complete within 50ms
+    \end{itemize}
+
+    \item \textbf{Concurrent User Load}
+    \begin{itemize}
+        \item Simulate 100 concurrent users
+        \item Monitor server CPU and memory
+        \item Verify system remains responsive
+    \end{itemize}
+\end{enumerate}
+
+\textbf{Deliverable:} Performance test report with graphs
+
+\section{Security Testing Tasks}
+
+\subsection{Task 7: Authentication Security Testing}
+
+\textbf{Objective:} Verify security requirements (NFR-004)
+
+\textbf{Test Cases:}
+
+\begin{enumerate}
+    \item \textbf{Password Security (FR-001.2, FR-001.7)}
+    \begin{itemize}
+        \item Verify passwords are hashed (not plaintext in DB)
+        \item Test password complexity requirements
+        \item Test SQL injection in login form
+    \end{itemize}
+
+    \item \textbf{JWT Security}
+    \begin{itemize}
+        \item Attempt to access API with tampered token
+        \item Test token expiration (30 minutes)
+        \item Verify refresh token mechanism
+    \end{itemize}
+
+    \item \textbf{Rate Limiting (NFR-004)}
+    \begin{itemize}
+        \item Make 101+ requests in 1 minute
+        \item Verify request is blocked (429 status)
+    \end{itemize}
+
+    \item \textbf{SQL Injection Testing}
+    \begin{itemize}
+        \item Test login with SQL injection payloads
+        \item Test search endpoints with malicious input
+        \item Verify all inputs are sanitized
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Task 8: HTTPS and Encryption Testing}
+
+\begin{enumerate}
+    \item Verify all API calls use HTTPS (TLS 1.3)
+    \item Test WebRTC encryption (SRTP)
+    \item Verify sensitive data is encrypted in database
+\end{enumerate}
+
+\section{Integration Testing Tasks}
+
+\subsection{Task 9: End-to-End API Flow Testing}
+
+\textbf{Scenario:} Complete user journey
+
+\begin{enumerate}
+    \item Register new user
+    \item Verify email (if enabled)
+    \item Login and get JWT token
+    \item Update user profile
+    \item Upload avatar
+    \item Create a booking
+    \item Get list of bookings
+    \item Cancel booking
+    \item Logout
+\end{enumerate}
+
+\textbf{Document:} Each step with request/response examples
+
+\subsection{Task 10: Database Integration Testing}
+
+\begin{enumerate}
+    \item Test database migrations
+    \item Verify foreign key constraints
+    \item Test transaction rollback on errors
+    \item Verify data integrity after operations
+\end{enumerate}
+
+\section{Infrastructure Testing Tasks}
+
+\subsection{Task 11: Docker Deployment Testing}
+
+\begin{enumerate}
+    \item \textbf{Build Docker Images}
+    \begin{lstlisting}[language=bash]
+docker-compose build
+    \end{lstlisting}
+
+    \item \textbf{Start All Services}
+    \begin{lstlisting}[language=bash]
+docker-compose up -d
+    \end{lstlisting}
+
+    \item \textbf{Verify Services Running}
+    \begin{lstlisting}[language=bash]
+docker-compose ps
+curl http://localhost:5000/health
+curl http://localhost:8000/health
+    \end{lstlisting}
+
+    \item \textbf{Check Logs}
+    \begin{lstlisting}[language=bash]
+docker-compose logs backend
+docker-compose logs ml-service
+    \end{lstlisting}
+\end{enumerate}
+
+\subsection{Task 12: Monitoring Stack Testing}
+
+\begin{enumerate}
+    \item Start monitoring stack
+    \begin{lstlisting}[language=bash]
+docker-compose -f docker-compose.monitoring.yml up -d
+    \end{lstlisting}
+
+    \item Access dashboards:
+    \begin{itemize}
+        \item Prometheus: http://localhost:9090
+        \item Grafana: http://localhost:3001 (admin/admin)
+        \item Jaeger: http://localhost:16686
+    \end{itemize}
+
+    \item Verify metrics are being collected
+    \item Check Grafana data sources are connected
+\end{enumerate}
+
+\section{Deliverables Checklist}
+
+\begin{tcolorbox}[colback=success!5,colframe=success,title=Your Final Deliverables]
+\begin{itemize}
+    \item[$\square$] Authentication API test report (Task 1)
+    \item[$\square$] User profile API test results (Task 2)
+    \item[$\square$] Booking API test results (Task 3)
+    \item[$\square$] ML recognition API tests (Task 4)
+    \item[$\square$] ML accuracy validation report with >= 85\% (Task 5)
+    \item[$\square$] Performance benchmark report (Task 6)
+    \item[$\square$] Security test results (Tasks 7-8)
+    \item[$\square$] End-to-end integration test log (Task 9)
+    \item[$\square$] Database integrity test results (Task 10)
+    \item[$\square$] Docker deployment verification (Task 11)
+    \item[$\square$] Monitoring stack screenshots (Task 12)
+\end{itemize}
+\end{tcolorbox}
+
+\section{Testing Tools \& Resources}
+
+\subsection{Recommended Tools}
+
+\begin{itemize}
+    \item \textbf{API Testing:} Postman, Insomnia, curl
+    \item \textbf{Performance:} Apache JMeter, k6, Artillery
+    \item \textbf{Security:} OWASP ZAP, Burp Suite Community
+    \item \textbf{Database:} DBeaver, pgAdmin, Azure Data Studio
+    \item \textbf{Monitoring:} Prometheus, Grafana (already included)
+\end{itemize}
+
+\subsection{Documentation to Read}
+
+\begin{itemize}
+    \item \texttt{docs/DEVELOPER\_GUIDE.md} - Complete API reference
+    \item \texttt{docs/DEPLOYMENT\_RUNBOOK.md} - Deployment instructions
+    \item \texttt{server/README.md} - Backend setup guide
+    \item \texttt{ml-service/README.md} - ML service documentation
+\end{itemize}
+
+\section{Demo Preparation}
+
+\subsection{What to Demonstrate}
+
+\begin{enumerate}
+    \item \textbf{API Functionality Demo (5 minutes)}
+    \begin{itemize}
+        \item Show Swagger documentation at http://localhost:5000/swagger
+        \item Demonstrate user registration via Postman
+        \item Show JWT token authentication
+        \item Display database records
+    \end{itemize}
+
+    \item \textbf{ML Service Demo (5 minutes)}
+    \begin{itemize}
+        \item Show health endpoint with model accuracy
+        \item Demonstrate real-time sign recognition
+        \item Show inference time measurements
+        \item Display confidence scores
+    \end{itemize}
+
+    \item \textbf{Performance Demo (3 minutes)}
+    \begin{itemize}
+        \item Show performance test results
+        \item Display Grafana metrics dashboard
+        \item Show p95 latency < 200ms
+    \end{itemize}
+
+    \item \textbf{Security Demo (3 minutes)}
+    \begin{itemize}
+        \item Show password hashing in database
+        \item Demonstrate rate limiting
+        \item Show SQL injection prevention
+    \end{itemize}
+\end{enumerate}
+
+\section{Timeline}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Task} & \textbf{Duration} & \textbf{Priority} \\ \midrule
+Setup \& Environment & 2 hours & High \\
+Authentication Testing & 3 hours & High \\
+Profile \& Booking APIs & 2 hours & Medium \\
+ML Service Testing & 4 hours & Critical \\
+Performance Testing & 3 hours & High \\
+Security Testing & 3 hours & High \\
+Integration Testing & 2 hours & Medium \\
+Infrastructure Testing & 2 hours & Medium \\
+Documentation & 2 hours & High \\
+Demo Preparation & 2 hours & High \\ \midrule
+\textbf{Total} & \textbf{25 hours} & \\ \bottomrule
+\end{tabular}
+\caption{Estimated time allocation for all tasks}
+\end{table}
+
+\section{Contact \& Support}
+
+\textbf{Team Partner:} Zainab (Frontend \& E2E Testing)
+
+\textbf{Collaboration Points:}
+\begin{itemize}
+    \item Coordinate on integration testing (Task 9)
+    \item Share test credentials for E2E testing
+    \item Validate API endpoints together
+\end{itemize}
+
+\vspace{1cm}
+
+\begin{tcolorbox}[colback=warning!5,colframe=warning,title=Important Notes]
+\begin{itemize}
+    \item Start with high-priority tasks first
+    \item Document everything with screenshots
+    \item Save all test results in organized folders
+    \item Keep Zainab updated on API availability
+    \item Report any bugs immediately
+\end{itemize}
+\end{tcolorbox}
+
+\end{document}
