@@ -14,11 +14,19 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
+# Install EF Core tools globally
+RUN dotnet tool install --global dotnet-ef --version 8.0.0
+ENV PATH="$PATH:/root/.dotnet/tools"
+
 # Copy project files
 COPY . .
 
 # Restore dependencies
 RUN dotnet restore
+
+# Copy and set permissions for entrypoint script
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
 # Expose ports
 EXPOSE 5000
@@ -27,8 +35,8 @@ EXPOSE 5000
 ENV ASPNETCORE_ENVIRONMENT=Development
 ENV ASPNETCORE_URLS=http://+:5000
 
-# Run with hot reload
-CMD ["dotnet", "watch", "run", "--project", "src/SilentTalk.Api/SilentTalk.Api.csproj", "--no-launch-profile"]
+# Run with entrypoint script
+ENTRYPOINT ["/app/entrypoint.sh"]
 
 # ============================================
 # Stage 2: Build (compile application)
