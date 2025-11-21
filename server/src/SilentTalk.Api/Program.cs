@@ -310,32 +310,92 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
-        Log.Information("Applying database migrations...");
+        Log.Information("============================================");
+        Log.Information("Starting database migration process...");
+        Log.Information("============================================");
 
-        var pendingMigrations = context.Database.GetPendingMigrations().ToList();
-        if (pendingMigrations.Any())
+        // Check database connection
+        var canConnect = await context.Database.CanConnectAsync();
+        Log.Information("Database connection test: {CanConnect}", canConnect ? "SUCCESS" : "FAILED");
+
+        if (!canConnect)
         {
-            Log.Information("Found {Count} pending migrations: {Migrations}",
-                pendingMigrations.Count,
-                string.Join(", ", pendingMigrations));
-            context.Database.Migrate();
-            Log.Information("Database migrations applied successfully");
+            Log.Error("Cannot connect to database. Migration aborted.");
+            throw new InvalidOperationException("Cannot connect to database");
+        }
+
+        // Get all migrations
+        var allMigrations = context.Database.GetMigrations().ToList();
+        Log.Information("Total migrations in assembly: {Count}", allMigrations.Count);
+        if (allMigrations.Any())
+        {
+            Log.Information("Migrations found: {Migrations}", string.Join(", ", allMigrations));
         }
         else
         {
-            var appliedMigrations = context.Database.GetAppliedMigrations().ToList();
-            Log.Information("No pending migrations. Applied migrations: {Count}", appliedMigrations.Count);
-            if (!appliedMigrations.Any())
+            Log.Warning("⚠️  NO MIGRATIONS FOUND IN ASSEMBLY!");
+            Log.Warning("Check that MigrationsAssembly is configured correctly");
+        }
+
+        // Get applied migrations
+        var appliedMigrations = context.Database.GetAppliedMigrations().ToList();
+        Log.Information("Applied migrations in database: {Count}", appliedMigrations.Count);
+        if (appliedMigrations.Any())
+        {
+            Log.Information("Already applied: {Migrations}", string.Join(", ", appliedMigrations));
+        }
+
+        // Get pending migrations
+        var pendingMigrations = context.Database.GetPendingMigrations().ToList();
+        Log.Information("Pending migrations to apply: {Count}", pendingMigrations.Count);
+
+        if (pendingMigrations.Any())
+        {
+            Log.Information("📋 Migrations to apply:");
+            foreach (var migration in pendingMigrations)
             {
-                Log.Warning("No migrations found or applied. Creating database schema...");
-                context.Database.EnsureCreated();
-                Log.Information("Database schema created");
+                Log.Information("  - {Migration}", migration);
+            }
+
+            Log.Information("🚀 Applying migrations...");
+            context.Database.Migrate();
+            Log.Information("✅ Database migrations applied successfully!");
+
+            // Verify migrations were applied
+            var newAppliedCount = context.Database.GetAppliedMigrations().Count();
+            Log.Information("Migrations now applied: {Count}", newAppliedCount);
+        }
+        else
+        {
+            if (allMigrations.Any() && !appliedMigrations.Any())
+            {
+                Log.Warning("⚠️  Migrations exist but none are applied. Database might be in inconsistent state.");
+                Log.Information("🔄 Attempting to apply migrations anyway...");
+                context.Database.Migrate();
+                Log.Information("✅ Migration attempt completed");
+            }
+            else if (!allMigrations.Any())
+            {
+                Log.Error("❌ No migrations found in assembly. Cannot initialize database.");
+                throw new InvalidOperationException("No migrations found in SilentTalk.Infrastructure assembly");
+            }
+            else
+            {
+                Log.Information("✅ Database is up to date. No pending migrations.");
             }
         }
+
+        Log.Information("============================================");
     }
     catch (Exception ex)
     {
-        Log.Error(ex, "An error occurred while migrating the database");
+        Log.Error(ex, "❌ An error occurred while migrating the database");
+        Log.Error("Exception type: {Type}", ex.GetType().Name);
+        Log.Error("Exception message: {Message}", ex.Message);
+        if (ex.InnerException != null)
+        {
+            Log.Error("Inner exception: {InnerMessage}", ex.InnerException.Message);
+        }
         throw;
     }
 }
