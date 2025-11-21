@@ -302,6 +302,26 @@ builder.Services.AddHealthChecks()
 var app = builder.Build();
 
 // ============================================
+// Apply Database Migrations Automatically
+// ============================================
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        Log.Information("Applying database migrations...");
+        context.Database.Migrate();
+        Log.Information("Database migrations applied successfully");
+    }
+    catch (Exception ex)
+    {
+        Log.Error(ex, "An error occurred while migrating the database");
+        throw;
+    }
+}
+
+// ============================================
 // Configure the HTTP request pipeline
 // ============================================
 
