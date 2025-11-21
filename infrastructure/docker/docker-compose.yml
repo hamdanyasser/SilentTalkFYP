@@ -143,8 +143,7 @@ services:
     environment:
       - LS_JAVA_OPTS=-Xmx256m -Xms256m
     ports:
-      - "5000:5000/tcp"
-      - "5000:5000/udp"
+      - "5044:5044/tcp"
       - "9600:9600"
     volumes:
       - ./config/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
