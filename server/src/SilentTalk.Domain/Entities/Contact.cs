@@ -38,10 +38,10 @@ public class Contact : BaseEntity
     /// <summary>
     /// The user who owns this contact
     /// </summary>
-    public User User { get; set; } = null!;
+    public ApplicationUser User { get; set; } = null!;
 
     /// <summary>
     /// The user who is the contact
     /// </summary>
-    public User ContactUser { get; set; } = null!;
+    public ApplicationUser ContactUser { get; set; } = null!;
 }
