@@ -4,6 +4,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -13,6 +14,7 @@ using SilentTalk.Api.Middleware;
 using SilentTalk.Application.Repositories;
 using SilentTalk.Application.Services;
 using SilentTalk.Domain.Entities;
+using SilentTalk.Domain.Interfaces;
 using SilentTalk.Infrastructure.Data;
 using SilentTalk.Infrastructure.Repositories;
 using SilentTalk.Infrastructure.Services;
@@ -57,6 +59,12 @@ builder.Services.AddScoped<IMongoDatabase>(sp =>
 {
     var client = sp.GetRequiredService<IMongoClient>();
     return client.GetDatabase("silentstalk");
+});
+
+builder.Services.AddScoped<MongoDbContext>(sp =>
+{
+    var database = sp.GetRequiredService<IMongoDatabase>();
+    return new MongoDbContext(database);
 });
 
 // ============================================
@@ -292,6 +300,26 @@ builder.Services.AddHealthChecks()
         tags: new[] { "cache", "redis" });
 
 var app = builder.Build();
+
+// ============================================
+// Apply Database Migrations Automatically
+// ============================================
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        Log.Information("Applying database migrations...");
+        context.Database.Migrate();
+        Log.Information("Database migrations applied successfully");
+    }
+    catch (Exception ex)
+    {
+        Log.Error(ex, "An error occurred while migrating the database");
+        throw;
+    }
+}
 
 // ============================================
 // Configure the HTTP request pipeline
