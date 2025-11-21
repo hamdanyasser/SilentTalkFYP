@@ -3,12 +3,22 @@ ONNX Runtime Inference Engine for Sign Language Recognition
 Optimized for low-latency inference (target: ≤100ms per frame)
 """
 
-import onnxruntime as ort
 import numpy as np
 from typing import List, Tuple, Optional, Dict
 import time
 import logging
 from pathlib import Path
+
+# Try to import onnxruntime, but allow service to start without it
+try:
+    import onnxruntime as ort
+    ONNX_AVAILABLE = True
+except ImportError as e:
+    logger_temp = logging.getLogger(__name__)
+    logger_temp.warning(f"ONNX Runtime not available: {e}")
+    logger_temp.warning("Service will start but model inference will not be available")
+    ONNX_AVAILABLE = False
+    ort = None  # type: ignore
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +43,12 @@ class ONNXInferenceEngine:
             class_names: List of class names (optional)
             providers: List of execution providers (e.g., ['CUDAExecutionProvider', 'CPUExecutionProvider'])
         """
+        if not ONNX_AVAILABLE or ort is None:
+            raise RuntimeError(
+                "ONNX Runtime is not available. Cannot create inference engine. "
+                "This may be due to Docker executable stack restrictions."
+            )
+
         self.model_path = model_path
 
         # Set execution providers

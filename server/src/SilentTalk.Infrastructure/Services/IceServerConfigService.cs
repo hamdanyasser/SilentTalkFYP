@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using SilentTalk.Application.DTOs.SignalR;
 using SilentTalk.Application.Services;
 using System.Security.Cryptography;
