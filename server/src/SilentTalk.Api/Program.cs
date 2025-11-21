@@ -61,6 +61,12 @@ builder.Services.AddScoped<IMongoDatabase>(sp =>
     return client.GetDatabase("silentstalk");
 });
 
+builder.Services.AddScoped<MongoDbContext>(sp =>
+{
+    var database = sp.GetRequiredService<IMongoDatabase>();
+    return new MongoDbContext(database);
+});
+
 // ============================================
 // ASP.NET Core Identity Configuration
 // ============================================
