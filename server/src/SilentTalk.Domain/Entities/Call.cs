@@ -75,7 +75,7 @@ public class Call : BaseEntity
     /// <summary>
     /// User who initiated the call
     /// </summary>
-    public User Initiator { get; set; } = null!;
+    public ApplicationUser Initiator { get; set; } = null!;
 
     /// <summary>
     /// Participants in this call
