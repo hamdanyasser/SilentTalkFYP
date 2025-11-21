@@ -5,6 +5,9 @@ echo "============================================"
 echo "SilentTalk Server - Starting..."
 echo "============================================"
 
+# Navigate to the project directory
+cd /app/src/SilentTalk.Api
+
 # ============================================
 # Check and Create Migrations if Needed
 # ============================================
@@ -28,6 +31,8 @@ if [ ! -d "$MIGRATIONS_DIR" ] || [ -z "$(ls -A $MIGRATIONS_DIR 2>/dev/null)" ]; 
         echo "❌ Migration creation failed!"
         exit 1
     fi
+
+    cd /app/src/SilentTalk.Api
 else
     echo "✅ Migrations directory exists"
 fi
@@ -39,26 +44,19 @@ echo "============================================"
 echo "Applying database migrations..."
 echo "============================================"
 
-cd /app
-dotnet ef database update \
-    --project src/SilentTalk.Infrastructure/SilentTalk.Infrastructure.csproj \
-    --startup-project src/SilentTalk.Api/SilentTalk.Api.csproj \
-    --verbose
-
-if [ $? -eq 0 ]; then
-    echo "✅ Migrations applied successfully"
-else
+# Apply migrations using dotnet ef
+# Docker Compose healthchecks ensure PostgreSQL is ready
+dotnet ef database update --project ../SilentTalk.Infrastructure/SilentTalk.Infrastructure.csproj --startup-project SilentTalk.Api.csproj --verbose || {
     echo "❌ Migration failed! Checking migration status..."
-    dotnet ef migrations list \
-        --project src/SilentTalk.Infrastructure/SilentTalk.Infrastructure.csproj \
-        --startup-project src/SilentTalk.Api/SilentTalk.Api.csproj
-fi
+    dotnet ef migrations list --project ../SilentTalk.Infrastructure/SilentTalk.Infrastructure.csproj --startup-project SilentTalk.Api.csproj
+    exit 1
+}
+
+echo "✅ Migrations applied successfully!"
+echo "============================================"
 
 # ============================================
 # Start the Application
 # ============================================
-echo "============================================"
-echo "Starting ASP.NET Core application..."
-echo "============================================"
-
-exec dotnet watch run --project src/SilentTalk.Api/SilentTalk.Api.csproj --no-launch-profile
+echo "🚀 Starting application..."
+exec dotnet watch run --project SilentTalk.Api.csproj --no-launch-profile
