@@ -376,8 +376,9 @@ using (var scope = app.Services.CreateScope())
             }
             else if (!allMigrations.Any())
             {
-                Log.Error("❌ No migrations found in assembly. Cannot initialize database.");
-                throw new InvalidOperationException("No migrations found in SilentTalk.Infrastructure assembly");
+                Log.Warning("⚠️ No migrations found in assembly.");
+                Log.Information("Migrations should be applied via 'dotnet ef database update' before startup.");
+                Log.Information("Continuing without automatic migration...");
             }
             else
             {
