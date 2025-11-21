@@ -311,8 +311,27 @@ using (var scope = app.Services.CreateScope())
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
         Log.Information("Applying database migrations...");
-        context.Database.Migrate();
-        Log.Information("Database migrations applied successfully");
+
+        var pendingMigrations = context.Database.GetPendingMigrations().ToList();
+        if (pendingMigrations.Any())
+        {
+            Log.Information("Found {Count} pending migrations: {Migrations}",
+                pendingMigrations.Count,
+                string.Join(", ", pendingMigrations));
+            context.Database.Migrate();
+            Log.Information("Database migrations applied successfully");
+        }
+        else
+        {
+            var appliedMigrations = context.Database.GetAppliedMigrations().ToList();
+            Log.Information("No pending migrations. Applied migrations: {Count}", appliedMigrations.Count);
+            if (!appliedMigrations.Any())
+            {
+                Log.Warning("No migrations found or applied. Creating database schema...");
+                context.Database.EnsureCreated();
+                Log.Information("Database schema created");
+            }
+        }
     }
     catch (Exception ex)
     {
