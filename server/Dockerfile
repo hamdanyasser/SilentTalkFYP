@@ -9,10 +9,9 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS development
 
 WORKDIR /app
 
-# Install necessary tools including dotnet-ef and postgresql-client
+# Install necessary tools including dotnet-ef
 RUN apt-get update && apt-get install -y \
     curl \
-    postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Entity Framework Core tools globally
