@@ -11,8 +11,8 @@ from collections import deque
 from datetime import datetime
 import logging
 
-from services.mediapipe_extractor import MediaPipeHandExtractor
-from services.onnx_inference import get_inference_engine
+from app.services.mediapipe_extractor import MediaPipeHandExtractor
+from app.services.onnx_inference import get_inference_engine
 
 logger = logging.getLogger(__name__)
 

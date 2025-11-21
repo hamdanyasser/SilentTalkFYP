@@ -307,8 +307,11 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-// HTTPS redirection
-app.UseHttpsRedirection();
+// HTTPS redirection (only in production to avoid issues with Docker dev environment)
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 // Request logging
 app.UseSerilogRequestLogging();
