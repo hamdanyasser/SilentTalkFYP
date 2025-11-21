@@ -14,7 +14,7 @@ import logging
 import asyncio
 import numpy as np
 
-from services.streaming_recognition import get_streaming_service
+from app.services.streaming_recognition import get_streaming_service
 
 logger = logging.getLogger(__name__)
 
