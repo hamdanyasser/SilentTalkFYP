@@ -26,7 +26,11 @@ print_info() {
     echo -e "${YELLOW}ℹ $1${NC}"
 }
 
-cd /home/user/SilentTalkFYP
+
+# Get the directory where this script is located
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+PROJECT_ROOT="$SCRIPT_DIR"
+cd $PROJECT_ROOT
 
 echo ""
 echo "Fix 1: Creating appsettings.Development.json"

@@ -32,6 +32,13 @@ print_info() {
     echo -e "${YELLOW}ℹ $1${NC}"
 }
 
+# Get the directory where this script is located
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+PROJECT_ROOT="$SCRIPT_DIR"
+
+echo "Project root: $PROJECT_ROOT"
+echo ""
+
 # Check prerequisites
 echo ""
 echo "Checking prerequisites..."
@@ -70,7 +77,7 @@ echo "========================================="
 echo "Step 1: Starting Database Services"
 echo "========================================="
 
-cd /home/user/SilentTalkFYP/infrastructure/docker
+cd $PROJECT_ROOT/infrastructure/docker
 
 # Check if containers are already running
 if docker compose ps | grep -q "postgres.*running"; then
@@ -113,7 +120,7 @@ echo "========================================="
 echo "Step 2: Starting ML Service (Port 8002)"
 echo "========================================="
 
-cd /home/user/SilentTalkFYP/ml-service
+cd $PROJECT_ROOT/ml-service
 
 # Check if virtual environment exists
 if [ ! -d "venv" ]; then
@@ -139,8 +146,8 @@ else
 
     if lsof -i :8002 &> /dev/null || netstat -tuln 2>/dev/null | grep -q ":8002" || ss -tuln 2>/dev/null | grep -q ":8002"; then
         print_success "ML Service started on port 8002"
-        print_info "Logs: /home/user/SilentTalkFYP/ml-service/ml-service.log"
-        print_info "PID saved to: /home/user/SilentTalkFYP/ml-service/ml-service.pid"
+        print_info "Logs: $PROJECT_ROOT/ml-service/ml-service.log"
+        print_info "PID saved to: $PROJECT_ROOT/ml-service/ml-service.pid"
     else
         print_error "ML Service failed to start. Check ml-service.log"
     fi
@@ -151,7 +158,7 @@ echo "========================================="
 echo "Step 3: Starting Backend API (Port 5000)"
 echo "========================================="
 
-cd /home/user/SilentTalkFYP/server
+cd $PROJECT_ROOT/server
 
 # Check if already running
 if lsof -i :5000 &> /dev/null || netstat -tuln 2>/dev/null | grep -q ":5000" || ss -tuln 2>/dev/null | grep -q ":5000"; then
@@ -169,8 +176,8 @@ else
         sleep 1
         if curl -s http://localhost:5000/health > /dev/null 2>&1; then
             print_success "Backend API started on port 5000"
-            print_info "Logs: /home/user/SilentTalkFYP/server/backend.log"
-            print_info "PID saved to: /home/user/SilentTalkFYP/server/backend.pid"
+            print_info "Logs: $PROJECT_ROOT/server/backend.log"
+            print_info "PID saved to: $PROJECT_ROOT/server/backend.pid"
             break
         fi
         if [ $i -eq 30 ]; then
@@ -184,7 +191,7 @@ echo "========================================="
 echo "Step 4: Starting Frontend (Port 3001)"
 echo "========================================="
 
-cd /home/user/SilentTalkFYP/client
+cd $PROJECT_ROOT/client
 
 # Check if node_modules exists
 if [ ! -d "node_modules" ]; then
@@ -205,8 +212,8 @@ else
 
     if lsof -i :3001 &> /dev/null || netstat -tuln 2>/dev/null | grep -q ":3001" || ss -tuln 2>/dev/null | grep -q ":3001"; then
         print_success "Frontend started on port 3001"
-        print_info "Logs: /home/user/SilentTalkFYP/client/frontend.log"
-        print_info "PID saved to: /home/user/SilentTalkFYP/client/frontend.pid"
+        print_info "Logs: $PROJECT_ROOT/client/frontend.log"
+        print_info "PID saved to: $PROJECT_ROOT/client/frontend.pid"
     else
         print_error "Frontend failed to start. Check frontend.log"
     fi
@@ -260,9 +267,9 @@ echo "  • PostgreSQL:  localhost:5432"
 echo "  • MongoDB:     localhost:27017"
 echo ""
 echo "Log files:"
-echo "  • ML Service:  /home/user/SilentTalkFYP/ml-service/ml-service.log"
-echo "  • Backend API: /home/user/SilentTalkFYP/server/backend.log"
-echo "  • Frontend:    /home/user/SilentTalkFYP/client/frontend.log"
+echo "  • ML Service:  $PROJECT_ROOT/ml-service/ml-service.log"
+echo "  • Backend API: $PROJECT_ROOT/server/backend.log"
+echo "  • Frontend:    $PROJECT_ROOT/client/frontend.log"
 echo ""
 echo "To stop all services, run: ./stop-all-services.sh"
 echo ""
