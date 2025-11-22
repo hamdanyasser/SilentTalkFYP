@@ -24,7 +24,7 @@ db.conversations.createIndex({ lastMessageAt: -1 });
 db.notifications.createIndex({ userId: 1, read: 1 });
 db.notifications.createIndex({ createdAt: -1 });
 
-// Create application user
+// Create application user with SCRAM-SHA-1 and SCRAM-SHA-256 support
 db.createUser({
   user: 'silentstalk',
   pwd: 'silentstalk_dev_password',
@@ -33,7 +33,8 @@ db.createUser({
       role: 'readWrite',
       db: 'silentstalk'
     }
-  ]
+  ],
+  mechanisms: ['SCRAM-SHA-1', 'SCRAM-SHA-256']
 });
 
 print('MongoDB initialized successfully for SilentTalk');
