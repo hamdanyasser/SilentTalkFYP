@@ -52,7 +52,14 @@ builder.Services.Configure<MongoDbSettings>(options =>
 builder.Services.AddSingleton<IMongoClient>(sp =>
 {
     var connectionString = builder.Configuration.GetConnectionString("MongoDB");
-    return new MongoClient(connectionString);
+    var mongoUrl = new MongoUrl(connectionString);
+    var settings = MongoClientSettings.FromUrl(mongoUrl);
+    // Explicitly set SCRAM-SHA-256 authentication mechanism
+    settings.Credential = MongoCredential.CreateScramSha256Credential(
+        mongoUrl.DatabaseName ?? "silentstalk",
+        mongoUrl.Username!,
+        mongoUrl.Password!);
+    return new MongoClient(settings);
 });
 
 builder.Services.AddScoped<IMongoDatabase>(sp =>
@@ -285,13 +292,22 @@ builder.Services.AddSwaggerGen(c =>
 // ============================================
 // Health Checks
 // ============================================
+// Configure MongoDB health check with explicit SCRAM-SHA-256 authentication
+var mongoUrl = new MongoUrl(builder.Configuration.GetConnectionString("MongoDB")!);
+var mongoClientSettings = MongoClientSettings.FromUrl(mongoUrl);
+// Explicitly set SCRAM-SHA-256 authentication mechanism
+mongoClientSettings.Credential = MongoCredential.CreateScramSha256Credential(
+    mongoUrl.DatabaseName ?? "silentstalk",
+    mongoUrl.Username!,
+    mongoUrl.Password!);
+
 builder.Services.AddHealthChecks()
     .AddNpgSql(
         builder.Configuration.GetConnectionString("DefaultConnection")!,
         name: "postgres",
         tags: new[] { "db", "postgres" })
     .AddMongoDb(
-        builder.Configuration.GetConnectionString("MongoDB")!,
+        mongoClientSettings,
         name: "mongodb",
         tags: new[] { "db", "mongodb" });
 //     .AddRedis(
