@@ -267,3 +267,4 @@ mongodb-data/
 # ============================================
 sqlserver-data/
 postgres-data/
+*.backup.*

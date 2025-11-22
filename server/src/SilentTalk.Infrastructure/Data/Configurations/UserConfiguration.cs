@@ -32,6 +32,9 @@ public class UserConfiguration : IEntityTypeConfiguration<ApplicationUser>
             .IsRequired();
 
         // Relationships
+        // Note: Contact relationships are configured in ContactConfiguration
+        // to avoid duplicate relationship definitions
+
         builder.HasMany(u => u.InitiatedCalls)
             .WithOne(c => c.Initiator)
             .HasForeignKey(c => c.InitiatorId)
@@ -41,15 +44,5 @@ public class UserConfiguration : IEntityTypeConfiguration<ApplicationUser>
             .WithOne(p => p.User)
             .HasForeignKey(p => p.UserId)
             .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasMany(u => u.UserContacts)
-            .WithOne(c => c.User)
-            .HasForeignKey(c => c.UserId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasMany(u => u.ContactOfUsers)
-            .WithOne(c => c.ContactUser)
-            .HasForeignKey(c => c.ContactUserId)
-            .OnDelete(DeleteBehavior.Restrict);
     }
 }

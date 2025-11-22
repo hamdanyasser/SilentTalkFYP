@@ -225,7 +225,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "http://localhost:5173") // React dev servers
+        policy.WithOrigins("http://localhost:3000", "http://localhost:3001", "http://localhost:5173") // React dev servers
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials(); // Required for SignalR
@@ -294,10 +294,10 @@ builder.Services.AddHealthChecks()
         builder.Configuration.GetConnectionString("MongoDB")!,
         name: "mongodb",
         tags: new[] { "db", "mongodb" })
-    .AddRedis(
-        builder.Configuration.GetConnectionString("Redis")!,
-        name: "redis",
-        tags: new[] { "cache", "redis" });
+//     .AddRedis(
+//         builder.Configuration.GetConnectionString("Redis")!,
+//         name: "redis",
+//         tags: new[] { "cache", "redis" });
 
 var app = builder.Build();
 
