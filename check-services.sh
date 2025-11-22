@@ -57,7 +57,7 @@ fi
 
 # Check MongoDB connectivity
 print_info "Checking MongoDB database connectivity..."
-if docker exec silents-talk-mongo mongosh -u silentstalk -p silentstalk123 --authenticationDatabase admin --eval "db.adminCommand('ping')" > /dev/null 2>&1; then
+if docker exec silents-talk-mongodb mongosh -u silentstalk -p silentstalk_dev_password --authenticationDatabase silentstalk --eval "db.adminCommand('ping')" > /dev/null 2>&1; then
     print_success "MongoDB database is accessible"
 else
     print_error "MongoDB database is NOT accessible"
