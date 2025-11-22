@@ -302,9 +302,31 @@ builder.Services.AddHealthChecks()
 var app = builder.Build();
 
 // ============================================
+// Auto-apply migrations in development
+// ============================================
+if (app.Environment.IsDevelopment())
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        try
+        {
+            Log.Information("Ensuring database is created...");
+            dbContext.Database.EnsureCreated();
+            Log.Information("Database created successfully");
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "An error occurred while creating database");
+        }
+    }
+}
+
+// ============================================
 // Configure the HTTP request pipeline
 // ============================================
-// Note: Database migrations are now handled by entrypoint.sh script
+// Note: Database migrations are now handled by entrypoint.sh script (Docker)
+// For local development, migrations are auto-applied above
 
 if (app.Environment.IsDevelopment())
 {
