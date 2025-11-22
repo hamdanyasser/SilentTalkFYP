@@ -119,7 +119,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         />
 
         {rightIcon && (
-          <span className="ds-input__icon ds-input__icon--right" aria-hidden="true">
+          <span className="ds-input__icon ds-input__icon--right">
             {rightIcon}
           </span>
         )}
