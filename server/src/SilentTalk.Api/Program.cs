@@ -52,8 +52,17 @@ builder.Services.Configure<MongoDbSettings>(options =>
 builder.Services.AddSingleton<IMongoClient>(sp =>
 {
     var connectionString = builder.Configuration.GetConnectionString("MongoDB");
-    // MongoClientSettings.FromConnectionString properly parses authMechanism parameter
-    var settings = MongoClientSettings.FromConnectionString(connectionString);
+    var mongoUrl = MongoUrl.Create(connectionString);
+    var settings = MongoClientSettings.FromUrl(mongoUrl);
+
+    // Manually set SCRAM-SHA-256 credential (FromConnectionString doesn't parse authMechanism correctly)
+    settings.Credential = MongoCredential.FromComponents(
+        mechanism: "SCRAM-SHA-256",
+        source: mongoUrl.DatabaseName ?? "silentstalk",
+        username: mongoUrl.Username!,
+        password: mongoUrl.Password!
+    );
+
     return new MongoClient(settings);
 });
 
@@ -287,9 +296,18 @@ builder.Services.AddSwaggerGen(c =>
 // ============================================
 // Health Checks
 // ============================================
-// Configure MongoDB health check - FromConnectionString parses authMechanism parameter
+// Configure MongoDB health check with explicit SCRAM-SHA-256
 var mongoConnectionString = builder.Configuration.GetConnectionString("MongoDB")!;
-var mongoClientSettings = MongoClientSettings.FromConnectionString(mongoConnectionString);
+var mongoHealthUrl = MongoUrl.Create(mongoConnectionString);
+var mongoHealthSettings = MongoClientSettings.FromUrl(mongoHealthUrl);
+
+// Manually set SCRAM-SHA-256 credential (FromConnectionString doesn't parse authMechanism correctly)
+mongoHealthSettings.Credential = MongoCredential.FromComponents(
+    mechanism: "SCRAM-SHA-256",
+    source: mongoHealthUrl.DatabaseName ?? "silentstalk",
+    username: mongoHealthUrl.Username!,
+    password: mongoHealthUrl.Password!
+);
 
 builder.Services.AddHealthChecks()
     .AddNpgSql(
@@ -297,9 +315,8 @@ builder.Services.AddHealthChecks()
         name: "postgres",
         tags: new[] { "db", "postgres" })
     .AddMongoDb(
-        mongoClientSettings,
+        mongoHealthSettings,
         name: "mongodb",
-        databaseName: "silentstalk",
         tags: new[] { "db", "mongodb" });
 //     .AddRedis(
 //         builder.Configuration.GetConnectionString("Redis")!,
