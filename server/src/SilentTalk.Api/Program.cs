@@ -52,18 +52,9 @@ builder.Services.Configure<MongoDbSettings>(options =>
 builder.Services.AddSingleton<IMongoClient>(sp =>
 {
     var connectionString = builder.Configuration.GetConnectionString("MongoDB");
-    var mongoUrl = MongoUrl.Create(connectionString);
-    var settings = MongoClientSettings.FromUrl(mongoUrl);
-
-    // Manually set SCRAM-SHA-256 credential (FromConnectionString doesn't parse authMechanism correctly)
-    settings.Credential = MongoCredential.FromComponents(
-        mechanism: "SCRAM-SHA-256",
-        source: mongoUrl.DatabaseName ?? "silentstalk",
-        username: mongoUrl.Username!,
-        password: mongoUrl.Password!
-    );
-
-    return new MongoClient(settings);
+    // Use MongoClient constructor directly with connection string
+    // This should properly parse authMechanism=SCRAM-SHA-256
+    return new MongoClient(connectionString);
 });
 
 builder.Services.AddScoped<IMongoDatabase>(sp =>
@@ -296,26 +287,13 @@ builder.Services.AddSwaggerGen(c =>
 // ============================================
 // Health Checks
 // ============================================
-// Configure MongoDB health check with explicit SCRAM-SHA-256
-var mongoConnectionString = builder.Configuration.GetConnectionString("MongoDB")!;
-var mongoHealthUrl = MongoUrl.Create(mongoConnectionString);
-var mongoHealthSettings = MongoClientSettings.FromUrl(mongoHealthUrl);
-
-// Manually set SCRAM-SHA-256 credential (FromConnectionString doesn't parse authMechanism correctly)
-mongoHealthSettings.Credential = MongoCredential.FromComponents(
-    mechanism: "SCRAM-SHA-256",
-    source: mongoHealthUrl.DatabaseName ?? "silentstalk",
-    username: mongoHealthUrl.Username!,
-    password: mongoHealthUrl.Password!
-);
-
 builder.Services.AddHealthChecks()
     .AddNpgSql(
         builder.Configuration.GetConnectionString("DefaultConnection")!,
         name: "postgres",
         tags: new[] { "db", "postgres" })
     .AddMongoDb(
-        mongoHealthSettings,
+        builder.Configuration.GetConnectionString("MongoDB")!,
         name: "mongodb",
         tags: new[] { "db", "mongodb" });
 //     .AddRedis(
