@@ -309,15 +309,34 @@ if (app.Environment.IsDevelopment())
     using (var scope = app.Services.CreateScope())
     {
         var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
+
         try
         {
             Log.Information("Ensuring database is created...");
             dbContext.Database.EnsureCreated();
             Log.Information("Database created successfully");
+
+            // Seed default roles
+            Log.Information("Seeding default roles...");
+            var roles = new[] { "USER", "ADMIN", "INTERPRETER" };
+            foreach (var roleName in roles)
+            {
+                if (!await roleManager.RoleExistsAsync(roleName))
+                {
+                    await roleManager.CreateAsync(new ApplicationRole
+                    {
+                        Name = roleName,
+                        NormalizedName = roleName
+                    });
+                    Log.Information($"Role {roleName} created");
+                }
+            }
+            Log.Information("Roles seeded successfully");
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "An error occurred while creating database");
+            Log.Error(ex, "An error occurred while creating database or seeding roles");
         }
     }
 }
