@@ -39,9 +39,9 @@ public class DatabaseSeeder
     {
         var users = new[]
         {
-            new User
+            new ApplicationUser
             {
-                UserId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
+                Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
                 Email = "john.doe@example.com",
                 PasswordHash = "$2a$11$hashedpassword1", // In production, use proper password hashing
                 DisplayName = "John Doe",
@@ -50,9 +50,9 @@ public class DatabaseSeeder
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             },
-            new User
+            new ApplicationUser
             {
-                UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
+                Id = Guid.Parse("22222222-2222-2222-2222-222222222222"),
                 Email = "jane.smith@example.com",
                 PasswordHash = "$2a$11$hashedpassword2",
                 DisplayName = "Jane Smith",
@@ -61,9 +61,9 @@ public class DatabaseSeeder
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             },
-            new User
+            new ApplicationUser
             {
-                UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
+                Id = Guid.Parse("33333333-3333-3333-3333-333333333333"),
                 Email = "bob.wilson@example.com",
                 PasswordHash = "$2a$11$hashedpassword3",
                 DisplayName = "Bob Wilson",
