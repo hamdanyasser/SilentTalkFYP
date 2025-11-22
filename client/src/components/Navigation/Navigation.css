@@ -1,0 +1,236 @@
+.navigation {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.nav-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: white;
+  font-weight: 700;
+  font-size: 1.25rem;
+  transition: opacity 0.2s;
+}
+
+.nav-logo:hover {
+  opacity: 0.9;
+}
+
+.nav-logo-icon {
+  font-size: 1.5rem;
+}
+
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  z-index: 1001;
+}
+
+.nav-toggle span {
+  width: 24px;
+  height: 3px;
+  background: white;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.nav-toggle.active span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.nav-toggle.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.nav-toggle.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -6px);
+}
+
+.nav-menu {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nav-link {
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  font-size: 0.95rem;
+  border-radius: 6px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.nav-link:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+.nav-link.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.nav-divider {
+  width: 1px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.3);
+  margin: 0 0.5rem;
+}
+
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nav-link-user {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nav-user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: white;
+  overflow: hidden;
+}
+
+.nav-user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.nav-user-name {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav-link-logout {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+}
+
+.nav-link-logout:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.nav-link-login {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.nav-link-register {
+  background: white;
+  color: #667eea;
+  font-weight: 600;
+}
+
+.nav-link-register:hover {
+  background: rgba(255, 255, 255, 0.95);
+  color: #667eea;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Mobile responsive */
+@media (max-width: 968px) {
+  .nav-toggle {
+    display: flex;
+  }
+
+  .nav-menu {
+    position: fixed;
+    top: 64px;
+    right: -100%;
+    width: 280px;
+    height: calc(100vh - 64px);
+    background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 1rem;
+    transition: right 0.3s ease;
+    overflow-y: auto;
+    box-shadow: -4px 0 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .nav-menu.active {
+    right: 0;
+  }
+
+  .nav-link {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+  }
+
+  .nav-divider {
+    width: 100%;
+    height: 1px;
+    margin: 0.5rem 0;
+  }
+
+  .nav-user {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .nav-link-user {
+    justify-content: flex-start;
+  }
+
+  .nav-user-name {
+    max-width: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .nav-logo-text {
+    font-size: 1.1rem;
+  }
+
+  .nav-container {
+    padding: 0 0.75rem;
+  }
+}
