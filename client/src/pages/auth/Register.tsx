@@ -17,10 +17,10 @@ export const Register: React.FC = () => {
     email: '',
     username: '',
     password: '',
+    confirmPassword: '',
     firstName: '',
     lastName: '',
   })
-  const [confirmPassword, setConfirmPassword] = useState('')
   const [errors, setErrors] = useState<FormErrors>({})
   const [isLoading, setIsLoading] = useState(false)
   const [serverError, setServerError] = useState<string | null>(null)
@@ -32,11 +32,7 @@ export const Register: React.FC = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
 
-    if (name === 'confirmPassword') {
-      setConfirmPassword(value)
-    } else {
-      setFormData(prev => ({ ...prev, [name]: value }))
-    }
+    setFormData(prev => ({ ...prev, [name]: value }))
 
     // Clear error for this field
     if (errors[name]) {
@@ -54,7 +50,7 @@ export const Register: React.FC = () => {
 
     // Validate form
     const validationErrors = validateForm(
-      { ...formData, confirmPassword },
+      formData,
       {
         email: commonValidationRules.email,
         username: commonValidationRules.username,
@@ -277,7 +273,7 @@ export const Register: React.FC = () => {
                   id="confirmPassword"
                   name="confirmPassword"
                   type={showPassword ? 'text' : 'password'}
-                  value={confirmPassword}
+                  value={formData.confirmPassword}
                   onChange={handleChange}
                   hasError={!!errors.confirmPassword}
                   aria-invalid={!!errors.confirmPassword}
