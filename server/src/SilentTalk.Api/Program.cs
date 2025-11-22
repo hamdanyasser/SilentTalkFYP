@@ -52,13 +52,8 @@ builder.Services.Configure<MongoDbSettings>(options =>
 builder.Services.AddSingleton<IMongoClient>(sp =>
 {
     var connectionString = builder.Configuration.GetConnectionString("MongoDB");
-    var mongoUrl = new MongoUrl(connectionString);
-    var settings = MongoClientSettings.FromUrl(mongoUrl);
-    // Explicitly set SCRAM-SHA-256 authentication mechanism
-    settings.Credential = MongoCredential.CreateScramSha256Credential(
-        mongoUrl.DatabaseName ?? "silentstalk",
-        mongoUrl.Username!,
-        mongoUrl.Password!);
+    // MongoClientSettings.FromConnectionString properly parses authMechanism parameter
+    var settings = MongoClientSettings.FromConnectionString(connectionString);
     return new MongoClient(settings);
 });
 
@@ -292,14 +287,9 @@ builder.Services.AddSwaggerGen(c =>
 // ============================================
 // Health Checks
 // ============================================
-// Configure MongoDB health check with explicit SCRAM-SHA-256 authentication
-var mongoUrl = new MongoUrl(builder.Configuration.GetConnectionString("MongoDB")!);
-var mongoClientSettings = MongoClientSettings.FromUrl(mongoUrl);
-// Explicitly set SCRAM-SHA-256 authentication mechanism
-mongoClientSettings.Credential = MongoCredential.CreateScramSha256Credential(
-    mongoUrl.DatabaseName ?? "silentstalk",
-    mongoUrl.Username!,
-    mongoUrl.Password!);
+// Configure MongoDB health check - FromConnectionString parses authMechanism parameter
+var mongoConnectionString = builder.Configuration.GetConnectionString("MongoDB")!;
+var mongoClientSettings = MongoClientSettings.FromConnectionString(mongoConnectionString);
 
 builder.Services.AddHealthChecks()
     .AddNpgSql(
