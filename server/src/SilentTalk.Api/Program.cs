@@ -299,6 +299,7 @@ builder.Services.AddHealthChecks()
     .AddMongoDb(
         mongoClientSettings,
         name: "mongodb",
+        databaseName: "silentstalk",
         tags: new[] { "db", "mongodb" });
 //     .AddRedis(
 //         builder.Configuration.GetConnectionString("Redis")!,
