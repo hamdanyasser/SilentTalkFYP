@@ -293,7 +293,7 @@ builder.Services.AddHealthChecks()
     .AddMongoDb(
         builder.Configuration.GetConnectionString("MongoDB")!,
         name: "mongodb",
-        tags: new[] { "db", "mongodb" })
+        tags: new[] { "db", "mongodb" });
 //     .AddRedis(
 //         builder.Configuration.GetConnectionString("Redis")!,
 //         name: "redis",
