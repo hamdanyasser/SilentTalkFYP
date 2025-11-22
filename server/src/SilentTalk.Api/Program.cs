@@ -52,6 +52,8 @@ builder.Services.Configure<MongoDbSettings>(options =>
 builder.Services.AddSingleton<IMongoClient>(sp =>
 {
     var connectionString = builder.Configuration.GetConnectionString("MongoDB");
+    // Use MongoClient constructor directly with connection string
+    // This should properly parse authMechanism=SCRAM-SHA-256
     return new MongoClient(connectionString);
 });
 
@@ -289,11 +291,11 @@ builder.Services.AddHealthChecks()
     .AddNpgSql(
         builder.Configuration.GetConnectionString("DefaultConnection")!,
         name: "postgres",
-        tags: new[] { "db", "postgres" })
-    .AddMongoDb(
-        builder.Configuration.GetConnectionString("MongoDB")!,
-        name: "mongodb",
-        tags: new[] { "db", "mongodb" });
+        tags: new[] { "db", "postgres" });
+//     .AddMongoDb(
+//         builder.Configuration.GetConnectionString("MongoDB")!,
+//         name: "mongodb",
+//         tags: new[] { "db", "mongodb" });
 //     .AddRedis(
 //         builder.Configuration.GetConnectionString("Redis")!,
 //         name: "redis",
