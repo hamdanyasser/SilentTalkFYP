@@ -315,9 +315,9 @@ if (app.Environment.IsDevelopment())
 
         try
         {
-            Log.Information("Ensuring database is created...");
-            dbContext.Database.EnsureCreated();
-            Log.Information("Database created successfully");
+            Log.Information("Applying database migrations...");
+            await dbContext.Database.MigrateAsync();
+            Log.Information("Database migrations applied successfully");
 
             // Seed default roles
             Log.Information("Seeding default roles...");
@@ -338,7 +338,7 @@ if (app.Environment.IsDevelopment())
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "An error occurred while creating database or seeding roles");
+            Log.Error(ex, "An error occurred while applying migrations or seeding roles");
         }
     }
 }
