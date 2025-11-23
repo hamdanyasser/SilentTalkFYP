@@ -30,8 +30,8 @@ REGISTER_RESPONSE=$(curl -s -X POST "${API_URL}/api/auth/register" \
     -d "{
         \"email\": \"${TEST_USER_EMAIL}\",
         \"password\": \"${TEST_USER_PASSWORD}\",
-        \"firstName\": \"Persistence\",
-        \"lastName\": \"Test\"
+        \"confirmPassword\": \"${TEST_USER_PASSWORD}\",
+        \"displayName\": \"Persistence Test\"
     }")
 
 echo "Response: ${REGISTER_RESPONSE}"
