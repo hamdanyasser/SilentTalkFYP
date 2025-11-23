@@ -165,7 +165,12 @@ export interface UpdateProfileRequest {
   firstName?: string
   lastName?: string
   username?: string
+  displayName?: string
+  bio?: string
+  avatarUrl?: string
   preferredSignLanguage?: SignLanguage
+  pronouns?: string
+  location?: string
   status?: UserStatus
 }
 

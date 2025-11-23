@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import '../styles/ProfilePage.css';
+import { updateProfile } from '../services/authService';
 
 interface UserProfile {
   id: string;
@@ -47,12 +48,27 @@ const ProfilePage: React.FC = () => {
 
   const handleSave = async () => {
     try {
-      // TODO: API call to save profile
-      // await fetch('/api/profile', { method: 'PUT', body: JSON.stringify(editedProfile) });
-      setProfile(editedProfile);
-      setIsEditing(false);
+      const response = await updateProfile({
+        displayName: editedProfile.displayName,
+        firstName: editedProfile.firstName,
+        lastName: editedProfile.lastName,
+        bio: editedProfile.bio,
+        avatarUrl: editedProfile.avatarUrl,
+        preferredSignLanguage: editedProfile.preferredSignLanguage,
+        pronouns: editedProfile.pronouns,
+        location: editedProfile.location,
+      });
+
+      if (response.success) {
+        setProfile(editedProfile);
+        setIsEditing(false);
+        alert('Profile updated successfully!');
+      } else {
+        alert(`Failed to save profile: ${response.message}`);
+      }
     } catch (error) {
       console.error('Failed to save profile:', error);
+      alert('An error occurred while saving your profile');
     }
   };
 

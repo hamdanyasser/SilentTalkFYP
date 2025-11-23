@@ -326,13 +326,30 @@ export async function verifyTwoFactor(
  */
 export async function updateProfile(data: UpdateProfileRequest): Promise<UpdateProfileResponse> {
   try {
-    // TODO: Replace with real API call
-    await delay(1000)
+    const token = localStorage.getItem('auth_token')
 
+    const response = await fetch(`${API_BASE_URL}/user/profile`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      return {
+        success: false,
+        message: error.message || 'Failed to update profile',
+      }
+    }
+
+    const user = await response.json()
     return {
       success: true,
       message: 'Profile updated successfully',
-      user: { ...getMockUser(), ...data } as User,
+      user,
     }
   } catch (error) {
     console.error('Profile update error:', error)

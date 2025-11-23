@@ -4,7 +4,7 @@
 }
 
 .hero-section {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #14b8a6 0%, #059669 100%);
   color: white;
   padding: 4rem 2rem;
   text-align: center;
@@ -63,7 +63,7 @@
 
 .btn-primary {
   background: white;
-  color: #667eea;
+  color: #14b8a6;
 }
 
 .btn-primary:hover {
@@ -137,7 +137,7 @@
 }
 
 .cta-section {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #14b8a6 0%, #059669 100%);
   color: white;
   padding: 4rem 2rem;
   text-align: center;

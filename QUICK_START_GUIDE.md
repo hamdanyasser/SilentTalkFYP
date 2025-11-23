@@ -48,21 +48,7 @@ python3 --version
 
 ## Quick Start (Automated)
 
-### Step 1: Apply Bug Fixes (First Time Only)
-
-```bash
-cd /home/user/SilentTalkFYP
-./apply-fixes.sh
-```
-
-This script automatically fixes:
-- ✅ Creates `appsettings.Development.json` with correct database credentials
-- ✅ Updates frontend `.env` to use ML service on port 8002
-- ✅ Fixes CORS configuration to allow port 3001
-- ✅ Comments out Redis health check (not running)
-- ✅ Creates backups of modified files
-
-### Step 2: Start All Services
+### Step 1: Start All Services
 
 ```bash
 ./start-all-services.sh
@@ -75,7 +61,7 @@ This script will:
 4. Start Frontend on port 3001 (background)
 5. Verify all services are running
 
-### Step 3: Access the Application
+### Step 2: Access the Application
 
 Open your browser and navigate to:
 
@@ -83,7 +69,7 @@ Open your browser and navigate to:
 - **Backend API (Swagger):** http://localhost:5000/swagger
 - **ML Service (Docs):** http://localhost:8002/docs
 
-### Step 4: Stop All Services
+### Step 3: Stop All Services
 
 When you're done:
 
@@ -340,8 +326,8 @@ SilentTalkFYP/
 │
 ├── start-all-services.sh     # Automated startup script
 ├── stop-all-services.sh      # Automated shutdown script
-├── apply-fixes.sh            # Bug fix script
-├── BUG_REPORT_AND_FIXES.md   # Detailed bug report
+├── quick-start.sh            # Fast startup script
+├── check-services.sh         # Service health checks
 └── QUICK_START_GUIDE.md      # This file
 ```
 
@@ -394,8 +380,9 @@ After getting everything running:
    ```
 
 5. **Review Documentation:**
-   - Read `BUG_REPORT_AND_FIXES.md` for detailed issue information
-   - Check `PROJECT_STATUS_REPORT.md` for FYP requirements
+   - Read `README.md` for project overview
+   - Check `BACKEND_API.md` for API reference
+   - See `AUTHENTICATION_IMPLEMENTATION.md` for auth details
 
 ---
 
@@ -403,10 +390,11 @@ After getting everything running:
 
 For issues or questions:
 
-1. Check `BUG_REPORT_AND_FIXES.md` for known issues
-2. Review logs in service directories
+1. Review logs in service directories (`backend.log`, `frontend.log`, `ml-service.log`)
+2. Use `./check-services.sh` to verify service health
 3. Ensure all prerequisites are installed
 4. Verify Docker Desktop is running (for WSL2)
+5. Check GitHub Issues for known problems
 
 ---
 
