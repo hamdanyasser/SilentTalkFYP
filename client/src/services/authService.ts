@@ -41,8 +41,9 @@ export async function register(data: RegisterRequest): Promise<RegisterResponse>
       body: JSON.stringify({
         email: data.email,
         password: data.password,
+        confirmPassword: data.confirmPassword,
         displayName: data.username || `${data.firstName || ''} ${data.lastName || ''}`.trim(),
-        preferredLanguage: data.preferredSignLanguage || 'ASL',
+        preferredLanguage: 'ASL',
       }),
     })
 

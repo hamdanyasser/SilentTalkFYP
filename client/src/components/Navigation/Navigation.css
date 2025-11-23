@@ -1,5 +1,5 @@
 .navigation {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #14b8a6 0%, #059669 100%);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   position: sticky;
   top: 0;
@@ -161,13 +161,13 @@
 
 .nav-link-register {
   background: white;
-  color: #667eea;
+  color: #14b8a6;
   font-weight: 600;
 }
 
 .nav-link-register:hover {
   background: rgba(255, 255, 255, 0.95);
-  color: #667eea;
+  color: #14b8a6;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
@@ -184,7 +184,7 @@
     right: -100%;
     width: 280px;
     height: calc(100vh - 64px);
-    background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(180deg, #14b8a6 0%, #059669 100%);
     flex-direction: column;
     align-items: stretch;
     gap: 0;
