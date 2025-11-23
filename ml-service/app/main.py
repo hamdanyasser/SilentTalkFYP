@@ -13,7 +13,7 @@ from pathlib import Path
 # Import API routers
 from app.api.recognition import router as recognition_router
 from app.api.streaming import router as streaming_router
-from app.services.onnx_inference import get_inference_engine
+from app.services.onnx_inference import get_inference_engine, is_mock_engine
 
 # Configure logging
 logging.basicConfig(
@@ -63,19 +63,53 @@ async def health_check():
     return {
         "status": "healthy",
         "service": "ml-service",
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.utcnow().isoformat(),
+        "model_status": "mock" if is_mock_engine() else "loaded"
     }
 
 
 @app.get("/health/ready")
 async def readiness_check():
     """Readiness check endpoint"""
-    # Add checks for dependencies (Redis, models loaded, etc.)
+    # Service is always ready, even with mock model
     return {
         "status": "ready",
         "service": "ml-service",
+        "model_status": "mock" if is_mock_engine() else "loaded",
         "timestamp": datetime.utcnow().isoformat()
     }
+
+
+@app.get("/status")
+async def get_status():
+    """Get detailed ML service status"""
+    using_mock = is_mock_engine()
+
+    status = {
+        "service": "SilentTalk ML Service",
+        "version": "1.0.0",
+        "timestamp": datetime.utcnow().isoformat(),
+        "model": {
+            "status": "mock" if using_mock else "loaded",
+            "type": "demo_predictions" if using_mock else "onnx_runtime",
+            "message": "🚧 Model training in progress - using demo predictions" if using_mock else "✅ Real model loaded"
+        },
+        "capabilities": {
+            "recognition": True,
+            "streaming": True,
+            "real_predictions": not using_mock
+        }
+    }
+
+    if using_mock:
+        status["model"]["instructions"] = {
+            "step_1": "Train a model using: python app/train.py --export-onnx",
+            "step_2": "Place the trained model at: checkpoints/model.onnx",
+            "step_3": "Restart the service to load the real model",
+            "documentation": "See ML_SERVICE_STATUS.md for details"
+        }
+
+    return status
 
 
 @app.get("/health/live")
@@ -95,34 +129,62 @@ async def startup_event():
     logger.info("Starting SilentTalk ML Service")
     logger.info("=" * 80)
 
+    # ASL alphabet classes (A-Z)
+    class_names = [chr(i) for i in range(ord('A'), ord('Z') + 1)]
+
     # Load ONNX model if available
     model_path = os.getenv("MODEL_PATH", "checkpoints/model.onnx")
 
-    if os.path.exists(model_path):
-        try:
-            logger.info(f"Loading ONNX model from {model_path}")
+    # Try to load real model, fall back to mock
+    try:
+        logger.info(f"Checking for ONNX model at {model_path}")
 
-            # ASL alphabet classes (A-Z)
-            class_names = [chr(i) for i in range(ord('A'), ord('Z') + 1)]
+        if os.path.exists(model_path):
+            logger.info(f"Found model file, attempting to load...")
 
-            # Initialize inference engine
+            # Initialize inference engine (will use real model if available, mock otherwise)
             engine = get_inference_engine(
                 model_path=model_path,
-                class_names=class_names
+                class_names=class_names,
+                allow_mock=True
             )
 
-            # Run benchmark
-            logger.info("Running inference benchmark...")
-            stats = engine.benchmark(num_iterations=100, sequence_length=30)
+            if not is_mock_engine():
+                # Run benchmark for real model
+                logger.info("Running inference benchmark...")
+                stats = engine.benchmark(num_iterations=100, sequence_length=30)
+                logger.info("✅ Real model loaded and benchmarked successfully")
+        else:
+            logger.info(f"No model file found at {model_path}")
+            # Initialize mock engine
+            engine = get_inference_engine(
+                class_names=class_names,
+                allow_mock=True
+            )
 
-            logger.info("Model loaded successfully")
-        except Exception as e:
-            logger.warning(f"Failed to load ONNX model: {e}")
-            logger.warning("Service will start without pre-loaded model")
-    else:
-        logger.warning(f"ONNX model not found at {model_path}")
-        logger.warning("Service will start without pre-loaded model")
-        logger.info("Train a model using: python app/train.py --export-onnx")
+        # Check final status
+        if is_mock_engine():
+            logger.warning("=" * 80)
+            logger.warning("🚧 RUNNING IN DEMO MODE")
+            logger.warning("=" * 80)
+            logger.warning("ML model not available - using mock predictions")
+            logger.warning("")
+            logger.warning("To add a trained model:")
+            logger.warning("  1. Train model: python app/train.py --export-onnx")
+            logger.warning("  2. Place model at: checkpoints/model.onnx")
+            logger.warning("  3. Restart service")
+            logger.warning("")
+            logger.warning("Service endpoints work normally with demo predictions")
+            logger.warning("=" * 80)
+        else:
+            logger.info("✅ Service ready with real ML model")
+
+    except Exception as e:
+        logger.error(f"Error during model initialization: {e}")
+        logger.warning("Falling back to mock engine for demo mode")
+
+        # Ensure mock engine is initialized
+        engine = get_inference_engine(class_names=class_names, allow_mock=True)
 
     logger.info("SilentTalk ML Service started successfully")
     logger.info("=" * 80)

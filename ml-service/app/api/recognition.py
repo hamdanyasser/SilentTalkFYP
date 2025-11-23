@@ -20,7 +20,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 from app.services.mediapipe_extractor import MediaPipeHandExtractor
-from app.services.onnx_inference import get_inference_engine
+from app.services.onnx_inference import get_inference_engine, is_mock_engine
 
 logger = logging.getLogger(__name__)
 
@@ -142,6 +142,9 @@ async def recognize_sign(
             return_timing=True
         )
 
+        # Check if using mock engine
+        using_mock = is_mock_engine()
+
         # Format predictions
         pred_results = [
             PredictionResult(
@@ -163,19 +166,28 @@ async def recognize_sign(
         recognition_sessions[session_id]["predictions_history"].append({
             "predictions": predictions,
             "inference_time_ms": inference_time,
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.utcnow().isoformat(),
+            "mock": using_mock
         })
         recognition_sessions[session_id]["last_updated"] = datetime.utcnow().isoformat()
 
-        logger.info(f"Recognition completed for session {session_id}: {inference_time:.2f}ms")
+        logger.info(f"Recognition completed for session {session_id}: {inference_time:.2f}ms (mock={using_mock})")
 
-        return RecognitionResponse(
-            session_id=session_id,
-            predictions=pred_results,
-            inference_time_ms=inference_time,
-            timestamp=datetime.utcnow().isoformat(),
-            landmarks_detected=True
-        )
+        # Build response
+        response_dict = {
+            "session_id": session_id,
+            "predictions": pred_results,
+            "inference_time_ms": inference_time,
+            "timestamp": datetime.utcnow().isoformat(),
+            "landmarks_detected": True
+        }
+
+        # Add mock warning if using demo predictions
+        if using_mock:
+            response_dict["model_status"] = "demo"
+            response_dict["message"] = "🚧 Using demo predictions - ML model training in progress"
+
+        return JSONResponse(content=response_dict)
 
     except Exception as e:
         logger.error(f"Recognition error: {e}", exc_info=True)

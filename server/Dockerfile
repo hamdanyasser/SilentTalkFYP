@@ -23,8 +23,7 @@ ENV PATH="${PATH}:/root/.dotnet/tools"
 # Copy project files
 COPY . .
 
-# Copy and set permissions for entrypoint script
-COPY entrypoint.sh /app/entrypoint.sh
+# Set permissions for entrypoint script
 RUN chmod +x /app/entrypoint.sh
 
 # Restore dependencies

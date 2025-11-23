@@ -16,8 +16,8 @@ RUN apk add --no-cache \
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci
+# Install dependencies (use npm install instead of ci to work without package-lock.json)
+RUN npm install
 
 # Copy application code
 COPY . .
@@ -41,8 +41,8 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install all dependencies
-RUN npm ci
+# Install all dependencies (use npm install instead of ci)
+RUN npm install
 
 # Copy source code
 COPY . .

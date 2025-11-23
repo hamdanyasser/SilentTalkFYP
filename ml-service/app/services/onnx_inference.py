@@ -303,33 +303,145 @@ class ONNXInferenceEngine:
         return stats
 
 
+class MockInferenceEngine:
+    """
+    Mock inference engine for when ONNX model is not available.
+    Provides friendly error messages and demo predictions.
+    """
+
+    def __init__(self, class_names: Optional[List[str]] = None):
+        """Initialize mock engine."""
+        self.class_names = class_names or [chr(i) for i in range(ord('A'), ord('Z') + 1)]
+        self.num_classes = len(self.class_names)
+        logger.info("🚧 Mock inference engine initialized (model training pending)")
+        logger.info("📝 To add a trained model: Place ONNX file at checkpoints/model.onnx")
+
+    def predict(
+        self,
+        landmarks_sequence: np.ndarray,
+        top_k: int = 5,
+        return_timing: bool = False
+    ) -> Tuple[List[Tuple[int, str, float]], Optional[float]]:
+        """
+        Return mock predictions for demo purposes.
+
+        Returns random predictions with a friendly message in logs.
+        """
+        logger.info("ℹ️ Using mock predictions - ML model not yet trained")
+
+        # Generate mock predictions (random but deterministic based on input shape)
+        np.random.seed(int(landmarks_sequence.sum() * 1000) % 1000)
+        predictions = np.random.dirichlet(np.ones(self.num_classes))
+
+        # Get top-k
+        top_k_indices = np.argsort(predictions)[-top_k:][::-1]
+        top_k_probs = predictions[top_k_indices]
+
+        # Format results
+        results = []
+        for idx, prob in zip(top_k_indices, top_k_probs):
+            class_name = self.class_names[idx] if idx < len(self.class_names) else f"class_{idx}"
+            results.append((int(idx), class_name, float(prob)))
+
+        # Mock timing (realistic but fake)
+        mock_time = 25.0 + np.random.rand() * 20.0
+
+        if return_timing:
+            return results, mock_time
+        else:
+            return results, None
+
+    def get_performance_stats(self) -> Dict[str, float]:
+        """Return mock performance stats."""
+        return {
+            "mean_ms": 35.0,
+            "median_ms": 32.0,
+            "min_ms": 20.0,
+            "max_ms": 50.0,
+            "p95_ms": 45.0,
+            "p99_ms": 48.0,
+            "total_inferences": 0,
+            "mock": True,
+            "message": "Model training in progress - these are demo predictions"
+        }
+
+    def benchmark(self, num_iterations: int = 100, sequence_length: int = 30) -> Dict[str, float]:
+        """Return mock benchmark stats."""
+        logger.info("🚧 Mock benchmark (model not available)")
+        return {
+            "iterations": num_iterations,
+            "mean_ms": 35.0,
+            "median_ms": 32.0,
+            "min_ms": 20.0,
+            "max_ms": 50.0,
+            "std_ms": 8.5,
+            "p95_ms": 45.0,
+            "p99_ms": 48.0,
+            "target_met": True,
+            "mock": True,
+            "message": "Model training in progress"
+        }
+
+
 # Singleton pattern for model loading
 _inference_engine: Optional[ONNXInferenceEngine] = None
+_mock_engine: Optional[MockInferenceEngine] = None
+_use_mock: bool = False
 
 
 def get_inference_engine(
     model_path: Optional[str] = None,
-    class_names: Optional[List[str]] = None
+    class_names: Optional[List[str]] = None,
+    allow_mock: bool = True
 ) -> ONNXInferenceEngine:
     """
     Get or create inference engine singleton.
 
+    If ONNX model is not available, returns a mock engine that provides
+    demo predictions and friendly error messages.
+
     Args:
-        model_path: Path to ONNX model (required for first call)
+        model_path: Path to ONNX model (optional)
         class_names: List of class names
+        allow_mock: If True, return mock engine when model unavailable
 
     Returns:
-        ONNXInferenceEngine instance
+        ONNXInferenceEngine or MockInferenceEngine instance
     """
-    global _inference_engine
+    global _inference_engine, _mock_engine, _use_mock
 
-    if _inference_engine is None:
-        if model_path is None:
-            raise ValueError("model_path must be provided for first initialization")
+    # If we already have a real engine, return it
+    if _inference_engine is not None:
+        return _inference_engine
 
-        _inference_engine = ONNXInferenceEngine(
-            model_path=model_path,
-            class_names=class_names
-        )
+    # If we're already using mock, return it
+    if _use_mock and _mock_engine is not None:
+        return _mock_engine
 
-    return _inference_engine
+    # Try to create real engine
+    if model_path and ONNX_AVAILABLE:
+        try:
+            _inference_engine = ONNXInferenceEngine(
+                model_path=model_path,
+                class_names=class_names
+            )
+            logger.info("✅ Real ONNX inference engine loaded successfully")
+            return _inference_engine
+        except Exception as e:
+            logger.warning(f"Failed to load ONNX model: {e}")
+            if not allow_mock:
+                raise
+
+    # Fall back to mock engine
+    if allow_mock:
+        if _mock_engine is None:
+            _mock_engine = MockInferenceEngine(class_names=class_names)
+        _use_mock = True
+        return _mock_engine
+    else:
+        raise RuntimeError("ONNX model not available and mock engine disabled")
+
+
+def is_mock_engine() -> bool:
+    """Check if currently using mock inference engine."""
+    return _use_mock
