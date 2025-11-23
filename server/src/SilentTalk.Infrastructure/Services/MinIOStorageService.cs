@@ -168,15 +168,22 @@ public class MinIOStorageService : IStorageService
 
         var observable = _minioClient.ListObjectsAsync(listObjectsArgs, cancellationToken);
 
-        await foreach (var item in observable)
-        {
-            if (!item.IsDir)
-            {
-                files.Add(item.Key);
-            }
-        }
+        // Use TaskCompletionSource to convert IObservable to async/await
+        var tcs = new TaskCompletionSource<List<string>>();
 
-        return files;
+        observable.Subscribe(
+            onNext: item =>
+            {
+                if (!item.IsDir)
+                {
+                    files.Add(item.Key);
+                }
+            },
+            onError: ex => tcs.SetException(ex),
+            onCompleted: () => tcs.SetResult(files)
+        );
+
+        return await tcs.Task;
     }
 
     private string ExtractObjectName(string fileUrl)

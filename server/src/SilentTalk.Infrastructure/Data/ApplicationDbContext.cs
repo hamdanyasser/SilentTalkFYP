@@ -16,7 +16,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
     }
 
     // DbSets for each entity
-    public DbSet<User> Users => Set<User>();
     public DbSet<Call> Calls => Set<Call>();
     public DbSet<Participant> Participants => Set<Participant>();
     public DbSet<Contact> Contacts => Set<Contact>();

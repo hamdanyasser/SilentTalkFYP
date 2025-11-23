@@ -19,7 +19,7 @@ from typing import Tuple, Dict
 # Add parent directory to path
 sys.path.append(str(Path(__file__).parent))
 
-from models.cnn_lstm_model import CNNLSTMSignLanguageModel, create_callbacks
+from app.models.cnn_lstm_model import CNNLSTMSignLanguageModel, create_callbacks
 
 # Configure logging
 logging.basicConfig(

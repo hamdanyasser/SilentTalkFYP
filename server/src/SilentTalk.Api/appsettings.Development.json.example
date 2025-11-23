@@ -1,0 +1,13 @@
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=localhost;Port=5432;Database=silentstalk_db;Username=silentstalk;Password=silentstalk_dev_password",
+    "MongoDb": "mongodb://silentstalk:silentstalk123@localhost:27017/silentstalk?authSource=admin",
+    "Redis": "localhost:6379"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  }
+}

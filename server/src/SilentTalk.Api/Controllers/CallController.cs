@@ -15,15 +15,18 @@ namespace SilentTalk.Api.Controllers;
 public class CallController : ControllerBase
 {
     private readonly ICallRepository _callRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IStorageService _storageService;
     private readonly ILogger<CallController> _logger;
 
     public CallController(
         ICallRepository callRepository,
+        IUnitOfWork unitOfWork,
         IStorageService storageService,
         ILogger<CallController> logger)
     {
         _callRepository = callRepository;
+        _unitOfWork = unitOfWork;
         _storageService = storageService;
         _logger = logger;
     }
@@ -56,7 +59,7 @@ public class CallController : ControllerBase
         };
 
         await _callRepository.AddAsync(call);
-        await _callRepository.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync();
 
         _logger.LogInformation("User {UserId} scheduled a call {CallId} for {ScheduledTime}",
             userId, call.CallId, request.ScheduledStartTime);
@@ -211,8 +214,8 @@ public class CallController : ControllerBase
 
         call.UpdatedAt = DateTime.UtcNow;
 
-        await _callRepository.UpdateAsync(call);
-        await _callRepository.SaveChangesAsync();
+        _callRepository.Update(call);
+        await _unitOfWork.SaveChangesAsync();
 
         _logger.LogInformation("User {UserId} updated scheduled call {CallId}", userId, id);
 
@@ -247,8 +250,8 @@ public class CallController : ControllerBase
         call.Status = CallStatus.Cancelled;
         call.UpdatedAt = DateTime.UtcNow;
 
-        await _callRepository.UpdateAsync(call);
-        await _callRepository.SaveChangesAsync();
+        _callRepository.Update(call);
+        await _unitOfWork.SaveChangesAsync();
 
         _logger.LogInformation("User {UserId} cancelled scheduled call {CallId}", userId, id);
 
@@ -274,7 +277,7 @@ public class CallController : ControllerBase
         };
 
         await _callRepository.AddAsync(call);
-        await _callRepository.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync();
 
         _logger.LogInformation("User {UserId} started instant call {CallId}", userId, call.CallId);
 
@@ -310,8 +313,8 @@ public class CallController : ControllerBase
         call.EndTime = DateTime.UtcNow;
         call.UpdatedAt = DateTime.UtcNow;
 
-        await _callRepository.UpdateAsync(call);
-        await _callRepository.SaveChangesAsync();
+        _callRepository.Update(call);
+        await _unitOfWork.SaveChangesAsync();
 
         _logger.LogInformation("User {UserId} ended call {CallId}", userId, id);
 
@@ -365,8 +368,8 @@ public class CallController : ControllerBase
             call.RecordingUrl = recordingUrl;
             call.UpdatedAt = DateTime.UtcNow;
 
-            await _callRepository.UpdateAsync(call);
-            await _callRepository.SaveChangesAsync();
+            _callRepository.Update(call);
+            await _unitOfWork.SaveChangesAsync();
 
             _logger.LogInformation("User {UserId} uploaded recording for call {CallId}", userId, id);
 
@@ -460,8 +463,8 @@ public class CallController : ControllerBase
             call.RecordingUrl = null;
             call.UpdatedAt = DateTime.UtcNow;
 
-            await _callRepository.UpdateAsync(call);
-            await _callRepository.SaveChangesAsync();
+            _callRepository.Update(call);
+            await _unitOfWork.SaveChangesAsync();
 
             _logger.LogInformation("User {UserId} deleted recording for call {CallId}", userId, id);
 

@@ -11,9 +11,9 @@ import os
 from pathlib import Path
 
 # Import API routers
-from api.recognition import router as recognition_router
-from api.streaming import router as streaming_router
-from services.onnx_inference import get_inference_engine
+from app.api.recognition import router as recognition_router
+from app.api.streaming import router as streaming_router
+from app.services.onnx_inference import get_inference_engine
 
 # Configure logging
 logging.basicConfig(

@@ -35,37 +35,45 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
  */
 export async function register(data: RegisterRequest): Promise<RegisterResponse> {
   try {
-    // TODO: Replace with real API call
-    // const response = await fetch(`${API_BASE_URL}/auth/register`, {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(data),
-    // });
-    // return await response.json();
+    const response = await fetch(`${API_BASE_URL}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: data.email,
+        password: data.password,
+        confirmPassword: data.confirmPassword,
+        displayName: data.username || `${data.firstName || ''} ${data.lastName || ''}`.trim(),
+        preferredLanguage: 'ASL',
+      }),
+    })
 
-    // Mock implementation
-    await delay(1000)
+    const result = await response.json()
 
-    // Simulate error for existing email
-    if (data.email === 'existing@example.com') {
+    if (!response.ok) {
       return {
         success: false,
-        message: 'An account with this email already exists',
+        message: result.error || result.errors?.join(', ') || 'Registration failed',
         requiresEmailVerification: false,
       }
     }
 
+    // Store tokens
+    if (result.accessToken) {
+      localStorage.setItem('accessToken', result.accessToken)
+      localStorage.setItem('refreshToken', result.refreshToken)
+    }
+
     return {
       success: true,
-      message: 'Registration successful! Please check your email to verify your account.',
-      userId: 'mock-user-id',
-      requiresEmailVerification: true,
+      message: 'Registration successful! You can now start using SilentTalk.',
+      userId: result.user?.id,
+      requiresEmailVerification: !result.user?.emailConfirmed,
     }
   } catch (error) {
     console.error('Registration error:', error)
     return {
       success: false,
-      message: 'Registration failed. Please try again.',
+      message: 'Registration failed. Please check your connection and try again.',
       requiresEmailVerification: false,
     }
   }
@@ -76,39 +84,107 @@ export async function register(data: RegisterRequest): Promise<RegisterResponse>
  */
 export async function login(data: LoginRequest): Promise<LoginResponse> {
   try {
-    // TODO: Replace with real API call
-    await delay(1000)
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: data.email,
+        password: data.password,
+      }),
+    })
 
-    // Mock implementation
-    if (data.email === 'test@example.com' && data.password === 'Test1234!') {
-      // Simulate 2FA required
-      if (data.email.includes('2fa')) {
-        return {
-          success: true,
-          requiresTwoFactor: true,
-          twoFactorToken: 'mock-2fa-token',
-          message: 'Please enter your 2FA code',
-        }
-      }
+    const result = await response.json()
 
-      // Successful login
+    if (!response.ok) {
       return {
-        success: true,
-        accessToken: 'mock-access-token',
-        refreshToken: 'mock-refresh-token',
-        user: getMockUser(),
+        success: false,
+        message: result.error || 'Invalid email or password',
       }
     }
 
+    // Check if 2FA is required
+    if (result.requiresTwoFactor) {
+      return {
+        success: true,
+        requiresTwoFactor: true,
+        twoFactorToken: result.accessToken,
+        message: 'Please enter your 2FA code',
+      }
+    }
+
+    // Store tokens
+    if (result.accessToken) {
+      localStorage.setItem('accessToken', result.accessToken)
+      localStorage.setItem('refreshToken', result.refreshToken)
+    }
+
+    // Map backend user format to frontend format
+    const user: User = {
+      id: result.user.id,
+      email: result.user.email,
+      username: result.user.displayName || result.user.email.split('@')[0],
+      firstName: result.user.displayName?.split(' ')[0],
+      lastName: result.user.displayName?.split(' ').slice(1).join(' '),
+      avatarUrl: result.user.profileImageUrl,
+      isEmailVerified: result.user.emailConfirmed,
+      isTwoFactorEnabled: result.user.twoFactorEnabled,
+      status: 'online',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      preferredSignLanguage: result.user.preferredLanguage || 'ASL',
+      notificationPreferences: {
+        email: {
+          enabled: true,
+          messageReceived: true,
+          callIncoming: true,
+          callMissed: true,
+          weeklyDigest: false,
+        },
+        push: {
+          enabled: true,
+          messageReceived: true,
+          callIncoming: true,
+          callMissed: true,
+        },
+        inApp: {
+          enabled: true,
+          sound: true,
+          vibration: true,
+        },
+      },
+      accessibilityPreferences: {
+        highContrast: false,
+        reduceMotion: false,
+        largeText: false,
+        captionsEnabled: true,
+        captionFontSize: 'normal',
+        screenReaderOptimized: false,
+      },
+      privacySettings: {
+        profileVisibility: 'public',
+        showOnlineStatus: true,
+        showLastSeen: true,
+        allowCallsFrom: 'everyone',
+        allowMessagesFrom: 'everyone',
+        dataCollection: {
+          analytics: true,
+          usageStatistics: true,
+          crashReports: true,
+        },
+      },
+    }
+
     return {
-      success: false,
-      message: 'Invalid email or password',
+      success: true,
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+      user,
     }
   } catch (error) {
     console.error('Login error:', error)
     return {
       success: false,
-      message: 'Login failed. Please try again.',
+      message: 'Login failed. Please check your connection and try again.',
     }
   }
 }
@@ -250,13 +326,30 @@ export async function verifyTwoFactor(
  */
 export async function updateProfile(data: UpdateProfileRequest): Promise<UpdateProfileResponse> {
   try {
-    // TODO: Replace with real API call
-    await delay(1000)
+    const token = localStorage.getItem('auth_token')
 
+    const response = await fetch(`${API_BASE_URL}/user/profile`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      return {
+        success: false,
+        message: error.message || 'Failed to update profile',
+      }
+    }
+
+    const user = await response.json()
     return {
       success: true,
       message: 'Profile updated successfully',
-      user: { ...getMockUser(), ...data } as User,
+      user,
     }
   } catch (error) {
     console.error('Profile update error:', error)
@@ -297,8 +390,18 @@ export async function uploadAvatar(file: File): Promise<UploadAvatarResponse> {
  */
 export async function logout(): Promise<void> {
   try {
-    // TODO: Replace with real API call
-    await delay(500)
+    const token = localStorage.getItem('accessToken')
+
+    if (token) {
+      // Call backend logout endpoint
+      await fetch(`${API_BASE_URL}/auth/logout`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      })
+    }
 
     // Clear tokens from localStorage
     localStorage.removeItem('accessToken')
@@ -306,6 +409,10 @@ export async function logout(): Promise<void> {
     localStorage.removeItem('user')
   } catch (error) {
     console.error('Logout error:', error)
+    // Still clear local storage even if API call fails
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('refreshToken')
+    localStorage.removeItem('user')
   }
 }
 
@@ -317,10 +424,80 @@ export async function getCurrentUser(): Promise<User | null> {
     const token = localStorage.getItem('accessToken')
     if (!token) return null
 
-    // TODO: Replace with real API call to validate token and get user
-    await delay(500)
+    const response = await fetch(`${API_BASE_URL}/auth/me`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    })
 
-    return getMockUser()
+    if (!response.ok) {
+      // Token is invalid, clear storage
+      localStorage.removeItem('accessToken')
+      localStorage.removeItem('refreshToken')
+      return null
+    }
+
+    const result = await response.json()
+
+    // Map backend user format to frontend format
+    const user: User = {
+      id: result.id,
+      email: result.email,
+      username: result.displayName || result.email.split('@')[0],
+      firstName: result.displayName?.split(' ')[0],
+      lastName: result.displayName?.split(' ').slice(1).join(' '),
+      avatarUrl: result.profileImageUrl,
+      isEmailVerified: result.emailConfirmed,
+      isTwoFactorEnabled: result.twoFactorEnabled,
+      status: 'online',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      preferredSignLanguage: result.preferredLanguage || 'ASL',
+      notificationPreferences: {
+        email: {
+          enabled: true,
+          messageReceived: true,
+          callIncoming: true,
+          callMissed: true,
+          weeklyDigest: false,
+        },
+        push: {
+          enabled: true,
+          messageReceived: true,
+          callIncoming: true,
+          callMissed: true,
+        },
+        inApp: {
+          enabled: true,
+          sound: true,
+          vibration: true,
+        },
+      },
+      accessibilityPreferences: {
+        highContrast: false,
+        reduceMotion: false,
+        largeText: false,
+        captionsEnabled: true,
+        captionFontSize: 'normal',
+        screenReaderOptimized: false,
+      },
+      privacySettings: {
+        profileVisibility: 'public',
+        showOnlineStatus: true,
+        showLastSeen: true,
+        allowCallsFrom: 'everyone',
+        allowMessagesFrom: 'everyone',
+        dataCollection: {
+          analytics: true,
+          usageStatistics: true,
+          crashReports: true,
+        },
+      },
+    }
+
+    return user
   } catch (error) {
     console.error('Get current user error:', error)
     return null

@@ -15,10 +15,10 @@ export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
  * - At least one uppercase letter
  * - At least one lowercase letter
  * - At least one number
- * - At least one special character
+ * - At least one special character (any non-alphanumeric)
  */
 export const STRONG_PASSWORD_REGEX =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/
 
 /**
  * Username regex:
@@ -187,7 +187,7 @@ export function getPasswordStrength(password: string): {
   // Character variety checks
   if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score++
   if (/\d/.test(password)) score++
-  if (/[@$!%*?&#]/.test(password)) score++
+  if (/[^A-Za-z\d]/.test(password)) score++ // Any special character
 
   // Cap at 4
   score = Math.min(score, 4)

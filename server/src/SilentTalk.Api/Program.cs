@@ -4,6 +4,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -13,6 +14,7 @@ using SilentTalk.Api.Middleware;
 using SilentTalk.Application.Repositories;
 using SilentTalk.Application.Services;
 using SilentTalk.Domain.Entities;
+using SilentTalk.Domain.Interfaces;
 using SilentTalk.Infrastructure.Data;
 using SilentTalk.Infrastructure.Repositories;
 using SilentTalk.Infrastructure.Services;
@@ -50,6 +52,8 @@ builder.Services.Configure<MongoDbSettings>(options =>
 builder.Services.AddSingleton<IMongoClient>(sp =>
 {
     var connectionString = builder.Configuration.GetConnectionString("MongoDB");
+    // Use MongoClient constructor directly with connection string
+    // This should properly parse authMechanism=SCRAM-SHA-256
     return new MongoClient(connectionString);
 });
 
@@ -57,6 +61,12 @@ builder.Services.AddScoped<IMongoDatabase>(sp =>
 {
     var client = sp.GetRequiredService<IMongoClient>();
     return client.GetDatabase("silentstalk");
+});
+
+builder.Services.AddScoped<MongoDbContext>(sp =>
+{
+    var database = sp.GetRequiredService<IMongoDatabase>();
+    return new MongoDbContext(database);
 });
 
 // ============================================
@@ -217,7 +227,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "http://localhost:5173") // React dev servers
+        policy.WithOrigins("http://localhost:3000", "http://localhost:3001", "http://localhost:5173") // React dev servers
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials(); // Required for SignalR
@@ -281,21 +291,63 @@ builder.Services.AddHealthChecks()
     .AddNpgSql(
         builder.Configuration.GetConnectionString("DefaultConnection")!,
         name: "postgres",
-        tags: new[] { "db", "postgres" })
-    .AddMongoDb(
-        builder.Configuration.GetConnectionString("MongoDB")!,
-        name: "mongodb",
-        tags: new[] { "db", "mongodb" })
-    .AddRedis(
-        builder.Configuration.GetConnectionString("Redis")!,
-        name: "redis",
-        tags: new[] { "cache", "redis" });
+        tags: new[] { "db", "postgres" });
+//     .AddMongoDb(
+//         builder.Configuration.GetConnectionString("MongoDB")!,
+//         name: "mongodb",
+//         tags: new[] { "db", "mongodb" });
+//     .AddRedis(
+//         builder.Configuration.GetConnectionString("Redis")!,
+//         name: "redis",
+//         tags: new[] { "cache", "redis" });
 
 var app = builder.Build();
 
 // ============================================
+// Auto-apply migrations in development
+// ============================================
+if (app.Environment.IsDevelopment())
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
+
+        try
+        {
+            Log.Information("Ensuring database is created...");
+            dbContext.Database.EnsureCreated();
+            Log.Information("Database created successfully");
+
+            // Seed default roles
+            Log.Information("Seeding default roles...");
+            var roles = new[] { "USER", "ADMIN", "INTERPRETER" };
+            foreach (var roleName in roles)
+            {
+                if (!await roleManager.RoleExistsAsync(roleName))
+                {
+                    await roleManager.CreateAsync(new ApplicationRole
+                    {
+                        Name = roleName,
+                        NormalizedName = roleName
+                    });
+                    Log.Information($"Role {roleName} created");
+                }
+            }
+            Log.Information("Roles seeded successfully");
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "An error occurred while creating database or seeding roles");
+        }
+    }
+}
+
+// ============================================
 // Configure the HTTP request pipeline
 // ============================================
+// Note: Database migrations are now handled by entrypoint.sh script (Docker)
+// For local development, migrations are auto-applied above
 
 if (app.Environment.IsDevelopment())
 {
@@ -307,8 +359,11 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-// HTTPS redirection
-app.UseHttpsRedirection();
+// HTTPS redirection (only in production to avoid issues with Docker dev environment)
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 // Request logging
 app.UseSerilogRequestLogging();

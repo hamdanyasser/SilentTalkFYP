@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using SilentTalk.Application.DTOs.Admin;
 using SilentTalk.Application.Repositories;
 using SilentTalk.Domain.Entities;
+using SilentTalk.Domain.Enums;
 using SilentTalk.Infrastructure.Data;
 using System.Security.Claims;
 using System.Text.Json;
@@ -462,10 +463,10 @@ public class AdminController : ControllerBase
         var totalParticipants = await _context.Participants.CountAsync();
 
         var completedCalls = await _context.Calls
-            .Where(c => c.Status == CallStatus.Ended && c.EndTime.HasValue)
+            .Where(c => c.Status == CallStatus.Ended && c.EndTime.HasValue && c.StartTime.HasValue)
             .ToListAsync();
         var avgCallDuration = completedCalls.Any()
-            ? completedCalls.Average(c => (c.EndTime!.Value - c.StartTime).TotalMinutes)
+            ? completedCalls.Average(c => (c.EndTime!.Value - c.StartTime!.Value).TotalMinutes)
             : 0;
 
         // System health

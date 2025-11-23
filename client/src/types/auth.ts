@@ -84,6 +84,7 @@ export interface RegisterRequest {
   email: string
   username: string
   password: string
+  confirmPassword: string
   firstName?: string
   lastName?: string
 }
@@ -164,7 +165,12 @@ export interface UpdateProfileRequest {
   firstName?: string
   lastName?: string
   username?: string
+  displayName?: string
+  bio?: string
+  avatarUrl?: string
   preferredSignLanguage?: SignLanguage
+  pronouns?: string
+  location?: string
   status?: UserStatus
 }
 

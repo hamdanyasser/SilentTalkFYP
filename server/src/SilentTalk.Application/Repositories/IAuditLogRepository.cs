@@ -1,4 +1,5 @@
 using SilentTalk.Domain.Entities;
+using SilentTalk.Domain.Interfaces;
 
 namespace SilentTalk.Application.Repositories;
 

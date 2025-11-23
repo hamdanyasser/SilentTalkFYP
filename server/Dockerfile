@@ -9,16 +9,29 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS development
 
 WORKDIR /app
 
-# Install necessary tools
+# Install necessary tools including dotnet-ef
 RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
+# Install Entity Framework Core tools globally
+RUN dotnet tool install --global dotnet-ef --version 8.0.0
+
+# Add dotnet tools to PATH
+ENV PATH="${PATH}:/root/.dotnet/tools"
+
 # Copy project files
 COPY . .
 
+# Copy and set permissions for entrypoint script
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
 # Restore dependencies
 RUN dotnet restore
+
+# Build the Infrastructure project to ensure migrations are compiled
+RUN dotnet build src/SilentTalk.Infrastructure/SilentTalk.Infrastructure.csproj -c Debug
 
 # Expose ports
 EXPOSE 5000
@@ -27,8 +40,8 @@ EXPOSE 5000
 ENV ASPNETCORE_ENVIRONMENT=Development
 ENV ASPNETCORE_URLS=http://+:5000
 
-# Run with hot reload
-CMD ["dotnet", "watch", "run", "--project", "src/SilentTalk.Api/SilentTalk.Api.csproj", "--no-launch-profile"]
+# Use entrypoint script to run migrations before starting app
+ENTRYPOINT ["/app/entrypoint.sh"]
 
 # ============================================
 # Stage 2: Build (compile application)

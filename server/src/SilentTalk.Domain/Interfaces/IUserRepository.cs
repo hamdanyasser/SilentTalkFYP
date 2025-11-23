@@ -5,22 +5,22 @@ namespace SilentTalk.Domain.Interfaces;
 /// <summary>
 /// Repository interface for User entity
 /// </summary>
-public interface IUserRepository : IRepository<User>
+public interface IUserRepository : IRepository<ApplicationUser>
 {
     /// <summary>
     /// Get user by email address
     /// </summary>
-    Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
+    Task<ApplicationUser?> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Get user with their initiated calls
     /// </summary>
-    Task<User?> GetWithCallsAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<ApplicationUser?> GetWithCallsAsync(Guid userId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Get user with their contacts
     /// </summary>
-    Task<User?> GetWithContactsAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<ApplicationUser?> GetWithContactsAsync(Guid userId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Check if email exists

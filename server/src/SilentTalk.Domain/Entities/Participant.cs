@@ -42,5 +42,5 @@ public class Participant : BaseEntity
     /// <summary>
     /// The user who is participating
     /// </summary>
-    public User User { get; set; } = null!;
+    public ApplicationUser User { get; set; } = null!;
 }
