@@ -276,3 +276,28 @@ mongodb-data/
 sqlserver-data/
 postgres-data/
 *.backup.*
+
+# ============================================
+# LaTeX / Documentation Build Artifacts
+# ============================================
+*.aux
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.nav
+*.snm
+*.vrb
+*.bbl
+*.blg
+*.lof
+*.lot
+*.idx
+*.ind
+*.ilg
+*.glo
+*.gls
+*.acn
+*.acr
+*.alg
