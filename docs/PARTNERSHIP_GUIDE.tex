@@ -1,0 +1,1839 @@
+% ============================================================
+% SilentTalk FYP - Partnership Collaboration Guide
+% Team: Yasser (Backend/Infrastructure) + Zainab (Frontend/UI)
+% Timeline: January - July 2026
+% ============================================================
+
+\documentclass[12pt,a4paper]{article}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{enumitem}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{tcolorbox}
+\usepackage{multirow}
+
+% Page setup
+\geometry{
+    left=2.5cm,
+    right=2.5cm,
+    top=3cm,
+    bottom=3cm
+}
+
+% Colors
+\definecolor{primaryblue}{RGB}{41, 128, 185}
+\definecolor{secondarygreen}{RGB}{39, 174, 96}
+\definecolor{warningorange}{RGB}{230, 126, 34}
+\definecolor{dangerred}{RGB}{231, 76, 60}
+\definecolor{codebg}{RGB}{245, 245, 245}
+
+% Hyperref setup
+\hypersetup{
+    colorlinks=true,
+    linkcolor=primaryblue,
+    filecolor=magenta,
+    urlcolor=primaryblue,
+    pdftitle={SilentTalk FYP Partnership Guide},
+    pdfauthor={Yasser \& Zainab},
+}
+
+% Code listing setup
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{codebg},
+    frame=single,
+    breaklines=true,
+    captionpos=b,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    keywordstyle=\color{primaryblue}\bfseries,
+    commentstyle=\color{secondarygreen},
+    stringstyle=\color{dangerred},
+    showstringspaces=false,
+    tabsize=2
+}
+
+% Custom commands
+\newcommand{\checkbox}{\Square}
+\newcommand{\checkedbox}{\CheckedBox}
+\newcommand{\priority}[1]{\textcolor{dangerred}{\textbf{#1}}}
+\newcommand{\status}[1]{\textcolor{secondarygreen}{\textbf{#1}}}
+\newcommand{\warning}[1]{\textcolor{warningorange}{\textbf{#1}}}
+
+% Headers and footers
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{SilentTalk FYP - Partnership Guide}
+\fancyhead[R]{\thepage}
+\fancyfoot[C]{January - July 2026}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% Title page
+\title{
+    \Huge\textbf{SilentTalk FYP}\\
+    \huge Partnership Collaboration Guide\\
+    \vspace{0.5cm}
+    \Large Team Success Roadmap
+}
+\author{
+    \textbf{Yasser} - Backend \& Infrastructure Lead\\
+    \textbf{Zainab} - Frontend \& UI/UX Lead\\
+    \vspace{0.3cm}\\
+    Final Year Project\\
+    January - July 2026
+}
+\date{\today}
+
+% Document begins
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+\newpage
+\tableofcontents
+\newpage
+
+% ============================================================
+\section{Welcome \& Introduction}
+% ============================================================
+
+\subsection{Purpose of This Guide}
+
+This comprehensive collaboration guide is designed to ensure seamless teamwork between Yasser (backend/infrastructure) and Zainab (frontend/UI) throughout the SilentTalk FYP project. The guide provides:
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Complete setup instructions} for Zainab to get started
+    \item \textbf{Accurate project status} based on current codebase analysis
+    \item \textbf{Clear task assignments} with realistic time estimates
+    \item \textbf{Week-by-week roadmap} from January to July 2026
+    \item \textbf{Technical references} and troubleshooting guides
+    \item \textbf{Collaboration workflows} for efficient teamwork
+\end{itemize}
+
+\subsection{Project Vision}
+
+\textit{``Breaking down communication barriers and creating an inclusive environment for the deaf and hard-of-hearing community through advanced technology.''}
+
+\vspace{0.5cm}
+
+SilentTalk is a comprehensive sign language communication platform that combines:
+\begin{itemize}
+    \item Real-time sign language recognition using machine learning
+    \item Accessible video conferencing with live captions
+    \item Community features (forums, resources, glossary)
+    \item Professional interpreter booking services
+\end{itemize}
+
+\subsection{Team Roles \& Responsibilities}
+
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\rowcolor{codebg}
+\textbf{Role} & \textbf{Responsibilities} \\ \hline
+\textbf{Yasser} & Backend API development, Database design, Infrastructure setup, Docker orchestration, SignalR implementation, ML service integration, Security, Deployment \\ \hline
+\textbf{Zainab} & Frontend development, UI/UX design, Component library, React integration, Accessibility implementation, User testing, Documentation \\ \hline
+\textbf{Shared} & Code reviews, Weekly planning, Testing, Documentation, Timeline management, Quality assurance \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsection{Timeline Overview}
+
+\begin{tcolorbox}[colback=secondarygreen!10, colframe=secondarygreen, title=7-Month Timeline]
+\textbf{January 2026:} Setup \& Planning\\
+\textbf{February:} Core authentication \& video calling\\
+\textbf{March:} ML integration \& caption system\\
+\textbf{April:} User management \& contacts\\
+\textbf{May:} Community features\\
+\textbf{June:} Testing \& polish\\
+\textbf{July:} Final testing \& submission
+\end{tcolorbox}
+
+% ============================================================
+\section{Setup Guide for Zainab}
+% ============================================================
+
+\subsection{Prerequisites}
+
+Before starting, ensure you have the following installed on your machine:
+
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{Git} (version 2.30+)
+    \begin{lstlisting}[language=bash]
+# Verify installation
+git --version
+    \end{lstlisting}
+
+    \item \textbf{Docker Desktop} (latest version)
+    \begin{lstlisting}[language=bash]
+# Verify installation
+docker --version
+docker-compose --version
+    \end{lstlisting}
+
+    \item \textbf{Node.js} (v20.x LTS)
+    \begin{lstlisting}[language=bash]
+# Verify installation
+node --version  # Should be v20.x
+npm --version   # Should be 10.x
+    \end{lstlisting}
+
+    \item \textbf{Visual Studio Code} (recommended IDE)
+
+    \item \textbf{Terminal/Command Prompt}
+\end{enumerate}
+
+\subsection{Step-by-Step Setup}
+
+\subsubsection{Step 1: Clone Repository}
+
+\begin{lstlisting}[language=bash]
+# Clone the repository
+git clone https://github.com/hamdanyasser/SilentTalkFYP.git
+
+# Navigate to project directory
+cd SilentTalkFYP
+
+# Check current branch
+git branch
+# You should be on: main
+\end{lstlisting}
+
+\subsubsection{Step 2: Install Frontend Dependencies}
+
+\begin{lstlisting}[language=bash]
+# Navigate to client directory
+cd client
+
+# Install Node.js dependencies
+npm install
+
+# This will install:
+# - React 18
+# - TypeScript
+# - Vite
+# - All required libraries
+\end{lstlisting}
+
+\warning{Note:} The project uses \texttt{npm install} (not \texttt{npm ci}) because there's no \texttt{package-lock.json}.
+
+\subsubsection{Step 3: Start Docker Services}
+
+\begin{lstlisting}[language=bash]
+# Go back to project root
+cd ~/SilentTalkFYP
+
+# Start all services with one command
+./start.sh
+
+# Wait ~60 seconds for services to initialize
+# You'll see status updates in the terminal
+\end{lstlisting}
+
+This script starts:
+\begin{itemize}
+    \item PostgreSQL (database)
+    \item MongoDB (messages/logs)
+    \item Redis (caching)
+    \item MinIO (file storage)
+    \item Backend API (ASP.NET Core)
+    \item ML Service (FastAPI)
+    \item Frontend (React + Vite)
+\end{itemize}
+
+\subsubsection{Step 4: Verify Services Are Running}
+
+\begin{lstlisting}[language=bash]
+# Check service status
+docker ps
+
+# You should see 7-8 containers running:
+# - silents-talk-postgres
+# - silents-talk-mongodb
+# - silents-talk-redis
+# - silents-talk-minio
+# - silents-talk-server
+# - silents-talk-ml
+# - silents-talk-client
+\end{lstlisting}
+
+\subsubsection{Step 5: Access the Application}
+
+Open your browser and navigate to:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\rowcolor{codebg}
+\textbf{Service} & \textbf{URL} \\ \hline
+Frontend (your work!) & \url{http://localhost:3000} \\ \hline
+Backend API Docs & \url{http://localhost:5000/docs} \\ \hline
+ML Service API & \url{http://localhost:8000/docs} \\ \hline
+MinIO Console & \url{http://localhost:9001} \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection{VS Code Setup}
+
+\subsubsection{Recommended Extensions}
+
+Install these VS Code extensions for optimal development experience:
+
+\begin{enumerate}
+    \item \textbf{ESLint} - JavaScript/TypeScript linting
+    \item \textbf{Prettier} - Code formatting
+    \item \textbf{ES7+ React Snippets} - React code snippets
+    \item \textbf{Auto Rename Tag} - HTML/JSX tag renaming
+    \item \textbf{GitLens} - Git integration
+    \item \textbf{Thunder Client} - API testing (alternative to Postman)
+    \item \textbf{Error Lens} - Inline error display
+    \item \textbf{Path Intellisense} - File path autocomplete
+\end{enumerate}
+
+\subsubsection{VS Code Settings}
+
+Create \texttt{.vscode/settings.json} in project root:
+
+\begin{lstlisting}[language=json]
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/dist": true
+  }
+}
+\end{lstlisting}
+
+\subsection{Troubleshooting Common Issues}
+
+\subsubsection{Docker Won't Start}
+
+\begin{tcolorbox}[colback=dangerred!10, colframe=dangerred, title=Problem: Docker containers fail to start]
+\textbf{Solution:}
+\begin{lstlisting}[language=bash]
+# Stop all containers
+cd ~/SilentTalkFYP
+./stop.sh
+
+# Clean Docker system
+docker system prune -f
+
+# Restart Docker Desktop
+# Then try starting again
+./start.sh
+\end{lstlisting}
+\end{tcolorbox}
+
+\subsubsection{Port Already in Use}
+
+\begin{tcolorbox}[colback=warningorange!10, colframe=warningorange, title=Problem: Port 3000/5000/8000 already in use]
+\textbf{Solution:}
+\begin{lstlisting}[language=bash]
+# Find what's using the port (Linux/Mac)
+lsof -i :3000
+lsof -i :5000
+
+# Kill the process
+kill -9 <PID>
+
+# Or change ports in docker-compose.yml if needed
+\end{lstlisting}
+\end{tcolorbox}
+
+\subsubsection{Frontend Won't Build}
+
+\begin{tcolorbox}[colback=warningorange!10, colframe=warningorange, title=Problem: npm install fails or build errors]
+\textbf{Solution:}
+\begin{lstlisting}[language=bash]
+cd ~/SilentTalkFYP/client
+
+# Clear cache and reinstall
+rm -rf node_modules
+rm package-lock.json
+npm cache clean --force
+npm install
+
+# If still issues, check Node version
+node --version  # Must be v20.x
+\end{lstlisting}
+\end{tcolorbox}
+
+\subsection{Verify Setup Checklist}
+
+Complete this checklist to ensure everything is working:
+
+\begin{itemize}
+    \item[$\square$] Git repository cloned successfully
+    \item[$\square$] Docker Desktop is running
+    \item[$\square$] All 7-8 Docker containers are running (check with \texttt{docker ps})
+    \item[$\square$] Frontend accessible at \url{http://localhost:3000}
+    \item[$\square$] Backend API docs at \url{http://localhost:5000/docs}
+    \item[$\square$] Can register a test user successfully
+    \item[$\square$] Can login with test user
+    \item[$\square$] VS Code opens project without errors
+    \item[$\square$] Can run \texttt{npm run dev} in client directory
+\end{itemize}
+
+Once all items are checked, you're ready to start development! 🎉
+
+% ============================================================
+\section{Project Status (Current State)}
+% ============================================================
+
+\subsection{Overall Completion: \texorpdfstring{\textasciitilde}{}20\%}
+
+Based on thorough codebase analysis, here's the accurate current status:
+
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|l|c|X|}
+\hline
+\rowcolor{codebg}
+\textbf{Component} & \textbf{Status} & \textbf{Notes} \\ \hline
+Infrastructure & \status{95\%} & Docker, databases, all services running \\ \hline
+Database & \status{90\%} & PostgreSQL + MongoDB configured \\ \hline
+Backend Auth & \status{60\%} & JWT working, email verification pending \\ \hline
+Backend Calls & \status{80\%} & Full call management + SignalR hub \\ \hline
+ML Service & \warning{30\%} & Demo mode, no trained model \\ \hline
+Frontend Auth & \status{70\%} & Login/register pages working \\ \hline
+Frontend Video & \warning{40\%} & UI exists, WebRTC not connected \\ \hline
+Frontend Other & \warning{15\%} & Basic pages, needs backend integration \\ \hline
+Testing & \priority{10\%} & Minimal tests exist \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsection{What's Working RIGHT NOW}
+
+\begin{tcolorbox}[colback=secondarygreen!10, colframe=secondarygreen, title=✅ Fully Functional Features]
+\begin{enumerate}
+    \item \textbf{Infrastructure} - All Docker services running, data persists
+    \item \textbf{Authentication} - Users can register/login, JWT tokens work
+    \item \textbf{Call Management Backend} - Full CRUD for calls, scheduling, history
+    \item \textbf{SignalR Hub} - Complete WebRTC signaling (601 lines of code!)
+    \item \textbf{Recording Upload} - Can upload/download call recordings to MinIO
+    \item \textbf{Admin Panel} - User management, statistics, audit logs
+    \item \textbf{Frontend Login/Register} - Forms work, connected to backend
+    \item \textbf{Video Call Page} - UI exists with caption overlay
+    \item \textbf{ML Service Connection} - WebSocket streaming ready (demo mode)
+    \item \textbf{Design System} - Button, Input, Modal components ready
+\end{enumerate}
+\end{tcolorbox}
+
+\subsection{What's Missing (Needs Implementation)}
+
+\begin{tcolorbox}[colback=dangerred!10, colframe=dangerred, title=❌ Critical Missing Features]
+\begin{enumerate}
+    \item \textbf{Trained ML Model} - Currently using mock predictions
+    \item \textbf{WebRTC Video Integration} - Backend ready, frontend needs work
+    \item \textbf{Contact Management} - Backend controller missing
+    \item \textbf{Forum Feature} - Backend not implemented
+    \item \textbf{Resource Library} - Backend not implemented
+    \item \textbf{Glossary} - Backend not implemented
+    \item \textbf{Profile Management} - Backend partially done
+    \item \textbf{Frontend UI Pages} - Many pages are placeholders
+    \item \textbf{Comprehensive Testing} - Only 10\% coverage
+    \item \textbf{Email Sending} - No SMTP configured
+\end{enumerate}
+\end{tcolorbox}
+
+\subsection{Technology Stack Overview}
+
+\subsubsection{Backend (Yasser's Domain)}
+
+\begin{itemize}
+    \item \textbf{Framework:} ASP.NET Core 8.0
+    \item \textbf{Language:} C\# 12
+    \item \textbf{Database:} PostgreSQL (primary), MongoDB (messages)
+    \item \textbf{Caching:} Redis
+    \item \textbf{Storage:} MinIO (S3-compatible)
+    \item \textbf{Real-time:} SignalR (WebSocket-based)
+    \item \textbf{ORM:} Entity Framework Core 8.0
+    \item \textbf{Auth:} ASP.NET Core Identity + JWT
+    \item \textbf{API Docs:} Swagger/OpenAPI
+\end{itemize}
+
+\subsubsection{Frontend (Zainab's Domain)}
+
+\begin{itemize}
+    \item \textbf{Framework:} React 18
+    \item \textbf{Language:} TypeScript 5.x
+    \item \textbf{Build Tool:} Vite
+    \item \textbf{State Management:} React Context API
+    \item \textbf{Styling:} CSS Modules + Sass
+    \item \textbf{HTTP Client:} Axios
+    \item \textbf{WebRTC:} simple-peer library
+    \item \textbf{SignalR Client:} @microsoft/signalr
+    \item \textbf{Testing:} Jest + React Testing Library
+\end{itemize}
+
+\subsubsection{ML Service (Shared Integration)}
+
+\begin{itemize}
+    \item \textbf{Framework:} FastAPI (Python)
+    \item \textbf{ML:} TensorFlow + ONNX Runtime
+    \item \textbf{Computer Vision:} MediaPipe
+    \item \textbf{Streaming:} WebSocket
+    \item \textbf{Status:} Demo mode (mock predictions)
+\end{itemize}
+
+\subsection{Repository Structure}
+
+\begin{lstlisting}[language=bash]
+SilentTalkFYP/
+├── server/                 # Backend API (Yasser)
+│   ├── src/
+│   │   ├── SilentTalk.Api/
+│   │   │   ├── Controllers/     # API endpoints
+│   │   │   ├── Hubs/            # SignalR hub
+│   │   │   ├── Program.cs       # App entry point
+│   │   └── SilentTalk.Domain/   # Entities/models
+│   └── database/migrations/
+├── client/                 # Frontend (Zainab)
+│   ├── src/
+│   │   ├── pages/         # Page components
+│   │   ├── components/    # Reusable components
+│   │   ├── services/      # API clients
+│   │   ├── contexts/      # React contexts
+│   │   ├── design-system/ # Design components
+│   │   ├── hooks/         # Custom hooks
+│   │   └── types/         # TypeScript types
+│   ├── package.json
+│   └── vite.config.ts
+├── ml-service/            # ML Service (Integration)
+│   ├── app/
+│   │   ├── api/          # FastAPI endpoints
+│   │   ├── services/     # ML inference
+│   │   └── main.py       # FastAPI app
+│   └── requirements.txt
+├── infrastructure/        # Docker configs
+│   └── docker/
+│       └── docker-compose.yml
+├── docs/                  # Documentation
+├── start.sh              # Start everything
+├── stop.sh               # Stop everything
+└── PROJECT_STATUS.md     # Detailed status
+\end{lstlisting}
+
+% ============================================================
+\section{Task Assignments \& Division of Labor}
+% ============================================================
+
+\subsection{Guiding Principles}
+
+\begin{enumerate}
+    \item \textbf{Clear Boundaries:} Yasser owns backend, Zainab owns frontend
+    \item \textbf{Communication:} Daily updates on blockers, weekly planning
+    \item \textbf{Code Reviews:} Review each other's PRs within 24 hours
+    \item \textbf{Shared Goals:} Both responsible for project success
+    \item \textbf{Flexibility:} Help each other when needed
+\end{enumerate}
+
+\subsection{Yasser's Tasks (Backend/Infrastructure)}
+
+\begin{longtable}{|p{0.5cm}|p{6cm}|p{2cm}|p{2cm}|p{2cm}|}
+\hline
+\rowcolor{codebg}
+\textbf{\#} & \textbf{Task} & \textbf{Priority} & \textbf{Time} & \textbf{Status} \\ \hline
+\endfirsthead
+\hline
+\rowcolor{codebg}
+\textbf{\#} & \textbf{Task} & \textbf{Priority} & \textbf{Time} & \textbf{Status} \\ \hline
+\endhead
+
+Y1 & Complete Contact Management Backend & High & 1 week & Todo \\ \hline
+Y2 & Implement Email Service (SMTP) & High & 3 days & Todo \\ \hline
+Y3 & Connect Profile Endpoints to DB & Medium & 2 days & Todo \\ \hline
+Y4 & Forum Backend Implementation & Medium & 2 weeks & Todo \\ \hline
+Y5 & Resource Library Backend & Medium & 1.5 weeks & Todo \\ \hline
+Y6 & Glossary Backend API & Low & 1 week & Todo \\ \hline
+Y7 & ML Model Training Setup & Critical & 2 weeks & Todo \\ \hline
+Y8 & Backend Unit Tests (80\% coverage) & High & 3 weeks & Todo \\ \hline
+Y9 & API Performance Optimization & Medium & 1 week & Todo \\ \hline
+Y10 & Security Audit \& Fixes & High & 1 week & Todo \\ \hline
+Y11 & Deployment Scripts \& CI/CD & Medium & 1 week & Todo \\ \hline
+Y12 & Documentation Updates & Low & Ongoing & Todo \\ \hline
+\caption{Yasser's Task List}
+\end{longtable}
+
+\subsection{Zainab's Tasks (Frontend/UI)}
+
+\begin{longtable}{|p{0.5cm}|p{6cm}|p{2cm}|p{2cm}|p{2cm}|}
+\hline
+\rowcolor{codebg}
+\textbf{\#} & \textbf{Task} & \textbf{Priority} & \textbf{Time} & \textbf{Status} \\ \hline
+\endfirsthead
+\hline
+\rowcolor{codebg}
+\textbf{\#} & \textbf{Task} & \textbf{Priority} & \textbf{Time} & \textbf{Status} \\ \hline
+\endhead
+
+Z1 & Complete WebRTC Video Integration & Critical & 2 weeks & Todo \\ \hline
+Z2 & Connect Call History Page to Backend & High & 3 days & Todo \\ \hline
+Z3 & Profile Page Backend Integration & High & 4 days & Todo \\ \hline
+Z4 & Contact Management UI & High & 1 week & Todo \\ \hline
+Z5 & Call Scheduling UI & High & 1 week & Todo \\ \hline
+Z6 & Forum Frontend Implementation & Medium & 2 weeks & Todo \\ \hline
+Z7 & Resource Library Frontend & Medium & 1.5 weeks & Todo \\ \hline
+Z8 & Glossary Frontend & Low & 1 week & Todo \\ \hline
+Z9 & Responsive Design Polish & High & 1 week & Todo \\ \hline
+Z10 & Accessibility Testing (WCAG 2.1) & High & 1 week & Todo \\ \hline
+Z11 & Frontend Unit Tests & Medium & 2 weeks & Todo \\ \hline
+Z12 & User Documentation & Medium & 1 week & Todo \\ \hline
+Z13 & UI/UX Polish & Medium & Ongoing & Todo \\ \hline
+\caption{Zainab's Task List}
+\end{longtable}
+
+\subsection{Shared Tasks (Collaboration Required)}
+
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.5cm}|X|p{2.5cm}|p{2.5cm}|}
+\hline
+\rowcolor{codebg}
+\textbf{\#} & \textbf{Task} & \textbf{Who Leads} & \textbf{Time} \\ \hline
+S1 & ML Model Integration & Yasser (backend), Zainab (UI) & 1 week \\ \hline
+S2 & End-to-End Testing & Both & 2 weeks \\ \hline
+S3 & Performance Testing & Yasser (API), Zainab (UI) & 1 week \\ \hline
+S4 & Security Testing & Both & 3 days \\ \hline
+S5 & User Acceptance Testing & Both & 1 week \\ \hline
+S6 & Bug Fixing Sprint & Both & 2 weeks \\ \hline
+S7 & Final Documentation & Both & 1 week \\ \hline
+S8 & Deployment & Yasser (infra), Zainab (test) & 3 days \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsection{Dependencies Matrix}
+
+\textit{Understanding task dependencies prevents blockers:}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|X|X|}
+\hline
+\rowcolor{codebg}
+\textbf{Frontend Task} & \textbf{Depends On (Backend)} \\ \hline
+WebRTC Video (Z1) & SignalR Hub ✅ Already done! \\ \hline
+Call History (Z2) & Call endpoints ✅ Ready! \\ \hline
+Profile Page (Z3) & User endpoints ⚠️ Yasser: Y3 \\ \hline
+Contact UI (Z4) & Contact backend ❌ Yasser: Y1 \\ \hline
+Forum UI (Z6) & Forum backend ❌ Yasser: Y4 \\ \hline
+Resource Library (Z7) & Resource backend ❌ Yasser: Y5 \\ \hline
+Glossary (Z8) & Glossary backend ❌ Yasser: Y6 \\ \hline
+\end{tabularx}
+\end{table}
+
+\warning{Key Insight:} Zainab can start Z1 (WebRTC) and Z2 (Call History) immediately because backend is ready!
+
+% ============================================================
+\section{Implementation Roadmap (January - July 2026)}
+% ============================================================
+
+\subsection{Month-by-Month Plan}
+
+\subsubsection{January 2026: Setup \& Foundation}
+
+\textbf{Goals:}
+\begin{itemize}
+    \item Zainab completes environment setup
+    \item Both team members understand codebase
+    \item Weekly meeting cadence established
+\end{itemize}
+
+\textbf{Deliverables:}
+\begin{itemize}
+    \item[$\square$] Zainab can run project locally
+    \item[$\square$] Git workflow established
+    \item[$\square$] Weekly meeting schedule set
+    \item[$\square$] Communication channels confirmed
+\end{itemize}
+
+\textbf{Tasks (Week by Week):}
+
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\rowcolor{codebg}
+\textbf{Week} & \textbf{Activities} \\ \hline
+Week 1 (Jan 6-12) & \textbf{Zainab:} Environment setup, run project locally, explore codebase\\
+& \textbf{Yasser:} Code walkthrough for Zainab, document current APIs \\ \hline
+Week 2 (Jan 13-19) & \textbf{Zainab:} Study existing components, review auth flow\\
+& \textbf{Yasser:} Start Y1 (Contact backend) \\ \hline
+Week 3 (Jan 20-26) & \textbf{Zainab:} Start Z2 (Call history page)\\
+& \textbf{Yasser:} Continue Y1 \\ \hline
+Week 4 (Jan 27-31) & \textbf{Both:} First mini-sprint review, plan February \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsubsection{February 2026: Core Features}
+
+\textbf{Goals:}
+\begin{itemize}
+    \item WebRTC video calling working end-to-end
+    \item Contact management complete
+    \item Call history integrated
+\end{itemize}
+
+\textbf{Deliverables:}
+\begin{itemize}
+    \item[$\square$] Users can make 1-on-1 video calls
+    \item[$\square$] Contact list shows online/offline status
+    \item[$\square$] Call history displays past calls with filters
+    \item[$\square$] Profile page connected to backend
+\end{itemize}
+
+\textbf{Tasks (Week by Week):}
+
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\rowcolor{codebg}
+\textbf{Week} & \textbf{Activities} \\ \hline
+Week 5 (Feb 3-9) & \textbf{Zainab:} Start Z1 (WebRTC integration - Part 1)\\
+& \textbf{Yasser:} Finish Y1 (Contact backend), start Y3 (Profile DB) \\ \hline
+Week 6 (Feb 10-16) & \textbf{Zainab:} Z1 (WebRTC - Part 2), Z2 complete\\
+& \textbf{Yasser:} Y3 complete, start Y2 (Email service) \\ \hline
+Week 7 (Feb 17-23) & \textbf{Zainab:} Z3 (Profile page), Z4 start (Contact UI)\\
+& \textbf{Yasser:} Y2 complete, review Z1 \\ \hline
+Week 8 (Feb 24-28) & \textbf{Both:} Integration testing video calls, sprint review \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsubsection{March 2026: ML Integration \& Captions}
+
+\textbf{Goals:}
+\begin{itemize}
+    \item ML model trained and integrated
+    \item Real-time captions working in video calls
+    \item Call scheduling implemented
+\end{itemize}
+
+\textbf{Deliverables:}
+\begin{itemize}
+    \item[$\square$] Sign language recognition (85\%+ accuracy)
+    \item[$\square$] Live captions during calls
+    \item[$\square$] Call scheduling calendar
+    \item[$\square$] Contact management complete
+\end{itemize}
+
+\textbf{Tasks:}
+\begin{itemize}
+    \item \textbf{Yasser:} Y7 (ML training), S1 (ML integration)
+    \item \textbf{Zainab:} Z4 complete, Z5 (Scheduling UI), S1 (ML UI)
+\end{itemize}
+
+\subsubsection{April 2026: Community Features}
+
+\textbf{Goals:}
+\begin{itemize}
+    \item Forum operational
+    \item Resource library functional
+    \item Glossary searchable
+\end{itemize}
+
+\textbf{Deliverables:}
+\begin{itemize}
+    \item[$\square$] Users can create/reply to forum posts
+    \item[$\square$] Resource library with videos/tutorials
+    \item[$\square$] Searchable sign language glossary
+\end{itemize}
+
+\textbf{Tasks:}
+\begin{itemize}
+    \item \textbf{Yasser:} Y4 (Forum backend), Y5 (Resources), Y6 (Glossary)
+    \item \textbf{Zainab:} Z6 (Forum UI), Z7 (Resources UI), Z8 (Glossary UI)
+\end{itemize}
+
+\subsubsection{May 2026: Polish \& Responsive Design}
+
+\textbf{Goals:}
+\begin{itemize}
+    \item All features responsive on mobile/tablet
+    \item Accessibility compliance (WCAG 2.1 AA)
+    \item UI/UX polished
+\end{itemize}
+
+\textbf{Deliverables:}
+\begin{itemize}
+    \item[$\square$] Mobile-responsive design
+    \item[$\square$] Accessibility audit passed
+    \item[$\square$] Performance optimized
+\end{itemize}
+
+\textbf{Tasks:}
+\begin{itemize}
+    \item \textbf{Yasser:} Y9 (Performance), Y10 (Security audit)
+    \item \textbf{Zainab:} Z9 (Responsive), Z10 (Accessibility), Z13 (UI polish)
+\end{itemize}
+
+\subsubsection{June 2026: Testing \& Bug Fixes}
+
+\textbf{Goals:}
+\begin{itemize}
+    \item Comprehensive testing complete
+    \item All critical bugs fixed
+    \item 80\%+ code coverage
+\end{itemize}
+
+\textbf{Deliverables:}
+\begin{itemize}
+    \item[$\square$] Unit tests (80\%+ coverage)
+    \item[$\square$] Integration tests
+    \item[$\square$] End-to-end tests
+    \item[$\square$] User acceptance testing
+\end{itemize}
+
+\textbf{Tasks:}
+\begin{itemize}
+    \item \textbf{Yasser:} Y8 (Backend tests)
+    \item \textbf{Zainab:} Z11 (Frontend tests)
+    \item \textbf{Both:} S2-S6 (E2E, performance, security, UAT, bug fixes)
+\end{itemize}
+
+\subsubsection{July 2026: Final Deployment \& Submission}
+
+\textbf{Goals:}
+\begin{itemize}
+    \item Production deployment
+    \item Documentation complete
+    \item FYP submitted
+\end{itemize}
+
+\textbf{Deliverables:}
+\begin{itemize}
+    \item[$\square$] Live production system
+    \item[$\square$] Complete documentation
+    \item[$\square$] User manual
+    \item[$\square$] Final presentation ready
+    \item[$\square$] FYP report submitted
+\end{itemize}
+
+\textbf{Tasks:}
+\begin{itemize}
+    \item \textbf{Both:} S7 (Documentation), S8 (Deployment), Final report
+\end{itemize}
+
+\subsection{Critical Milestones}
+
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\rowcolor{codebg}
+\textbf{Date} & \textbf{Milestone} & \textbf{Success Criteria} \\ \hline
+Jan 31 & Setup Complete & Zainab can develop independently \\ \hline
+Feb 28 & MVP Ready & Video calls + contact management working \\ \hline
+Mar 31 & ML Integrated & Real sign recognition in calls \\ \hline
+Apr 30 & Feature Complete & All major features implemented \\ \hline
+May 31 & Polish Complete & Responsive, accessible, performant \\ \hline
+Jun 30 & Testing Complete & 80\%+ coverage, bugs fixed \\ \hline
+Jul 15 & Deployment & Live production system \\ \hline
+Jul 31 & FYP Submission & Documentation \& report submitted \\ \hline
+\end{tabularx}
+\end{table}
+
+% ============================================================
+\section{Detailed Task Implementation Guides}
+% ============================================================
+
+\subsection{For Zainab: WebRTC Video Integration (Z1)}
+
+\textbf{Priority:} \priority{Critical} \quad \textbf{Time Estimate:} 2 weeks
+
+\subsubsection{Overview}
+
+Implement peer-to-peer video calling using WebRTC and the existing SignalR hub.
+
+\subsubsection{Prerequisites}
+\begin{itemize}
+    \item SignalR hub is fully implemented (CallHub.cs) ✅
+    \item Frontend has CallSignalingClient service ✅
+    \item simple-peer library can be used
+\end{itemize}
+
+\subsubsection{Step-by-Step Implementation}
+
+\textbf{Step 1: Install Dependencies}
+
+\begin{lstlisting}[language=bash]
+cd ~/SilentTalkFYP/client
+npm install simple-peer @types/simple-peer
+\end{lstlisting}
+
+\textbf{Step 2: Create WebRTC Service}
+
+Create \texttt{src/services/webrtc.service.ts}:
+
+\begin{lstlisting}[language=javascript, caption=webrtc.service.ts (partial)]
+import Peer from 'simple-peer';
+
+export class WebRTCService {
+  private localStream: MediaStream | null = null;
+  private peers: Map<string, Peer.Instance> = new Map();
+
+  async getLocalStream(): Promise<MediaStream> {
+    if (!this.localStream) {
+      this.localStream = await navigator.mediaDevices
+        .getUserMedia({ video: true, audio: true });
+    }
+    return this.localStream;
+  }
+
+  createPeer(userId: string, initiator: boolean): Peer.Instance {
+    const peer = new Peer({ initiator, stream: this.localStream });
+    this.peers.set(userId, peer);
+    return peer;
+  }
+
+  // More methods for sending offers/answers
+}
+\end{lstlisting}
+
+\textbf{Step 3: Update VideoCallPage Component}
+
+Integrate WebRTC with SignalR:
+
+\begin{lstlisting}[language=javascript, caption=VideoCallPage.tsx (partial)]
+const VideoCallPage = () => {
+  const [localStream, setLocalStream] = useState<MediaStream>();
+  const [remoteStreams, setRemoteStreams] = useState<Map>();
+  const signalingClient = useSignalRConnection();
+
+  useEffect(() => {
+    // Get local media
+    webrtcService.getLocalStream().then(setLocalStream);
+
+    // Listen for SignalR events
+    signalingClient.on('userJoined', handleUserJoined);
+    signalingClient.on('receiveOffer', handleOffer);
+    signalingClient.on('receiveAnswer', handleAnswer);
+
+    // Join call
+    signalingClient.joinCall(callId);
+  }, []);
+
+  const handleUserJoined = (userId: string) => {
+    // Create peer and send offer
+    const peer = webrtcService.createPeer(userId, true);
+    peer.on('signal', signal => {
+      signalingClient.sendOffer(userId, signal);
+    });
+  };
+
+  // More handlers...
+};
+\end{lstlisting}
+
+\textbf{Step 4: Test Video Calling}
+
+\begin{enumerate}
+    \item Open two browser windows
+    \item Login as different users
+    \item Start a call
+    \item Verify video/audio streaming
+\end{enumerate}
+
+\subsubsection{Success Criteria}
+\begin{itemize}
+    \item[$\square$] Local video displays in call
+    \item[$\square$] Remote video displays from other user
+    \item[$\square$] Audio works bidirectionally
+    \item[$\square$] Can mute/unmute audio
+    \item[$\square$] Can toggle video on/off
+    \item[$\square$] Call ends gracefully
+\end{itemize}
+
+\subsubsection{Common Issues \& Solutions}
+
+\begin{tcolorbox}[colback=warningorange!10, colframe=warningorange, title=Issue: Camera permission denied]
+\textbf{Solution:} Add HTTPS in development or use localhost exception. Check browser console for permission errors.
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=warningorange!10, colframe=warningorange, title=Issue: SignalR disconnects]
+\textbf{Solution:} Implement reconnection logic in CallSignalingClient. The backend hub already supports ReconnectToCall().
+\end{tcolorbox}
+
+\subsection{For Zainab: Call History Page (Z2)}
+
+\textbf{Priority:} \priority{High} \quad \textbf{Time Estimate:} 3 days
+
+\subsubsection{Backend API (Already Ready!)}
+
+The CallController has these endpoints ready:
+
+\begin{lstlisting}[language=bash]
+GET /api/call/history?page=1&pageSize=20&status=Ended
+GET /api/call/statistics
+\end{lstlisting}
+
+\subsubsection{Implementation Steps}
+
+\textbf{Step 1: Create Call History Service}
+
+\begin{lstlisting}[language=javascript, caption=src/services/callHistory.service.ts]
+import axios from 'axios';
+
+export interface CallHistoryItem {
+  callId: string;
+  initiatorName: string;
+  startTime: string;
+  endTime: string;
+  duration: number; // minutes
+  status: 'Ended' | 'Cancelled';
+  recordingUrl?: string;
+}
+
+export const callHistoryService = {
+  async getHistory(page = 1, pageSize = 20) {
+    const response = await axios.get('/api/call/history', {
+      params: { page, pageSize }
+    });
+    return response.data;
+  },
+
+  async getStatistics() {
+    const response = await axios.get('/api/call/statistics');
+    return response.data;
+  }
+};
+\end{lstlisting}
+
+\textbf{Step 2: Update CallHistoryPage Component}
+
+\begin{lstlisting}[language=javascript, caption=src/pages/CallHistoryPage.tsx (partial)]
+const CallHistoryPage = () => {
+  const [calls, setCalls] = useState<CallHistoryItem[]>([]);
+  const [stats, setStats] = useState(null);
+  const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    loadHistory();
+    loadStats();
+  }, [page]);
+
+  const loadHistory = async () => {
+    const data = await callHistoryService.getHistory(page);
+    setCalls(data.items);
+  };
+
+  return (
+    <div className="call-history">
+      <h1>Call History</h1>
+      <CallStatistics stats={stats} />
+      <CallList calls={calls} />
+      <Pagination page={page} onPageChange={setPage} />
+    </div>
+  );
+};
+\end{lstlisting}
+
+\textbf{Step 3: Test}
+
+\begin{enumerate}
+    \item Make a few test calls
+    \item End the calls
+    \item Navigate to Call History page
+    \item Verify calls are listed with correct details
+\end{enumerate}
+
+\subsubsection{Success Criteria}
+\begin{itemize}
+    \item[$\square$] Call history loads from backend
+    \item[$\square$] Pagination works
+    \item[$\square$] Statistics display (total calls, duration)
+    \item[$\square$] Can click to view call details
+    \item[$\square$] Recording download link works (if available)
+\end{itemize}
+
+\subsection{For Yasser: Contact Management Backend (Y1)}
+
+\textbf{Priority:} \priority{High} \quad \textbf{Time Estimate:} 1 week
+
+\subsubsection{Overview}
+
+Implement backend API for contact/friend management. The Contact entity already exists.
+
+\subsubsection{Implementation Steps}
+
+\textbf{Step 1: Create ContactController}
+
+Create \texttt{server/src/SilentTalk.Api/Controllers/ContactController.cs}:
+
+\begin{lstlisting}[language=csharp, caption=ContactController.cs (partial)]
+[ApiController]
+[Route("api/[controller]")]
+[Authorize]
+public class ContactController : ControllerBase
+{
+    private readonly ApplicationDbContext _context;
+
+    [HttpGet]
+    public async Task<IActionResult> GetContacts()
+    {
+        var userId = User.GetUserId();
+        var contacts = await _context.Contacts
+            .Where(c => c.UserId == userId &&
+                        c.Status == ContactStatus.Accepted)
+            .Include(c => c.ContactUser)
+            .ToListAsync();
+
+        return Ok(contacts);
+    }
+
+    [HttpPost("request")]
+    public async Task<IActionResult> SendContactRequest(
+        [FromBody] ContactRequestDto dto)
+    {
+        // Create contact with Pending status
+        // Send notification to other user
+    }
+
+    [HttpPost("{contactId}/accept")]
+    public async Task<IActionResult> AcceptRequest(Guid contactId)
+    {
+        // Update status to Accepted
+    }
+
+    [HttpPost("{contactId}/block")]
+    public async Task<IActionResult> BlockContact(Guid contactId)
+    {
+        // Update status to Blocked
+    }
+}
+\end{lstlisting}
+
+\textbf{Step 2: Add DTOs}
+
+\begin{lstlisting}[language=csharp, caption=DTOs]
+public class ContactRequestDto
+{
+    public string Email { get; set; } // or UserId
+}
+
+public class ContactDto
+{
+    public Guid ContactId { get; set; }
+    public string DisplayName { get; set; }
+    public string Email { get; set; }
+    public string ProfileImageUrl { get; set; }
+    public ContactStatus Status { get; set; }
+    public bool IsOnline { get; set; }
+}
+\end{lstlisting}
+
+\textbf{Step 3: Test Endpoints}
+
+Use Swagger or curl:
+
+\begin{lstlisting}[language=bash]
+# Get contacts
+curl -H "Authorization: Bearer <token>" \
+  http://localhost:5000/api/contact
+
+# Send request
+curl -X POST \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"friend@example.com"}' \
+  http://localhost:5000/api/contact/request
+\end{lstlisting}
+
+\subsubsection{Success Criteria}
+\begin{itemize}
+    \item[$\square$] Can send contact request
+    \item[$\square$] Can accept/reject requests
+    \item[$\square$] Can block contacts
+    \item[$\square$] Can get list of contacts
+    \item[$\square$] Online status updated via SignalR
+    \item[$\square$] Unit tests written
+\end{itemize}
+
+\subsection{For Both: End-to-End Testing (S2)}
+
+\textbf{Priority:} \priority{High} \quad \textbf{Time Estimate:} 2 weeks
+
+\subsubsection{Tools}
+\begin{itemize}
+    \item \textbf{Frontend:} Playwright or Cypress
+    \item \textbf{Backend:} xUnit integration tests
+\end{itemize}
+
+\subsubsection{Critical User Flows to Test}
+
+\begin{enumerate}
+    \item \textbf{Authentication Flow}
+    \begin{itemize}
+        \item Register → Email verification → Login → Access protected page
+    \end{itemize}
+
+    \item \textbf{Video Call Flow}
+    \begin{itemize}
+        \item Login → Schedule call → Join call → Video/audio working → End call
+    \end{itemize}
+
+    \item \textbf{Contact Management Flow}
+    \begin{itemize}
+        \item Login → Add contact → Accept request → Start call with contact
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection{Implementation Example (Playwright)}
+
+\begin{lstlisting}[language=javascript, caption=tests/e2e/auth.spec.ts]
+import { test, expect } from '@playwright/test';
+
+test('user can register and login', async ({ page }) => {
+  // Register
+  await page.goto('http://localhost:3000/register');
+  await page.fill('[name="email"]', 'test@example.com');
+  await page.fill('[name="password"]', 'Test123!');
+  await page.fill('[name="confirmPassword"]', 'Test123!');
+  await page.fill('[name="displayName"]', 'Test User');
+  await page.click('button[type="submit"]');
+
+  // Verify redirect to login
+  await expect(page).toHaveURL('/login');
+
+  // Login
+  await page.fill('[name="email"]', 'test@example.com');
+  await page.fill('[name="password"]', 'Test123!');
+  await page.click('button[type="submit"]');
+
+  // Verify redirect to home
+  await expect(page).toHaveURL('/');
+  await expect(page.locator('text=Test User')).toBeVisible();
+});
+\end{lstlisting}
+
+% ============================================================
+\section{Collaboration Workflow}
+% ============================================================
+
+\subsection{Weekly Meeting Structure}
+
+\subsubsection{Monday Planning Meeting (30 minutes)}
+
+\textbf{Agenda:}
+\begin{enumerate}
+    \item Review previous week's accomplishments
+    \item Discuss blockers and dependencies
+    \item Plan current week's tasks
+    \item Assign priorities
+\end{enumerate}
+
+\textbf{Format:}
+\begin{itemize}
+    \item Each person shares: What I did, what I'm doing, blockers
+    \item Update task board (Trello/Notion/GitHub Projects)
+    \item Set 3-5 key goals for the week
+\end{itemize}
+
+\subsubsection{Wednesday Quick Sync (15 minutes)}
+
+\textbf{Agenda:}
+\begin{itemize}
+    \item Progress check
+    \item Any blockers?
+    \item Any help needed?
+\end{itemize}
+
+\subsubsection{Friday Review (30 minutes)}
+
+\textbf{Agenda:}
+\begin{enumerate}
+    \item Demo completed features
+    \item Review code quality
+    \item Discuss learnings
+    \item Preview next week
+\end{enumerate}
+
+\subsection{Git Workflow}
+
+\subsubsection{Branch Naming Convention}
+
+\begin{lstlisting}[language=bash]
+# Feature branches
+feature/z1-webrtc-integration
+feature/y1-contact-backend
+
+# Bug fixes
+fix/login-validation-error
+fix/video-stream-freeze
+
+# Improvements
+improve/responsive-navbar
+improve/api-performance
+\end{lstlisting}
+
+\subsubsection{Development Workflow}
+
+\textbf{Step 1: Create Feature Branch}
+\begin{lstlisting}[language=bash]
+# Always branch from main
+git checkout main
+git pull origin main
+
+# Create feature branch
+git checkout -b feature/z2-call-history
+\end{lstlisting}
+
+\textbf{Step 2: Develop \& Commit}
+\begin{lstlisting}[language=bash]
+# Make changes
+# ...
+
+# Stage and commit
+git add .
+git commit -m "feat: add call history page with pagination"
+
+# Follow conventional commits:
+# feat: new feature
+# fix: bug fix
+# docs: documentation
+# style: formatting
+# refactor: code restructuring
+# test: adding tests
+# chore: maintenance
+\end{lstlisting}
+
+\textbf{Step 3: Push \& Create PR}
+\begin{lstlisting}[language=bash]
+# Push to remote
+git push origin feature/z2-call-history
+
+# Create Pull Request on GitHub
+# - Add description
+# - Link related issues
+# - Request review from partner
+\end{lstlisting}
+
+\textbf{Step 4: Code Review}
+\begin{itemize}
+    \item Partner reviews within 24 hours
+    \item Address feedback
+    \item Merge when approved
+\end{itemize}
+
+\subsubsection{Pull Request Template}
+
+\begin{lstlisting}[language=markdown]
+## Description
+Brief description of changes
+
+## Type of Change
+- [ ] New feature
+- [ ] Bug fix
+- [ ] Breaking change
+- [ ] Documentation update
+
+## Testing Done
+- [ ] Unit tests added/updated
+- [ ] Manually tested locally
+- [ ] Tested with other features
+
+## Screenshots (if UI change)
+[Add screenshots]
+
+## Checklist
+- [ ] Code follows style guidelines
+- [ ] Self-review completed
+- [ ] Comments added for complex code
+- [ ] No console.log() left in code
+- [ ] Documentation updated
+\end{lstlisting}
+
+\subsection{Code Review Guidelines}
+
+\subsubsection{What to Look For}
+
+\begin{enumerate}
+    \item \textbf{Functionality:} Does it work as intended?
+    \item \textbf{Code Quality:} Clean, readable, maintainable?
+    \item \textbf{Best Practices:} Follows conventions?
+    \item \textbf{Performance:} Any optimization issues?
+    \item \textbf{Security:} No vulnerabilities?
+    \item \textbf{Testing:} Adequate test coverage?
+\end{enumerate}
+
+\subsubsection{Review Comments Guidelines}
+
+\begin{itemize}
+    \item Be constructive, not critical
+    \item Explain the "why" behind suggestions
+    \item Use prefixes:
+    \begin{itemize}
+        \item \textit{NIT:} Minor nitpick (optional)
+        \item \textit{Q:} Question for clarification
+        \item \textit{BLOCKER:} Must fix before merge
+        \item \textit{SUGGESTION:} Consider this approach
+    \end{itemize}
+    \item Praise good code!
+\end{itemize}
+
+\subsection{Communication Best Practices}
+
+\subsubsection{Daily Updates (Async)}
+
+Use WhatsApp/Slack for quick updates:
+
+\begin{tcolorbox}[colback=secondarygreen!10, colframe=secondarygreen, title=Example Daily Update]
+\textbf{Today's Progress:}\\
+✅ Completed call history page\\
+✅ Connected to backend API\\
+🚧 Working on pagination component\\
+\\
+\textbf{Tomorrow:}\\
+🎯 Finish pagination\\
+🎯 Start profile page integration\\
+\\
+\textbf{Blockers:}\\
+None
+\end{tcolorbox}
+
+\subsubsection{Asking for Help}
+
+When stuck, provide context:
+
+\begin{tcolorbox}[colback=warningorange!10, colframe=warningorange, title=Good Help Request]
+\textbf{Problem:} SignalR connection keeps dropping during video calls\\
+\\
+\textbf{What I tried:}
+\begin{itemize}
+    \item Checked network tab - seeing 101 switching protocols
+    \item Added reconnection logic
+    \item Still disconnects after ~2 minutes
+\end{itemize}
+\textbf{Error:} [paste error message]\\
+\\
+\textbf{Question:} Is there a timeout setting in the backend hub?
+\end{tcolorbox}
+
+\subsection{Task Management}
+
+\subsubsection{Recommended Tool: GitHub Projects}
+
+Create a project board with columns:
+\begin{itemize}
+    \item \textbf{Backlog} - All tasks
+    \item \textbf{Todo} - Planned for current sprint
+    \item \textbf{In Progress} - Currently working on
+    \item \textbf{Review} - Awaiting code review
+    \item \textbf{Done} - Completed and merged
+\end{itemize}
+
+\subsubsection{Sprint Structure (2-week sprints)}
+
+\begin{enumerate}
+    \item \textbf{Sprint Planning} (Monday Week 1)
+    \begin{itemize}
+        \item Select tasks from backlog
+        \item Assign to team members
+        \item Estimate time
+    \end{itemize}
+
+    \item \textbf{Daily Work} (async updates)
+    \item \textbf{Mid-Sprint Check} (Wednesday Week 1)
+    \item \textbf{Sprint Review} (Friday Week 2)
+    \begin{itemize}
+        \item Demo completed features
+        \item Move unfinished tasks to next sprint
+    \end{itemize}
+\end{enumerate}
+
+% ============================================================
+\section{Technical Reference}
+% ============================================================
+
+\subsection{Backend API Endpoints}
+
+\subsubsection{Authentication Endpoints}
+
+\begin{longtable}{|p{2cm}|p{5cm}|p{5cm}|}
+\hline
+\rowcolor{codebg}
+\textbf{Method} & \textbf{Endpoint} & \textbf{Description} \\ \hline
+\endfirsthead
+\hline
+\rowcolor{codebg}
+\textbf{Method} & \textbf{Endpoint} & \textbf{Description} \\ \hline
+\endhead
+
+POST & /api/auth/register & Register new user \\ \hline
+POST & /api/auth/login & Login and get JWT token \\ \hline
+POST & /api/auth/logout & Invalidate refresh token \\ \hline
+POST & /api/auth/refresh & Refresh access token \\ \hline
+GET & /api/auth/verify-email & Verify email with token \\ \hline
+POST & /api/auth/forgot-password & Request password reset \\ \hline
+POST & /api/auth/reset-password & Reset password with token \\ \hline
+GET & /api/auth/me & Get current user info \\ \hline
+\caption{Auth Endpoints}
+\end{longtable}
+
+\subsubsection{Call Management Endpoints}
+
+\begin{longtable}{|p{2cm}|p{5cm}|p{5cm}|}
+\hline
+\rowcolor{codebg}
+\textbf{Method} & \textbf{Endpoint} & \textbf{Description} \\ \hline
+\endfirsthead
+\hline
+\rowcolor{codebg}
+\textbf{Method} & \textbf{Endpoint} & \textbf{Description} \\ \hline
+\endhead
+
+POST & /api/call/schedule & Schedule a call \\ \hline
+POST & /api/call/start & Start instant call \\ \hline
+GET & /api/call/\{id\} & Get call details \\ \hline
+POST & /api/call/\{id\}/end & End call \\ \hline
+GET & /api/call/history & Get call history (paginated) \\ \hline
+GET & /api/call/statistics & Get user call statistics \\ \hline
+POST & /api/call/\{id\}/recording & Upload recording \\ \hline
+GET & /api/call/\{id\}/recording & Download recording URL \\ \hline
+\caption{Call Endpoints}
+\end{longtable}
+
+\subsection{SignalR Hub Methods}
+
+\subsubsection{CallHub Events}
+
+\begin{longtable}{|p{4cm}|p{8cm}|}
+\hline
+\rowcolor{codebg}
+\textbf{Method} & \textbf{Description} \\ \hline
+\endfirsthead
+\hline
+\rowcolor{codebg}
+\textbf{Method} & \textbf{Description} \\ \hline
+\endhead
+
+JoinCall(callId) & Join a call room \\ \hline
+LeaveCall(callId) & Leave call room \\ \hline
+SendOffer(userId, offer) & Send WebRTC offer \\ \hline
+SendAnswer(userId, answer) & Send WebRTC answer \\ \hline
+SendIceCandidate(userId, candidate) & Send ICE candidate \\ \hline
+UpdateMediaState(audio, video) & Toggle audio/video \\ \hline
+SendChatMessage(callId, message) & Send in-call chat \\ \hline
+StartScreenshare() & Start screen sharing \\ \hline
+StartRecording() & Start call recording \\ \hline
+\caption{SignalR Hub Methods}
+\end{longtable}
+
+\subsection{Essential Commands Reference}
+
+\subsubsection{Docker Commands}
+
+\begin{lstlisting}[language=bash]
+# Start application
+cd ~/SilentTalkFYP
+./start.sh
+
+# Stop application
+./stop.sh
+
+# View logs
+cd infrastructure/docker
+docker-compose logs -f server      # Backend
+docker-compose logs -f client      # Frontend
+docker-compose logs -f ml-service  # ML service
+
+# Restart specific service
+docker-compose restart server
+
+# Rebuild after code changes
+docker-compose up -d --build server
+
+# Check running containers
+docker ps
+
+# Check service health
+curl http://localhost:5000/health
+curl http://localhost:8000/status
+\end{lstlisting}
+
+\subsubsection{Frontend Development Commands}
+
+\begin{lstlisting}[language=bash]
+cd ~/SilentTalkFYP/client
+
+# Install dependencies
+npm install
+
+# Start dev server (if not using Docker)
+npm run dev
+
+# Build for production
+npm run build
+
+# Run tests
+npm test
+
+# Run linter
+npm run lint
+
+# Format code
+npm run format
+\end{lstlisting}
+
+\subsubsection{Backend Development Commands}
+
+\begin{lstlisting}[language=bash]
+cd ~/SilentTalkFYP/server
+
+# Build solution
+dotnet build
+
+# Run API (if not using Docker)
+dotnet run --project src/SilentTalk.Api
+
+# Run tests
+dotnet test
+
+# Create migration
+dotnet ef migrations add MigrationName \
+  --project src/SilentTalk.Infrastructure
+
+# Update database
+dotnet ef database update \
+  --project src/SilentTalk.Api
+\end{lstlisting}
+
+\subsection{Common Issues \& Solutions}
+
+\subsubsection{Frontend Issues}
+
+\begin{tcolorbox}[colback=dangerred!10, colframe=dangerred, title=Issue: CORS error when calling API]
+\textbf{Symptom:} Browser console shows "CORS policy blocked"\\
+\\
+\textbf{Solution:}
+\begin{enumerate}
+    \item Verify backend CORS is configured in Program.cs
+    \item Check VITE\_API\_URL is correct (\url{http://localhost:5000})
+    \item Ensure backend container is running
+    \item Check Network tab for actual URL being called
+\end{enumerate}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=dangerred!10, colframe=dangerred, title=Issue: SignalR connection fails]
+\textbf{Symptom:} "Failed to start the connection"\\
+\\
+\textbf{Solution:}
+\begin{itemize}
+    \item Check VITE\_WS\_URL is correct (ws://localhost:5000)
+    \item Verify backend SignalR hub is running
+    \item Check browser console for detailed error
+    \item Ensure JWT token is included in connection
+\end{itemize}
+\end{tcolorbox}
+
+\subsubsection{Backend Issues}
+
+\begin{tcolorbox}[colback=dangerred!10, colframe=dangerred, title=Issue: Database connection fails]
+\textbf{Symptom:} API throws connection timeout\\
+\\
+\textbf{Solution:}
+\begin{enumerate}
+    \item Check PostgreSQL container is running: \texttt{docker ps}
+    \item Verify connection string in appsettings.json
+    \item Check database is initialized: \texttt{docker exec -it silents-talk-postgres psql -U silentstalk}
+    \item Run migrations: \texttt{dotnet ef database update}
+\end{enumerate}
+\end{tcolorbox}
+
+\subsection{Performance Optimization Tips}
+
+\subsubsection{Frontend Optimization}
+
+\begin{enumerate}
+    \item \textbf{Code Splitting}
+    \begin{lstlisting}[language=javascript]
+// Lazy load pages
+const VideoCallPage = lazy(() =>
+  import('./pages/VideoCallPage')
+);
+    \end{lstlisting}
+
+    \item \textbf{Memoization}
+    \begin{lstlisting}[language=javascript]
+// Prevent unnecessary re-renders
+const MemoizedComponent = React.memo(MyComponent);
+    \end{lstlisting}
+
+    \item \textbf{Image Optimization}
+    \begin{itemize}
+        \item Use WebP format
+        \item Lazy load images
+        \item Use appropriate sizes
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection{Backend Optimization}
+
+\begin{enumerate}
+    \item \textbf{Database Queries}
+    \begin{itemize}
+        \item Use Select() to project only needed fields
+        \item Add indexes on frequently queried columns
+        \item Use AsNoTracking() for read-only queries
+    \end{itemize}
+
+    \item \textbf{Caching}
+    \begin{lstlisting}[language=csharp]
+// Cache frequently accessed data
+var cachedData = await _cache.GetOrCreateAsync(
+    key: "user:profile:123",
+    factory: async () => await GetUserProfile(123),
+    expiration: TimeSpan.FromMinutes(5)
+);
+    \end{lstlisting}
+\end{enumerate}
+
+% ============================================================
+\section{Quality Assurance Checklist}
+% ============================================================
+
+\subsection{Before Each Pull Request}
+
+\begin{itemize}
+    \item[$\square$] Code builds without errors
+    \item[$\square$] All tests pass
+    \item[$\square$] No console.log() or debugger statements
+    \item[$\square$] Code follows style guide
+    \item[$\square$] Comments added for complex logic
+    \item[$\square$] No hardcoded credentials or secrets
+    \item[$\square$] Responsive design tested (mobile/tablet/desktop)
+    \item[$\square$] Browser compatibility checked
+    \item[$\square$] Accessibility checked (keyboard navigation, screen reader)
+\end{itemize}
+
+\subsection{Before Each Demo/Milestone}
+
+\begin{itemize}
+    \item[$\square$] All features working end-to-end
+    \item[$\square$] No critical bugs
+    \item[$\square$] Performance acceptable (<2s page load)
+    \item[$\square$] Data persists across restarts
+    \item[$\square$] Error handling graceful
+    \item[$\square$] Documentation updated
+    \item[$\square$] Demo script prepared
+\end{itemize}
+
+\subsection{Final Submission Checklist}
+
+\begin{itemize}
+    \item[$\square$] All features from requirements implemented
+    \item[$\square$] ML model accuracy ≥85\%
+    \item[$\square$] Video calling works reliably
+    \item[$\square$] Accessibility compliance (WCAG 2.1 AA)
+    \item[$\square$] Security audit passed
+    \item[$\square$] Performance benchmarks met
+    \item[$\square$] Code test coverage ≥80\%
+    \item[$\square$] User documentation complete
+    \item[$\square$] Admin documentation complete
+    \item[$\square$] Deployment guide written
+    \item[$\square$] Final report submitted
+\end{itemize}
+
+% ============================================================
+\section{Conclusion \& Final Notes}
+% ============================================================
+
+\subsection{Keys to Success}
+
+\begin{enumerate}
+    \item \textbf{Communication is Critical}
+    \begin{itemize}
+        \item Daily async updates
+        \item Weekly sync meetings
+        \item Ask questions early
+        \item Share blockers immediately
+    \end{itemize}
+
+    \item \textbf{Stay Organized}
+    \begin{itemize}
+        \item Use task board (GitHub Projects)
+        \item Follow Git workflow
+        \item Document decisions
+        \item Track time estimates
+    \end{itemize}
+
+    \item \textbf{Quality Over Speed}
+    \begin{itemize}
+        \item Write tests
+        \item Review code thoroughly
+        \item Refactor when needed
+        \item Don't skip documentation
+    \end{itemize}
+
+    \item \textbf{Support Each Other}
+    \begin{itemize}
+        \item Help when partner is stuck
+        \item Share learnings
+        \item Celebrate small wins
+        \item Be patient and respectful
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Emergency Contacts}
+
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\rowcolor{codebg}
+\textbf{Person} & \textbf{Contact} \\ \hline
+Yasser & [Email/Phone] \\ \hline
+Zainab & [Email/Phone] \\ \hline
+FYP Supervisor & [Email] \\ \hline
+\end{tabularx}
+\end{table}
+
+\subsection{Resources}
+
+\begin{itemize}
+    \item \textbf{Documentation Folder:} \texttt{/docs} in repository
+    \item \textbf{Project Status:} \texttt{PROJECT\_STATUS.md}
+    \item \textbf{API Docs:} \url{http://localhost:5000/docs} (when running)
+    \item \textbf{Quick Start:} \texttt{QUICK\_START.md}
+\end{itemize}
+
+\subsection{Acknowledgments}
+
+This project represents months of hard work and dedication. By following this collaboration guide, maintaining clear communication, and supporting each other, you will successfully deliver a high-quality Final Year Project that makes a real difference in the deaf and hard-of-hearing community.
+
+\vspace{1cm}
+
+\textit{Good luck, and happy coding! 🚀}
+
+\vspace{1cm}
+
+\begin{center}
+\textbf{Version 1.0 - January 2026}\\
+\textit{Last Updated: \today}
+\end{center}
+
+\end{document}
