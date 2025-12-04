@@ -25,8 +25,8 @@ import {
   User,
 } from '../types/auth'
 
-// Force the correct API URL - environment variable wasn't being picked up
-const API_BASE_URL = 'http://localhost:5000/api'
+// Use relative URL - Vite proxy will forward to backend
+const API_BASE_URL = '/api'
 
 // Simulated delay for mock API calls
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
@@ -85,8 +85,7 @@ export async function register(data: RegisterRequest): Promise<RegisterResponse>
  */
 export async function login(data: LoginRequest): Promise<LoginResponse> {
   try {
-    // Hardcoded URL to bypass any caching issues
-    const response = await fetch('http://localhost:5000/api/auth/login', {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

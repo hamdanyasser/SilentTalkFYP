@@ -16,6 +16,17 @@ export default defineConfig({
     watch: {
       usePolling: true,
     },
+    proxy: {
+      '/api': {
+        target: 'http://server:5000',
+        changeOrigin: true,
+      },
+      '/hubs': {
+        target: 'http://server:5000',
+        changeOrigin: true,
+        ws: true,
+      },
+    },
   },
   preview: {
     host: '0.0.0.0',

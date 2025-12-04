@@ -8,7 +8,8 @@
 import * as signalR from '@microsoft/signalr'
 import { PresenceUpdate, UserStatus } from '../types/contacts'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+// Use empty string for relative URLs - Vite proxy will forward to backend
+const API_BASE_URL = ''
 
 type PresenceCallback = (update: PresenceUpdate) => void
 type ContactAddedCallback = (contact: unknown) => void
