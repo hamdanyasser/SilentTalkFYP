@@ -5,6 +5,11 @@ echo "============================================"
 echo "SilentTalk Server - Starting..."
 echo "============================================"
 
+# Clean up any stale build artifacts to prevent "Text file busy" errors
+echo "🧹 Cleaning up stale build artifacts..."
+rm -rf /app/src/SilentTalk.Api/bin/Debug/net8.0/SilentTalk.Api 2>/dev/null || true
+rm -rf /app/src/SilentTalk.Api/obj/Debug/net8.0/apphost 2>/dev/null || true
+
 # Navigate to the project directory
 cd /app/src/SilentTalk.Api
 
@@ -59,6 +64,4 @@ echo "============================================"
 # Start the Application
 # ============================================
 echo "🚀 Starting application..."
-# Clean up any stale build artifacts to prevent "Text file busy" errors
-rm -f /app/src/SilentTalk.Api/bin/Debug/net8.0/SilentTalk.Api 2>/dev/null || true
 exec dotnet run --project SilentTalk.Api.csproj --no-launch-profile
