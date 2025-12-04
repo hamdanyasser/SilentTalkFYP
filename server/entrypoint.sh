@@ -59,4 +59,6 @@ echo "============================================"
 # Start the Application
 # ============================================
 echo "🚀 Starting application..."
-exec dotnet watch run --project SilentTalk.Api.csproj --no-launch-profile
+# Clean up any stale build artifacts to prevent "Text file busy" errors
+rm -f /app/src/SilentTalk.Api/bin/Debug/net8.0/SilentTalk.Api 2>/dev/null || true
+exec dotnet run --project SilentTalk.Api.csproj --no-launch-profile
