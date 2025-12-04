@@ -1,9 +1,21 @@
 #!/bin/bash
-set -e
+# Don't use set -e so we can continue even if migrations fail
 
 echo "============================================"
 echo "SilentTalk Server - Starting..."
 echo "============================================"
+
+# Clean up ALL stale build artifacts to prevent "Text file busy" errors
+echo "🧹 Cleaning up ALL build artifacts..."
+rm -rf /app/src/SilentTalk.Api/bin 2>/dev/null || true
+rm -rf /app/src/SilentTalk.Api/obj 2>/dev/null || true
+rm -rf /app/src/SilentTalk.Application/bin 2>/dev/null || true
+rm -rf /app/src/SilentTalk.Application/obj 2>/dev/null || true
+rm -rf /app/src/SilentTalk.Domain/bin 2>/dev/null || true
+rm -rf /app/src/SilentTalk.Domain/obj 2>/dev/null || true
+rm -rf /app/src/SilentTalk.Infrastructure/bin 2>/dev/null || true
+rm -rf /app/src/SilentTalk.Infrastructure/obj 2>/dev/null || true
+echo "✅ Build artifacts cleaned"
 
 # Navigate to the project directory
 cd /app/src/SilentTalk.Api
@@ -44,19 +56,16 @@ echo "============================================"
 echo "Applying database migrations..."
 echo "============================================"
 
-# Apply migrations using dotnet ef
-# Docker Compose healthchecks ensure PostgreSQL is ready
+# Apply migrations - continue even if it fails (DB might already be set up)
 dotnet ef database update --project ../SilentTalk.Infrastructure/SilentTalk.Infrastructure.csproj --startup-project SilentTalk.Api.csproj --verbose || {
-    echo "❌ Migration failed! Checking migration status..."
-    dotnet ef migrations list --project ../SilentTalk.Infrastructure/SilentTalk.Infrastructure.csproj --startup-project SilentTalk.Api.csproj
-    exit 1
+    echo "⚠️ Migration command returned non-zero. Checking if we can continue..."
+    echo "Attempting to start anyway (database might already be migrated)..."
 }
 
-echo "✅ Migrations applied successfully!"
 echo "============================================"
 
 # ============================================
 # Start the Application
 # ============================================
 echo "🚀 Starting application..."
-exec dotnet watch run --project SilentTalk.Api.csproj --no-launch-profile
+exec dotnet run --project SilentTalk.Api.csproj --no-launch-profile

@@ -25,7 +25,8 @@ import {
   User,
 } from '../types/auth'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+// Use relative URL - Vite proxy will forward to backend
+const API_BASE_URL = '/api'
 
 // Simulated delay for mock API calls
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))

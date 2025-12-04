@@ -315,7 +315,7 @@ services:
     restart: unless-stopped
     environment:
       - NODE_ENV=development
-      - VITE_API_URL=http://localhost:5000
+      - VITE_API_URL=http://localhost:5000/api
       - VITE_WS_URL=ws://localhost:5000
       - VITE_ML_SERVICE_URL=http://localhost:8000
       - VITE_TURN_SERVER=turn:localhost:3478
